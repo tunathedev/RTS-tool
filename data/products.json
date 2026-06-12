@@ -1,0 +1,733 @@
+{
+  "title": "RTS Shelf Life Quick Sheet",
+  "source": "READY TO EAT ITEM SHELF LIFE DATES",
+  "note": "ALL RTE ITEMS MUST BE DATED IMMEDIATELY once taken out of the freezer",
+  "lastUpdated": "2026-03-31",
+  "categories": [
+    {
+      "category": "Babka",
+      "items": [
+        {
+          "name": "Molly's Babka Chocolate or Cinnamon",
+          "days": 21,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Biscotti",
+      "items": [
+        {
+          "name": "Biscotti",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Bread/Buns",
+      "items": [
+        {
+          "name": "Cristal Bread Slices and Bagel Buns",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "H-E-B Brioche Bread",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "EuroPastry Flavored Brioche",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Baked Challah Bread (Miami Onion Roll)",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "Aloha and Brioche Hams and Hots",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Izzio Bread - Focaccia,Ciabatta, SF sourdough, Roasted Garlic",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Red Fruit King Bread",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Filled King Cakes",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "EuroPastry Irish Soda Bread",
+          "days": 2,
+          "pkgDate": false
+        },
+        {
+          "name": "Cartozzo's Mini King Cake",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Gambino's King Cake",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "Crown Bakeries - Hot Cross Buns",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "King Cake Traditional",
+          "days": 6,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Bunuelo",
+      "items": [
+        {
+          "name": "My Nana Bunuelo Chips & Rounds",
+          "days": 30,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Cakes",
+      "items": [
+        {
+          "name": "Chalet Cake Pops - Current Program",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Honey Cake",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "4\" Tiramisu & Limoncello Bowls",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Amore Cake Frozen",
+          "days": 35,
+          "pkgDate": false
+        },
+        {
+          "name": "Angel Food Bars/Dessert Shells/Lady Fingers",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Angel Food Cakes SUGAR FREE",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Bundt Cakes 7-Up, Mississippi, Louisiana Crunch, Big Red",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Bundt Cakes Café Valley Lemon & Triple Chocolate",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Cake Pops (everyday white, chocolate, & holiday)",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Coffee Cakes Strips",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Crème Cake Bites (Cinn, Lemon, 7-up, Red Velvet, Pumpkin)",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Crème Cakes 36oz. SAB",
+          "days": 6,
+          "pkgDate": false
+        },
+        {
+          "name": "Pumpkin Nut Crème Cake",
+          "days": 6,
+          "pkgDate": false
+        },
+        {
+          "name": "Guzel Cakes",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Sliced Loaf Cakes",
+          "days": 6,
+          "pkgDate": false
+        },
+        {
+          "name": "Cake Walk Cake Pops - New upcoming",
+          "days": 10,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Candy",
+      "items": [
+        {
+          "name": "Palmer Candy (assorted varieties)",
+          "days": 180,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Cheesecakes",
+      "items": [
+        {
+          "name": "Father's Table Cheesecake (freezer)",
+          "days": 35,
+          "pkgDate": false
+        },
+        {
+          "name": "Father's Table Cheesecakes & Slices (refrigeration)",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Cotton Blues Slices (freezer)",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Cotton Blues Slices (refrigeration)",
+          "days": 3,
+          "pkgDate": false
+        },
+        {
+          "name": "HEB Cheesecakes (refrigeration)",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Chuckanut Bay Heart White Raspberry Cheesecake",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Chuckanut Bay Heart Chocolate Truffle Cheesecake",
+          "days": 21,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Cookies",
+      "items": [
+        {
+          "name": "5 dozen Fancy Assortment cookies",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Alyssa's Cookies (Oatmeal & Vegan)",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Cookie Crush cookies",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Cookies in Tub (decorated Bakemex)",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Yatab Mandazi African Beignets",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Danish Nut Horn cookies",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Decorating Cookie Kits",
+          "days": 90,
+          "pkgDate": false
+        },
+        {
+          "name": "Ginger Chewies/Snickerdoodles",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Lilly's Black & White Cookies, Linzer Cookies",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Lofthouse Cookies (frosted seasonal & everyday)",
+          "days": 28,
+          "pkgDate": false
+        },
+        {
+          "name": "Madeleines (assorted flavors)",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Red & Green Stars cookies",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Sweet Middle Cookies",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "HEB Chocolate Chip Cookie Snack Packs",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "DVS Cookies",
+          "days": 28,
+          "pkgDate": false
+        },
+        {
+          "name": "BetterBites Do Bites",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Bakery Fresh Brookie 4ct",
+          "days": 12,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Croissants",
+      "items": [
+        {
+          "name": "Cocktail Croissants Café Valley",
+          "days": 7,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Cupcakes",
+      "items": [
+        {
+          "name": "LaBree's Mini Cucakes",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "LaBree's Large Pumpkin",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Mini Cupcakes (white, chocolate, red velvet, holiday)",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Better Bites Cupcakes",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Kimberley's Cupcakes",
+          "days": 21,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Danish/Donuts/Elcairs",
+      "items": [
+        {
+          "name": "Donut Holes (Powdered, Sourcream and Devils Food)",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "Donut Holes (Glazed Yeast)",
+          "days": 2,
+          "pkgDate": false
+        },
+        {
+          "name": "CLYDE'S 12CT YEAST RAISED GLZED DONUTS",
+          "days": 2,
+          "pkgDate": false
+        },
+        {
+          "name": "RICH'S 12CT YEAST RAISED GLZED DONUTS",
+          "days": 3,
+          "pkgDate": false
+        },
+        {
+          "name": "Mini Assorted/Cheese Danish",
+          "days": 7,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Energy Bars",
+      "items": [
+        {
+          "name": "Sunrise Energy Bars",
+          "days": 45,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Garlic Sticks/Butter",
+      "items": [
+        {
+          "name": "Better Butters",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Garlic Butter",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Gluten Free Items",
+      "items": [
+        {
+          "name": "Gluten Free Cakerie (FROZEN)",
+          "days": 35,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free Cakerie",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free Brownies",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free BSBH Bread & Rolls",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free Gillian's Mini Cupcakes",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free Mini Muffins Abe's",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Gluten Free Muffins Abe's 4ct",
+          "days": 7,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Granola",
+      "items": [
+        {
+          "name": "Granola RTS",
+          "days": 30,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Ice Cream Cakes/Cupcakes",
+      "items": [
+        {
+          "name": "Oreo Premium Ice Cream Cake (blue box)",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Mini Muffins",
+      "items": [
+        {
+          "name": "Café Valley Mini Muffins",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Mini Muffins",
+          "days": 5,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Palmiers",
+      "items": [
+        {
+          "name": "Mini Palmiers",
+          "days": 90,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Passover Items",
+      "items": [
+        {
+          "name": "Passover (Raspberry roll, Seven Layer Cake & Apricot roll)",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Passover Raspberry Torte",
+          "days": 21,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Swiss Colony Petite Fours",
+      "items": [
+        {
+          "name": "Swiss Colony Petite Fours (everyday & seasonal)",
+          "days": 21,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Pies",
+      "items": [
+        {
+          "name": "Kenny's Mini Pies",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Chess Pie 8\" (Lemon, Buttermilk, Chocolate)",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Lemon Meringue Pie (SAB)",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Willamette Valley White Pumpkin Pie",
+          "days": 5,
+          "pkgDate": false
+        },
+        {
+          "name": "Pecan & Chocolate Pecan Pie 8\"",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Pecan & Pumpkin Pies 12\" SAB",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Pumpkin Pie regular and NSA 8\"",
+          "days": 3,
+          "pkgDate": false
+        },
+        {
+          "name": "Sweet Potato Pie 8\"",
+          "days": 3,
+          "pkgDate": false
+        },
+        {
+          "name": "Apple Caramel Crumb 8\"",
+          "days": 5,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Pretzel Items",
+      "items": [
+        {
+          "name": "Pretzel Rolls and Buns",
+          "days": 4,
+          "pkgDate": false
+        },
+        {
+          "name": "Pretzilla Pretzel Bites",
+          "days": 10,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Stuffing Mix",
+      "items": [
+        {
+          "name": "Stuffing Mix",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Sugar Free",
+      "items": [
+        {
+          "name": "Sugar Free Angel Food Cakes",
+          "days": 30,
+          "pkgDate": false
+        },
+        {
+          "name": "Sugar Free 7\" Decorated Cakes",
+          "days": 6,
+          "pkgDate": false
+        },
+        {
+          "name": "Sugar Free Cookies",
+          "days": null,
+          "pkgDate": true
+        },
+        {
+          "name": "Sugar Free Lemon Cakes",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Sugar Free Meringue Pies",
+          "days": 5,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Two Bite Items",
+      "items": [
+        {
+          "name": "Two Bite Brownie bites",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Brownies with Icing Party Tray",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Cinnamon rolls",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Macaroon cookies",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Pecan Tarts Party Tray",
+          "days": 21,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Pumpkin Tarts w/cream cheese",
+          "days": 7,
+          "pkgDate": false
+        },
+        {
+          "name": "Two Bite Scones (blueberry, Orange Cran, & Pumpkin)",
+          "days": 10,
+          "pkgDate": false
+        },
+        {
+          "name": "Flavorful Brownies Bites (cookie butter, Mint & Raspberry)",
+          "days": 14,
+          "pkgDate": false
+        },
+        {
+          "name": "HEB Brownies Snack Pack",
+          "days": 30,
+          "pkgDate": false
+        }
+      ]
+    },
+    {
+      "category": "Stollen/Panettone",
+      "items": [
+        {
+          "name": "Schlunder Stollen",
+          "days": 60,
+          "pkgDate": false
+        },
+        {
+          "name": "Ofner Panettone Assorted",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Fruit Cakes",
+      "items": [
+        {
+          "name": "Fruit cake Cello",
+          "days": 90,
+          "pkgDate": false
+        },
+        {
+          "name": "Collin Street",
+          "days": null,
+          "pkgDate": true
+        }
+      ]
+    },
+    {
+      "category": "Rosca de Reyes",
+      "items": [
+        {
+          "name": "Rosca de Reyes - Traditional and Filled",
+          "days": 6,
+          "pkgDate": false
+        }
+      ]
+    }
+  ]
+}
