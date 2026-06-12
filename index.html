@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RTS Sell-By Date Calculator</title>
+  <meta name="description" content="Ready-to-Sell shelf life quick sheet and sell-by date calculator for bakery RTE items, with HEB.com product images." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">RTS</span>
+        <div class="brand-text">
+          <h1>Sell-By Date Calculator</h1>
+          <p class="subtitle">Ready-to-Eat Shelf Life Quick Sheet</p>
+        </div>
+      </div>
+      <div class="updated" id="lastUpdated"></div>
+    </div>
+  </header>
+
+  <div class="alert" role="note">
+    <strong>⚠️ All RTE items must be dated immediately</strong> once taken out of the freezer.
+  </div>
+
+  <main class="layout">
+    <!-- LEFT: product list -->
+    <section class="panel list-panel" aria-label="Product list">
+      <div class="search-row">
+        <input
+          type="search"
+          id="search"
+          placeholder="Search a product (e.g. brioche, king cake, donut)…"
+          autocomplete="off"
+          aria-label="Search products" />
+        <select id="categoryFilter" aria-label="Filter by category">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <div class="count" id="resultCount"></div>
+      <div id="productList" class="product-list" role="listbox" aria-label="Products"></div>
+    </section>
+
+    <!-- RIGHT: calculator detail -->
+    <section class="panel detail-panel" id="detailPanel" aria-live="polite">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-emoji">🧁</div>
+        <p>Select a product to calculate its sell-by date.</p>
+      </div>
+
+      <div class="detail" id="detail" hidden>
+        <div class="detail-head">
+          <div class="detail-img" id="detailImg">
+            <div class="img-placeholder" id="imgPlaceholder">No image</div>
+          </div>
+          <div class="detail-head-text">
+            <div class="detail-category" id="detailCategory"></div>
+            <h2 id="detailName"></h2>
+            <div class="shelf" id="detailShelf"></div>
+          </div>
+        </div>
+
+        <div class="calc">
+          <div class="calc-field">
+            <label for="pullDate">Date pulled from freezer</label>
+            <div class="date-row">
+              <input type="date" id="pullDate" />
+              <button type="button" class="btn-ghost" id="todayBtn">Today</button>
+            </div>
+          </div>
+
+          <div class="result" id="result"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn" id="printBtn">🖨️ Print label</button>
+          <a class="btn btn-secondary" id="hebLink" target="_blank" rel="noopener">🔎 View on HEB.com</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Printable label (hidden on screen, shown on print) -->
+  <div id="printLabel" class="print-label" aria-hidden="true"></div>
+
+  <footer class="footer">
+    <span>RTS Shelf Life Quick Sheet &middot; sorted by Category</span>
+    <span id="footerCount"></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

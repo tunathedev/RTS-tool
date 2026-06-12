@@ -1,0 +1,7 @@
+# Auto-generated HEB image lookup cache
+data/image-cache.json
+
+# OS / editor cruft
+.DS_Store
+node_modules/
+*.log
