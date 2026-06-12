@@ -2,92 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RTS Sell-By Date Calculator</title>
-  <meta name="description" content="Ready-to-Sell shelf life quick sheet and sell-by date calculator for bakery RTE items, with HEB.com product images." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ee3124" />
+  <title>RTS Sell-By + Pull List</title>
+  <meta name="description" content="Mobile sell-by date calculator and morning pull list for bakery RTE items, with HEB.com product images." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>" />
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <span class="brand-mark">RTS</span>
-        <div class="brand-text">
-          <h1>Sell-By Date Calculator</h1>
-          <p class="subtitle">Ready-to-Eat Shelf Life Quick Sheet</p>
-        </div>
+    <div class="brand">
+      <span class="brand-mark">RTS</span>
+      <div class="brand-text">
+        <h1>Sell-By &amp; Pull List</h1>
+        <p class="subtitle" id="lastUpdated">Ready-to-Eat Shelf Life</p>
       </div>
-      <div class="updated" id="lastUpdated"></div>
     </div>
   </header>
 
   <div class="alert" role="note">
-    <strong>⚠️ All RTE items must be dated immediately</strong> once taken out of the freezer.
+    ⚠️ <strong>Date all RTE items immediately</strong> when pulled from the freezer.
   </div>
 
-  <main class="layout">
-    <!-- LEFT: product list -->
-    <section class="panel list-panel" aria-label="Product list">
+  <!-- Global pull date: drives every sell-by calculation -->
+  <div class="pulldate-bar">
+    <label for="pullDate">Pulled from freezer</label>
+    <div class="pulldate-controls">
+      <input type="date" id="pullDate" />
+      <button type="button" class="btn-ghost" id="todayBtn">Today</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" id="tabBrowse" role="tab" aria-selected="true">Browse</button>
+    <button class="tab" id="tabList" role="tab" aria-selected="false">
+      Pull List <span class="tab-count" id="listCount">0</span>
+    </button>
+  </nav>
+
+  <main>
+    <!-- BROWSE VIEW -->
+    <section id="browseView" class="view" role="tabpanel">
       <div class="search-row">
-        <input
-          type="search"
-          id="search"
-          placeholder="Search a product (e.g. brioche, king cake, donut)…"
-          autocomplete="off"
-          aria-label="Search products" />
+        <input type="search" id="search" placeholder="Search (brioche, king cake, donut…)" autocomplete="off" aria-label="Search products" />
         <select id="categoryFilter" aria-label="Filter by category">
           <option value="">All categories</option>
         </select>
       </div>
       <div class="count" id="resultCount"></div>
-      <div id="productList" class="product-list" role="listbox" aria-label="Products"></div>
+      <div id="productList" class="product-list"></div>
     </section>
 
-    <!-- RIGHT: calculator detail -->
-    <section class="panel detail-panel" id="detailPanel" aria-live="polite">
-      <div class="empty-state" id="emptyState">
-        <div class="empty-emoji">🧁</div>
-        <p>Select a product to calculate its sell-by date.</p>
+    <!-- PULL LIST VIEW -->
+    <section id="listView" class="view" role="tabpanel" hidden>
+      <div id="pullListEmpty" class="empty-state">
+        <div class="empty-emoji">🧺</div>
+        <p>Your pull list is empty.</p>
+        <p class="empty-hint">Go to <strong>Browse</strong> and tap <span class="mini-add">＋</span> on the items you need to pull this morning.</p>
       </div>
 
-      <div class="detail" id="detail" hidden>
-        <div class="detail-head">
-          <div class="detail-img" id="detailImg">
-            <div class="img-placeholder" id="imgPlaceholder">No image</div>
-          </div>
-          <div class="detail-head-text">
-            <div class="detail-category" id="detailCategory"></div>
-            <h2 id="detailName"></h2>
-            <div class="shelf" id="detailShelf"></div>
-          </div>
-        </div>
-
-        <div class="calc">
-          <div class="calc-field">
-            <label for="pullDate">Date pulled from freezer</label>
-            <div class="date-row">
-              <input type="date" id="pullDate" />
-              <button type="button" class="btn-ghost" id="todayBtn">Today</button>
-            </div>
-          </div>
-
-          <div class="result" id="result"></div>
-        </div>
-
-        <div class="actions">
-          <button type="button" class="btn" id="printBtn">🖨️ Print label</button>
-          <a class="btn btn-secondary" id="hebLink" target="_blank" rel="noopener">🔎 View on HEB.com</a>
+      <div id="pullListWrap" hidden>
+        <div class="pull-summary" id="pullSummary"></div>
+        <div id="pullItems" class="pull-items"></div>
+        <div class="pull-actions">
+          <button type="button" class="btn" id="copyBtn">📋 Copy / Share list</button>
+          <button type="button" class="btn btn-ghost-danger" id="clearBtn">Clear list</button>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Printable label (hidden on screen, shown on print) -->
-  <div id="printLabel" class="print-label" aria-hidden="true"></div>
+  <!-- DETAIL SHEET (bottom sheet on mobile / modal on desktop) -->
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Product details" hidden>
+    <button class="sheet-close" id="sheetClose" aria-label="Close">✕</button>
+    <div class="sheet-head">
+      <div class="detail-img" id="detailImg"><div class="img-placeholder">No image</div></div>
+      <div class="detail-head-text">
+        <div class="detail-category" id="detailCategory"></div>
+        <h2 id="detailName"></h2>
+        <div class="shelf" id="detailShelf"></div>
+      </div>
+    </div>
+    <div class="sheet-result" id="sheetResult"></div>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-block" id="sheetAddBtn">＋ Add to pull list</button>
+      <a class="btn btn-secondary btn-block" id="hebLink" target="_blank" rel="noopener">🔎 View on HEB.com</a>
+    </div>
+  </div>
 
   <footer class="footer">
-    <span>RTS Shelf Life Quick Sheet &middot; sorted by Category</span>
+    <span>RTS Shelf Life Quick Sheet</span>
     <span id="footerCount"></span>
   </footer>
 

@@ -11,16 +11,20 @@ It also pulls **product images from HEB.com** for the selected item.
 
 ## Features
 
+- 📱 **Mobile-first** — built to use on your phone while walking the floor.
 - 🔎 **Search & browse** all RTE products by name or category.
-- 🗓️ **Sell-by calculator** — `sell-by = date pulled from freezer + shelf-life days`.
+- 🗓️ **Sell-by calculator** — `sell-by = date pulled from freezer + shelf-life days`,
+  shown as **MM/DD/YYYY**.
   - Color-coded result (good / sell soon / expired) with days remaining.
   - Items marked **"Pkg date"** correctly tell you to follow the printed package
     date instead of calculating.
+- 🧺 **Morning pull list** — tap ＋ on the items you need to pull from the freezer.
+  The **Pull List** tab shows each item's sell-by date, lets you set quantities,
+  check items off as you pull them, and **copy/share** the whole list as text.
+  Your list is saved on the device (localStorage).
 - 🖼️ **HEB.com images** for the selected product (see *Images* below).
-- 🖨️ **Print a label** with the product name, pull date, and sell-by date.
-- 📱 Works on phones/tablets for use on the store floor.
-- ⚠️ Prominent reminder: *all RTE items must be dated immediately once taken out
-  of the freezer.*
+- ⚠️ Prominent reminder: *date all RTE items immediately when pulled from the
+  freezer.*
 
 ## Run it
 
@@ -99,7 +103,7 @@ Source sheet last updated **3/31/2026**.
 |------|---------|
 | `index.html` | App shell |
 | `styles.css` | Styling (HEB-red theme, print label, responsive) |
-| `app.js` | Calculator, search, image loading, printing |
+| `app.js` | Calculator, search, pull list, image loading |
 | `server.js` | Static server + HEB image proxy (optional) |
 | `data/products.json` | Shelf-life dataset |
 | `data/heb-overrides.json` | Optional manual image pins |
