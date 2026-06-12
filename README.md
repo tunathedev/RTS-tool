@@ -28,7 +28,7 @@ It also pulls **product images from HEB.com** for the selected item.
 
 ```bash
 node server.js
-# then open http://localhost:3000
+# then open http://localhost:3500
 ```
 
 `server.js` is zero-dependency (Node built-ins only). It serves the app and
