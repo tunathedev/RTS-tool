@@ -191,7 +191,8 @@ function syncHolidayBtn() {
 }
 
 function loadCakePref() {
-  try { state.hideCake = localStorage.getItem(LS_CAKE) === '1'; } catch { state.hideCake = false; }
+  let v = null; try { v = localStorage.getItem(LS_CAKE); } catch {}
+  state.hideCake = v === null ? true : v === '1';   // default: cake-side items hidden
 }
 function toggleCake() {
   state.hideCake = !state.hideCake;
