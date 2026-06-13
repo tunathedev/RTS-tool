@@ -222,6 +222,8 @@ const header = rows[0];
 const idx = (name) => header.indexOf(name);
 const cUpc = idx('ID_CONSM_UNT_CD'), cDsc = idx('DSC_ITEM'),
   cFac = idx('PROD_FCNG_QTY'), cDeep = idx('ROW_DEEP_QTY'), cHi = idx('ROW_HI_QTY'), cImg = idx('image');
+// optional case-pack / items-per-box column (any of these header names)
+const cBox = ['CASE_PACK', 'CASEPACK', 'ITEMS_PER_BOX', 'CS_PACK', 'CASE_QTY', 'PACK_QTY', 'CASE'].map(idx).find((i) => i >= 0) ?? -1;
 
 const byUpc = new Map();
 for (const r of rows.slice(1)) {
@@ -231,9 +233,10 @@ for (const r of rows.slice(1)) {
   const deep = parseInt(r[cDeep] || '0', 10) || 0;
   const tall = parseInt(r[cHi] || '0', 10) || 0;
   const score = wide * deep * tall;
-  const rec = { upc, desc: (r[cDsc] || '').trim(), wide, deep, tall, score, image: (r[cImg] || '').trim() };
+  const box = cBox >= 0 ? (parseInt(r[cBox] || '0', 10) || 0) : 0;
+  const rec = { upc, desc: (r[cDsc] || '').trim(), wide, deep, tall, score, box, image: (r[cImg] || '').trim() };
   const prev = byUpc.get(upc);
-  if (!prev || score > prev.score) byUpc.set(upc, rec); // keep the largest placement
+  if (!prev || score > prev.score) byUpc.set(upc, Object.assign(rec, { box: box || (prev && prev.box) || 0 })); // keep largest placement, retain box
 }
 
 const cats = new Map();
@@ -258,6 +261,7 @@ for (const rec of byUpc.values()) {
     image: rec.image || undefined,
   };
   if (rec.tall || rec.wide || rec.deep) item.par = { tall: rec.tall, wide: rec.wide, deep: rec.deep };
+  if (rec.box > 0) item.boxQty = rec.box;
   if (!cats.has(category)) cats.set(category, []);
   cats.get(category).push(item);
   review.push(`${days == null ? 'PKG' : String(days).padStart(3)}  ${item.name}  [${category}]`);

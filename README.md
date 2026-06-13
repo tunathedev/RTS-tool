@@ -68,6 +68,17 @@ REVIEW=1 node tools/import-planogram.js path/to/planogram.csv   # + print every 
 Expected planogram columns: `ID_CONSM_UNT_CD` (UPC), `DSC_ITEM` (description),
 `PROD_FCNG_QTY` (wide), `ROW_DEEP_QTY` (deep), `ROW_HI_QTY` (tall), `image`.
 
+**Compile case-pack (items-per-box) values as you go:**
+
+```bash
+node tools/make-casepack-worksheet.js                       # writes data/case-pack-worksheet.csv (all SKUs)
+# fill in the case_pack column in that CSV as you work, then:
+node tools/import-casepack.js data/case-pack-worksheet.csv  # merges boxQty by UPC (non-destructive)
+```
+
+The planogram importer also reads a case-pack column automatically if your
+export includes one (`CASE_PACK`, `ITEMS_PER_BOX`, `CS_PACK`, `CASE_QTY`, …).
+
 **Or merge a simple spreadsheet** onto existing products by name:
 
 ```bash
