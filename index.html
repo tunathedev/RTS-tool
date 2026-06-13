@@ -41,7 +41,7 @@
     <div class="wx-head">
       <button type="button" class="wx-toggle" id="wxToggle" aria-expanded="true">
         <span class="wx-chevron" aria-hidden="true">▾</span>
-        <span class="wx-title">⛅ San Antonio · 78252 — daily</span>
+        <span class="wx-title">⛅ San Antonio · 78252 — hourly</span>
         <span class="wx-now" id="wxNow"></span>
       </button>
       <button type="button" class="wx-refresh" id="wxRefresh" aria-label="Refresh weather" title="Refresh">↻</button>
@@ -49,9 +49,11 @@
     <div class="wx-body" id="wxBody">
       <div class="wx-current" id="wxCurrent"></div>
       <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
-      <div class="wx-tip" id="wxTip"></div>
     </div>
   </section>
+
+  <!-- Sell tip lives outside the weather box so it stays visible -->
+  <div class="wx-tip-wrap"><div class="wx-tip" id="wxTip"></div></div>
 
   <!-- Tabs -->
   <nav class="tabs" role="tablist">

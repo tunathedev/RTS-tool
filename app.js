@@ -655,8 +655,9 @@ async function loadWeather() {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX.lat}&longitude=${WX.lon}`
     + `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`
     + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
+    + `&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m`
     + `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=${encodeURIComponent(WX.tz)}`
-    + `&forecast_days=5&timeformat=unixtime`;
+    + `&forecast_days=2&timeformat=unixtime`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error('http ' + res.status);
@@ -668,50 +669,64 @@ async function loadWeather() {
 }
 
 function renderWeather(data) {
-  const dl = data && data.daily;
-  if (!dl || !Array.isArray(dl.time)) {
+  const hl = data && data.hourly;
+  if (!hl || !Array.isArray(hl.time)) {
     $('wxBullets').innerHTML = `<div class="wx-err">Weather unavailable right now.</div>`;
     return;
   }
-  const days = dl.time.map((sec, i) => ({
-    sec,
-    hi: Math.round(dl.temperature_2m_max[i]),
-    lo: Math.round(dl.temperature_2m_min[i]),
-    pop: dl.precipitation_probability_max[i] ?? 0,
-    code: dl.weather_code[i] ?? 0,
-  }));
+  const dl = data.daily || {};
+  const today = {
+    hi: dl.temperature_2m_max ? Math.round(dl.temperature_2m_max[0]) : null,
+    lo: dl.temperature_2m_min ? Math.round(dl.temperature_2m_min[0]) : null,
+    pop: dl.precipitation_probability_max ? (dl.precipitation_probability_max[0] ?? 0) : 0,
+    code: dl.weather_code ? dl.weather_code[0] : 0,
+  };
 
-  // current conditions (for the preview + detail card)
+  // current conditions card (today's high/low)
   const cur = data.current || {};
-  const today = days[0] || {};
   const curTemp = Math.round(cur.temperature_2m ?? today.hi ?? 0);
-  const [ce, clabel] = wmo(cur.weather_code ?? today.code);
+  const [ce, clabel] = wmo(cur.weather_code ?? today.code ?? 0);
   $('wxNow').textContent = `${curTemp}° ${ce}`;
   $('wxCurrent').innerHTML =
     `<div class="wx-cur-emoji">${ce}</div>
      <div class="wx-cur-main">
        <div class="wx-cur-temp">${curTemp}°</div>
        <div class="wx-cur-label">${escapeHtml(clabel)}</div>
-       <div class="wx-cur-meta">Feels ${Math.round(cur.apparent_temperature ?? curTemp)}° · 💨 ${Math.round(cur.wind_speed_10m ?? 0)} mph · 🌧️ ${today.pop ?? 0}%</div>
-     </div>
-     <div class="wx-cur-hilo">today<br><b>${today.hi}°</b> / ${today.lo}°</div>`;
+       <div class="wx-cur-meta">Feels ${Math.round(cur.apparent_temperature ?? curTemp)}° · 💨 ${Math.round(cur.wind_speed_10m ?? 0)} mph · 🌧️ ${today.pop}%</div>
+     </div>` +
+    (today.hi != null ? `<div class="wx-cur-hilo">today<br><b>${today.hi}°</b> / ${today.lo}°</div>` : '');
 
-  $('wxBullets').innerHTML = days.map((d, i) => {
-    const [emoji, label] = wmo(d.code);
+  // hourly strip (next 12 hours)
+  const now = Math.floor(Date.now() / 1000);
+  let start = hl.time.findIndex((t) => t >= now);
+  if (start < 0) start = 0;
+  const hours = [];
+  for (let k = 0; k < 12; k++) {
+    const i = start + k;
+    if (i >= hl.time.length) break;
+    hours.push({
+      sec: hl.time[i],
+      temp: Math.round(hl.temperature_2m[i]),
+      pop: hl.precipitation_probability[i] ?? 0,
+      wind: Math.round(hl.wind_speed_10m[i] ?? 0),
+      code: hl.weather_code[i] ?? 0,
+    });
+  }
+  $('wxBullets').innerHTML = hours.map((b, k) => {
+    const [emoji, label] = wmo(b.code);
     return `<div class="wx-bullet" title="${escapeHtml(label)}">
-      <div class="wx-when">${i === 0 ? 'Today' : weekday(d.sec)}</div>
+      <div class="wx-when">${k === 0 ? 'Now' : hourLabel(b.sec)}</div>
       <div class="wx-emoji">${emoji}</div>
-      <div class="wx-temp">${d.hi}°</div>
-      <div class="wx-cond">${d.lo}°<br><span class="wx-rain">${d.pop}%</span></div>
+      <div class="wx-temp">${b.temp}°</div>
+      <div class="wx-cond"><span class="wx-rain">${b.pop}%</span><br>💨${b.wind}</div>
     </div>`;
   }).join('');
 
-  $('wxTip').innerHTML = sellTip([{ temp: today.hi, pop: today.pop }]);
+  const maxPop = Math.max(today.pop || 0, ...hours.map((x) => x.pop));
+  $('wxTip').innerHTML = sellTip([{ temp: today.hi ?? curTemp, pop: maxPop }]);
 }
 
-function weekday(sec) {
-  return new Intl.DateTimeFormat('en-US', { timeZone: WX.tz, weekday: 'short' }).format(new Date(sec * 1000));
-}
+function hourLabel(sec) { const p = hourParts(sec); return `${p.h} ${p.ap}`; }
 function blockLabel(startSec, endSec) {
   const a = hourParts(startSec), b = hourParts(endSec);
   return a.ap === b.ap ? `${a.h}–${b.h} ${b.ap}` : `${a.h} ${a.ap}–${b.h} ${b.ap}`;
