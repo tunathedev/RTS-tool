@@ -122,7 +122,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 
 /* ---------- Scanner modal ---------- */
 .scan-modal {
-  position: fixed; inset: 0; z-index: 60; background: #0b0b0c; color: #fff;
+  position: fixed; inset: 0; z-index: 90; background: #0b0b0c; color: #fff;
   display: flex; flex-direction: column;
   padding: calc(env(safe-area-inset-top,0px) + 8px) 0 0;
 }
@@ -435,9 +435,16 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .chip-btn:hover { background: #fafafa; border-color: #d8dbe0; }
 
 /* ---------- Item editor modal ---------- */
-.editor-sheet { max-height: 92vh; overflow-y: auto; }
-.editor-title { font-family: var(--font-head); margin: 0 30px 12px 0; font-size: 1.2rem; }
-.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+#editorBackdrop { z-index: 65; }
+.editor-sheet {
+  z-index: 70; display: flex; flex-direction: column;
+  max-height: 90vh; overflow: hidden;
+}
+.editor-title { flex: 0 0 auto; font-family: var(--font-head); margin: 2px 36px 12px 0; font-size: 1.2rem; }
+.editor-grid {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; padding: 2px 2px 4px;
+}
 .ed-field { display: flex; flex-direction: column; font-size: .76rem; font-weight: 700; color: var(--muted); gap: 4px; }
 .ed-field input[type="text"], .ed-field input[type="number"] {
   padding: 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 16px; color: var(--ink); font-weight: 500;
@@ -452,7 +459,7 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 }
 .ed-check { flex-direction: row; align-items: center; gap: 8px; grid-column: 1 / -1; font-weight: 600; color: var(--ink); font-size: .85rem; }
 .ed-check input { width: 18px; height: 18px; }
-.editor-actions { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.editor-actions { flex: 0 0 auto; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
 .editor-actions-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .editor-actions-row .btn-ghost { padding: 9px 14px; font-size: .85rem; }
 

@@ -253,6 +253,9 @@ let editorFromSheet = false;
 function openItemEditor(it) {
   editorKey = it ? it._key : null;
   editorFromSheet = !!it;
+  // hide the detail sheet underneath so the two don't overlap (keep state.current
+  // so Cancel can return to it)
+  if (it) { state.current = it; $('sheet').hidden = true; $('sheetBackdrop').hidden = true; }
   $('editorTitle').textContent = it ? 'Edit item' : 'Add item';
   const par = (it && it.par) || {};
   $('edName').value = it ? it.name : '';
@@ -267,10 +270,15 @@ function openItemEditor(it) {
   $('edDays').disabled = pkg;
   $('edDelete').style.display = it ? '' : 'none';
   $('edReset').style.display = it && !it._added ? '' : 'none';
+  $('itemEditor').scrollTop = 0;
   $('editorBackdrop').hidden = false;
   $('itemEditor').hidden = false;
 }
 function closeItemEditor() { $('itemEditor').hidden = true; $('editorBackdrop').hidden = true; }
+function cancelItemEditor() {
+  closeItemEditor();
+  if (editorFromSheet && state.current) openSheet(state.current);
+}
 
 function readEditor() {
   const name = $('edName').value.trim();
@@ -962,9 +970,9 @@ function wireEvents() {
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);
-  $('edCancel').addEventListener('click', closeItemEditor);
-  $('editorClose').addEventListener('click', closeItemEditor);
-  $('editorBackdrop').addEventListener('click', closeItemEditor);
+  $('edCancel').addEventListener('click', cancelItemEditor);
+  $('editorClose').addEventListener('click', cancelItemEditor);
+  $('editorBackdrop').addEventListener('click', cancelItemEditor);
   $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; });
   // export / import
   $('exportBtn').addEventListener('click', exportCatalog);
@@ -973,7 +981,7 @@ function wireEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('scanModal').hidden) closeScanner();
-    else if (!$('itemEditor').hidden) closeItemEditor();
+    else if (!$('itemEditor').hidden) cancelItemEditor();
     else if (!$('sheet').hidden) closeSheet();
   });
 }
