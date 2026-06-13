@@ -159,8 +159,25 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 .wx-chevron { font-size: .7rem; color: var(--muted); transition: transform .18s; }
 .weather.collapsed .wx-chevron { transform: rotate(-90deg); }
 .wx-title { font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wx-now { font-size: .8rem; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.wx-now { font-size: .95rem; font-weight: 800; color: var(--ink); white-space: nowrap; }
 .weather.collapsed .wx-body { display: none; }
+/* collapsed = minimal preview: just current temp + icon */
+.weather.collapsed .wx-title { display: none; }
+.weather:not(.collapsed) .wx-now { display: none; }
+
+/* expanded: current-conditions detail */
+.wx-current {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+}
+.wx-current:empty { display: none; }
+.wx-cur-emoji { font-size: 2.2rem; line-height: 1; }
+.wx-cur-main { flex: 1; min-width: 0; }
+.wx-cur-temp { font-family: var(--font-head); font-size: 1.7rem; font-weight: 800; line-height: 1; }
+.wx-cur-label { font-size: .82rem; color: var(--ink); font-weight: 600; margin-top: 2px; }
+.wx-cur-meta { font-size: .74rem; color: var(--muted); margin-top: 3px; }
+.wx-cur-hilo { text-align: right; font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.wx-cur-hilo b { color: var(--ink); }
 .wx-refresh {
   border: 1px solid var(--line); background: #fff; color: var(--muted);
   width: 28px; height: 28px; border-radius: 8px; font-size: 1rem; line-height: 1; cursor: pointer;

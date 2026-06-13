@@ -653,7 +653,7 @@ async function loadWeather() {
   box.innerHTML = `<div class="wx-msg">Loading weather…</div>`;
   $('wxTip').innerHTML = '';
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX.lat}&longitude=${WX.lon}`
-    + `&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m`
+    + `&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m`
     + `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=${encodeURIComponent(WX.tz)}`
     + `&forecast_days=2&timeformat=unixtime`;
   try {
@@ -683,13 +683,30 @@ function renderWeather(h) {
     hours.push({
       sec: h.time[i],
       temp: Math.round(h.temperature_2m[i]),
+      feels: Math.round(h.apparent_temperature ? h.apparent_temperature[i] : h.temperature_2m[i]),
       pop: h.precipitation_probability[i] ?? 0,
       wind: Math.round(h.wind_speed_10m[i] ?? 0),
       code: h.weather_code[i] ?? 0,
     });
   }
 
-  if (hours[0]) { const [e] = wmo(hours[0].code); $('wxNow').textContent = `${hours[0].temp}° ${e}`; }
+  // collapsed preview + current-conditions detail
+  const c = hours[0];
+  if (c) {
+    const [e, label] = wmo(c.code);
+    $('wxNow').textContent = `${c.temp}° ${e}`;
+    const hi = Math.max(...hours.map((x) => x.temp));
+    const lo = Math.min(...hours.map((x) => x.temp));
+    $('wxCurrent').innerHTML =
+      `<div class="wx-cur-emoji">${e}</div>
+       <div class="wx-cur-main">
+         <div class="wx-cur-temp">${c.temp}°</div>
+         <div class="wx-cur-label">${escapeHtml(label)}</div>
+         <div class="wx-cur-meta">Feels ${c.feels}° · 💨 ${c.wind} mph · 🌧️ ${c.pop}%</div>
+       </div>
+       <div class="wx-cur-hilo">next 12h<br><b>${hi}°</b> / ${lo}°</div>`;
+  }
+
   $('wxBullets').innerHTML = hours.map((b, k) => {
     const [emoji, label] = wmo(b.code);
     const when = k === 0 ? 'Now' : hourLabel(b.sec);
@@ -697,7 +714,7 @@ function renderWeather(h) {
       <div class="wx-when">${when}</div>
       <div class="wx-emoji">${emoji}</div>
       <div class="wx-temp">${b.temp}°</div>
-      <div class="wx-cond"><span class="wx-rain">${b.pop}%</span></div>
+      <div class="wx-cond"><span class="wx-rain">${b.pop}%</span><br>💨${b.wind}</div>
     </div>`;
   }).join('');
 
