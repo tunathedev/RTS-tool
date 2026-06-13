@@ -301,6 +301,8 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
   background: #fff; color: var(--heb); display: inline-flex; align-items: center; justify-content: center;
   font-size: .85rem; font-weight: 900;
 }
+.table-header.season { background: linear-gradient(135deg, #0f7a3d, #0b5e2e); }
+.table-header.season .table-num { background: transparent; color: #fff; font-size: 1rem; }
 .cat-header {
   background: #fafafa; color: var(--heb-dark);
   font-weight: 700; font-size: .7rem; letter-spacing: .6px; text-transform: uppercase;

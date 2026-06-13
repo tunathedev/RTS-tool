@@ -105,6 +105,7 @@ function effective(src, patch, key, isAdded) {
     boxQty: ('boxQty' in patch ? patch.boxQty : src.boxQty) || undefined,
     table: ('table' in patch ? patch.table : src.table) || undefined,
     holiday: ('holiday' in patch ? patch.holiday : src.holiday) || false,
+    seasonTable: ('seasonTable' in patch ? patch.seasonTable : src.seasonTable) || undefined,
     _key: key, _added: !!isAdded,
     _defDays: src.days, _defPkg: src.pkgDate,
   };
@@ -137,6 +138,11 @@ function tableFor(it) {
   return CATEGORY_TABLE[it.category] || 2;
 }
 
+/* Holiday items live on a parallel set of 6 "Season Tables". */
+const SEASON_TABLES = [1, 2, 3, 4, 5, 6].map((n) => ({ n, name: 'Season Table ' + n }));
+const SEASON_NAME = Object.fromEntries(SEASON_TABLES.map((t) => [t.n, t.name]));
+function seasonFor(it) { return it.holiday ? (it.seasonTable || 1) : 0; }
+
 function rebuildItems() {
   const list = [];
   for (const b of state.base) {
@@ -148,9 +154,14 @@ function rebuildItems() {
     list.push(effective(a, {}, a._key, true));
   }
   const order = (cat) => { if (!state.catOrder.has(cat)) state.catOrder.set(cat, state.catOrder.size); return state.catOrder.get(cat); };
-  for (const it of list) it._table = tableFor(it);
-  // sort by physical table, then category, then name
-  list.sort((x, y) => x._table - y._table || order(x.category) - order(y.category) || x.name.localeCompare(y.name));
+  for (const it of list) { it._table = tableFor(it); it._season = seasonFor(it); }
+  // everyday tables first (by table), then seasonal items (by season table)
+  list.sort((x, y) => {
+    const hx = x.holiday ? 1 : 0, hy = y.holiday ? 1 : 0;
+    if (hx !== hy) return hx - hy;
+    const gx = x.holiday ? x._season : x._table, gy = y.holiday ? y._season : y._table;
+    return gx - gy || order(x.category) - order(y.category) || x.name.localeCompare(y.name);
+  });
   state.items = list;
   state.byName = new Map(); state.byUpc = new Map();
   for (const it of list) { state.byName.set(it.name, it); if (it.upc) state.byUpc.set(normUpc(it.upc), it); }
@@ -202,11 +213,18 @@ function buildCategoryFilter() {
   const sel = $('categoryFilter');
   const cur = sel.value;
   sel.innerHTML = '<option value="">All tables</option>';
-  const present = new Set(state.items.map((i) => i._table));
+  const present = new Set(state.items.filter((i) => !i.holiday).map((i) => i._table));
   for (const t of TABLES) {
     if (!present.has(t.n)) continue;
     const o = document.createElement('option');
     o.value = String(t.n); o.textContent = `${t.n} · ${t.name}`;
+    sel.appendChild(o);
+  }
+  const seasonPresent = new Set(state.items.filter((i) => i.holiday).map((i) => i._season));
+  for (const t of SEASON_TABLES) {
+    if (!seasonPresent.has(t.n)) continue;
+    const o = document.createElement('option');
+    o.value = 's' + t.n; o.textContent = `🎄 ${t.name}`;
     sel.appendChild(o);
   }
   if ([...sel.options].some((o) => o.value === cur)) sel.value = cur;
@@ -225,20 +243,32 @@ function buildCatDatalist() {
 function renderList() {
   const term = $('search').value.trim().toLowerCase();
   const tableFilter = $('categoryFilter').value;
+  const seasonFilter = tableFilter.startsWith('s');
+  const filterNum = seasonFilter ? parseInt(tableFilter.slice(1), 10) : parseInt(tableFilter, 10);
   const list = $('productList');
   list.innerHTML = '';
-  let shown = 0, lastCat = null, lastTable = null;
+  let shown = 0, lastCat = null, lastGroup = null;
 
   for (const it of state.items) {
-    if (state.hideHoliday && it.holiday) continue;
-    if (tableFilter && String(it._table) !== tableFilter) continue;
+    // holiday toggle hides seasonal items (unless explicitly filtering a season)
+    if (state.hideHoliday && it.holiday && !seasonFilter) continue;
+    if (tableFilter) {
+      if (seasonFilter) { if (!(it.holiday && it._season === filterNum)) continue; }
+      else { if (it.holiday || it._table !== filterNum) continue; }
+    }
     if (term && !matches(it, term)) continue;
 
-    if (it._table !== lastTable) {
+    const groupKey = it.holiday ? 's' + it._season : 't' + it._table;
+    if (groupKey !== lastGroup) {
       const th = document.createElement('div');
-      th.className = 'table-header';
-      th.innerHTML = `<span class="table-num">${it._table}</span> ${escapeHtml(TABLE_NAME[it._table] || 'Other')}`;
-      list.appendChild(th); lastTable = it._table; lastCat = null;
+      if (it.holiday) {
+        th.className = 'table-header season';
+        th.innerHTML = `<span class="table-num">🎄</span> ${escapeHtml(SEASON_NAME[it._season] || 'Seasonal')}`;
+      } else {
+        th.className = 'table-header';
+        th.innerHTML = `<span class="table-num">${it._table}</span> ${escapeHtml(TABLE_NAME[it._table] || 'Other')}`;
+      }
+      list.appendChild(th); lastGroup = groupKey; lastCat = null;
     }
     if (it.category !== lastCat) {
       const h = document.createElement('div');
@@ -272,8 +302,10 @@ function renderList() {
   }
 
   if (shown === 0) list.innerHTML = `<div class="no-results">No products match “${escapeHtml(term)}”.</div>`;
+  let filterLabel = '';
+  if (tableFilter) filterLabel = seasonFilter ? ` · 🎄 ${SEASON_NAME[filterNum]}` : ` · Table ${filterNum} · ${TABLE_NAME[filterNum]}`;
   $('resultCount').textContent =
-    `${shown} ${shown === 1 ? 'product' : 'products'}` + (tableFilter ? ` · Table ${tableFilter} · ${TABLE_NAME[tableFilter]}` : '');
+    `${shown} ${shown === 1 ? 'product' : 'products'}` + filterLabel;
 }
 
 function matches(it, term) {
@@ -326,6 +358,8 @@ function openItemEditor(it) {
   $('edImage').value = it ? (it.image || '') : '';
   $('edTall').value = par.tall || ''; $('edWide').value = par.wide || ''; $('edDeep').value = par.deep || '';
   $('edHoliday').checked = it ? !!it.holiday : false;
+  $('edSeason').value = it && it.seasonTable ? String(it.seasonTable) : '1';
+  $('edSeasonField').hidden = !$('edHoliday').checked;
   const pkg = it ? it.pkgDate : false;
   $('edPkg').checked = pkg;
   $('edDays').value = it && !pkg ? it.days : '';
@@ -360,6 +394,7 @@ function readEditor() {
     boxQty: box || null,
     par: (tall || wide || deep) ? { tall, wide, deep } : null,
     holiday: $('edHoliday').checked,
+    seasonTable: $('edHoliday').checked ? (parseInt($('edSeason').value, 10) || 1) : null,
     days: pkg ? null : days,
   };
 }
@@ -1052,6 +1087,7 @@ function wireEvents() {
   $('editorClose').addEventListener('click', cancelItemEditor);
   $('editorBackdrop').addEventListener('click', cancelItemEditor);
   $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; });
+  $('edHoliday').addEventListener('change', (e) => { $('edSeasonField').hidden = !e.target.checked; });
   // export / import
   $('exportBtn').addEventListener('click', exportCatalog);
   $('importBtn').addEventListener('click', () => $('importFile').click());
