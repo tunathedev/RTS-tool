@@ -15,6 +15,7 @@ const LS_WX = 'rts.wxCollapsed';
 const LS_HOLIDAY = 'rts.hideHoliday';
 const LS_CAKE = 'rts.hideCake';
 const LS_PROD = 'rts.production.v1';
+const LS_COMPBOX = 'rts.componentBox.v1';
 
 const state = {
   data: null,
@@ -30,6 +31,7 @@ const state = {
   hideHoliday: false,
   hideCake: false,
   prod: {},           // production plan: id -> { make, done }
+  compBox: {},        // component name -> items per box (for box-pull math)
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
@@ -763,8 +765,18 @@ const PRODUCTION = [
 
 function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
+  try { state.compBox = JSON.parse(localStorage.getItem(LS_COMPBOX) || '{}') || {}; } catch { state.compBox = {}; }
 }
 function saveProduction() { try { localStorage.setItem(LS_PROD, JSON.stringify(state.prod)); } catch {} }
+function saveCompBox() { try { localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
+function setCompBox(name) {
+  const cur = state.compBox[name] || '';
+  const v = prompt(`How many "${name}" come per box (case pack)?`, cur);
+  if (v === null) return;
+  const n = parseInt(v, 10);
+  if (Number.isFinite(n) && n > 0) state.compBox[name] = n; else delete state.compBox[name];
+  saveCompBox(); renderProduction();
+}
 function prodOf(id) { return state.prod[id] || (state.prod[id] = { make: 0, done: false }); }
 
 function setProdMake(id, delta) {
@@ -855,15 +867,28 @@ function renderProduction() {
     ? 'Set how many to make with the + buttons.'
     : `<strong>${totalPlatters}</strong> platter${totalPlatters === 1 ? '' : 's'} · <strong>${totalHalves}</strong> creme-cake halves · ${doneCount}/${planned} produced`;
 
-  // Prep totals (component rollup)
+  // Prep totals (component rollup) + box-pull math
   const prepEl = $('prodPrep');
   if (!prep.size && !wholesToSlice && !tbd.length) { prepEl.innerHTML = ''; return; }
-  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1])
-    .map(([n, q]) => `<div class="prep-row"><span>${escapeHtml(n)}</span><b>${q}</b></div>`);
-  if (wholesToSlice) rows.push(`<div class="prep-row"><span>Creme cake wholes to slice</span><b>${wholesToSlice}</b></div>`);
-  let html = `<div class="prep-head">🧾 Prep totals — bake / portion this</div>${rows.join('')}`;
+  let totalBoxes = 0, anyBox = false;
+  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
+    const box = state.compBox[n];
+    let boxHtml;
+    if (box) {
+      const boxes = Math.ceil(q / box);
+      totalBoxes += boxes; anyBox = true;
+      boxHtml = `<button type="button" class="prep-box known" data-comp="${escapeHtml(n)}">📦 ${boxes} box${boxes === 1 ? '' : 'es'} <small>(${box}/bx)</small></button>`;
+    } else {
+      boxHtml = `<button type="button" class="prep-box" data-comp="${escapeHtml(n)}">📦 set box</button>`;
+    }
+    return `<div class="prep-row"><span class="prep-name">${escapeHtml(n)}</span><span class="prep-qty"><b>${q}</b></span>${boxHtml}</div>`;
+  });
+  if (wholesToSlice) rows.push(`<div class="prep-row"><span class="prep-name">Creme cake wholes to slice</span><span class="prep-qty"><b>${wholesToSlice}</b></span><span class="prep-box-spacer"></span></div>`);
+  let html = `<div class="prep-head">🧾 Prep totals — bake / portion / pull</div>${rows.join('')}`;
+  if (anyBox) html += `<div class="prep-total-boxes"><span>Total boxes to pull</span><b>${totalBoxes}</b></div>`;
   if (tbd.length) html += `<div class="prep-tbd">Piece counts TBD: ${escapeHtml(tbd.join(', '))}</div>`;
   prepEl.innerHTML = html;
+  prepEl.querySelectorAll('.prep-box').forEach((b) => b.addEventListener('click', () => setCompBox(b.dataset.comp)));
 }
 
 function productionText() {
@@ -882,8 +907,15 @@ function productionText() {
   if (lines.length === 1) return 'Production plan is empty.';
   if (prep.size || wholes) {
     lines.push('', 'Prep totals:');
-    [...prep.entries()].sort((a, b) => b[1] - a[1]).forEach(([n, q]) => lines.push(`  ${n}: ${q}`));
+    let totalBoxes = 0;
+    [...prep.entries()].sort((a, b) => b[1] - a[1]).forEach(([n, q]) => {
+      const box = state.compBox[n];
+      const b = box ? Math.ceil(q / box) : 0;
+      if (b) totalBoxes += b;
+      lines.push(`  ${n}: ${q}${box ? ` (${b} box)` : ''}`);
+    });
     if (wholes) lines.push(`  Creme cake wholes to slice: ${wholes}`);
+    if (totalBoxes) lines.push(`  TOTAL BOXES TO PULL: ${totalBoxes}`);
   }
   return lines.join('\n');
 }
