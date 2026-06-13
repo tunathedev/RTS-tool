@@ -391,6 +391,13 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
   background: #f6f8fb; border: 1px dashed var(--line); border-radius: 9px; padding: 8px 10px;
 }
 .pull-check:disabled { opacity: .4; }
+.prod-prep:empty { display: none; }
+.prod-prep { margin: 10px 14px 0; border: 1px solid #bfe6c8; background: #effaf1; border-radius: 12px; padding: 10px 12px; }
+.prep-head { font-family: var(--font-head); font-weight: 800; color: var(--ok); font-size: .82rem; margin-bottom: 6px; }
+.prep-row { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; padding: 3px 0; border-bottom: 1px dashed #cdeed5; }
+.prep-row:last-of-type { border-bottom: none; }
+.prep-row b { color: var(--ok); font-variant-numeric: tabular-nums; }
+.prep-tbd { margin-top: 8px; font-size: .74rem; color: var(--muted); }
 
 /* ---------- Pull list ---------- */
 .pull-summary { padding: 12px 14px; font-size: .82rem; color: var(--muted); border-bottom: 1px solid var(--line); }

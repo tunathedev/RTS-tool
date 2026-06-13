@@ -735,13 +735,22 @@ function flashBtn(btn, msg) {
 }
 
 /* ---------------- Production (platters & sliced half creme cakes) ---------------- */
+// recipe component { n: name, q: pieces per platter (0 = count TBD) }
 const PRODUCTION = [
-  { id: 'plt-doughnut', group: 'Platters', name: 'Doughnut Platter', components: ['Glazed', 'Chocolate', 'Powdered'] },
-  { id: 'plt-cookie', group: 'Platters', name: 'Cookie Platter', components: ['Oatmeal', 'Sugar', 'Candy', 'Chunk'] },
-  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookie + Brownie Platter', components: ['Oatmeal', 'Sugar', 'Candy', 'Chunk', 'Brownie Bites'] },
-  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Platter', components: ['Lemon', 'Marble', 'Danish'] },
-  { id: 'plt-pdp-half', group: 'Platters', name: 'Pan de Polvo (Half & Half)', components: ['Powdered Sugar', 'Cinnamon'] },
-  { id: 'plt-pdp-cinn', group: 'Platters', name: 'Pan de Polvo (Cinnamon)', components: ['Cinnamon'] },
+  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', price: 11.98, note: '~80 holes',
+    recipe: [{ n: 'Glazed donut holes', q: 27 }, { n: 'Chocolate donut holes', q: 27 }, { n: 'Powdered donut holes', q: 26 }] },
+  { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)', price: 11.98,
+    recipe: [{ n: 'Oatmeal cookies', q: 9 }, { n: 'Sugar cookies', q: 9 }, { n: 'Chocolate candy cookies', q: 9 }, { n: 'Chocolate chunk cookies', q: 9 }] },
+  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray', price: 15.98,
+    recipe: [{ n: 'Oatmeal cookies', q: 6 }, { n: 'Sugar cookies', q: 6 }, { n: 'Chocolate candy cookies', q: 6 }, { n: 'Chocolate chunk cookies', q: 6 }, { n: 'Brownie bites', q: 28 }] },
+  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray', price: 11.98,
+    recipe: [{ n: 'Marble loaf slices', q: 0 }, { n: 'Lemon loaf slices', q: 0 }, { n: 'Danish loaf slices', q: 0 }] },
+  { id: 'plt-pdp-half', group: 'Platters', name: 'Pan de Polvo Tray — Half & Half (48 oz)', price: 15.98, note: '3 lb',
+    recipe: [{ n: 'Cinnamon pan de polvo', q: 0 }, { n: 'Powdered sugar pan de polvo', q: 0 }] },
+  { id: 'plt-pdp-cinn', group: 'Platters', name: 'Pan de Polvo Tray — Cinnamon (48 oz)', price: 15.98, note: '3 lb',
+    recipe: [{ n: 'Cinnamon pan de polvo', q: 0 }] },
+  { id: 'plt-mantecada', group: 'Platters', name: 'Mantecada Cupcakes Tray', price: 8.98, note: '15 ct',
+    recipe: [{ n: 'Mantecada cupcakes', q: 15 }] },
   { id: 'cake-marble', group: 'Sliced Half Creme Cakes', name: 'Marble', cake: true },
   { id: 'cake-lemon', group: 'Sliced Half Creme Cakes', name: 'Lemon', cake: true },
   { id: 'cake-strawberry', group: 'Sliced Half Creme Cakes', name: 'Strawberry', cake: true },
@@ -780,12 +789,21 @@ function updateProdCount() {
   $('prodCount').textContent = n;
 }
 
+function recipeSummary(it) {
+  if (it.cake) return 'sliced half creme cake';
+  const parts = (it.recipe || []).map((c) => (c.q ? c.q + ' ' : '') + c.n.replace(/ (cookies|donut holes|pan de polvo|loaf slices|cupcakes)$/i, ''));
+  return parts.join(' · ') + (it.price ? ` · $${it.price.toFixed(2)}` : '') + (it.note ? ` · ${it.note}` : '');
+}
+
 function renderProduction() {
   updateProdCount();
   const wrap = $('prodItems');
   wrap.innerHTML = '';
   let lastGroup = null;
   let totalPlatters = 0, totalHalves = 0, doneCount = 0, planned = 0;
+  const prep = new Map();      // component name -> total pieces
+  const tbd = [];              // platters whose piece counts aren't set yet
+  let wholesToSlice = 0;
 
   for (const it of PRODUCTION) {
     const p = state.prod[it.id] || { make: 0, done: false };
@@ -797,11 +815,20 @@ function renderProduction() {
     if (p.make > 0) {
       planned++;
       if (p.done) doneCount++;
-      if (it.cake) totalHalves += p.make; else totalPlatters += p.make;
+      if (it.cake) { totalHalves += p.make; wholesToSlice += Math.ceil(p.make / 2); }
+      else {
+        totalPlatters += p.make;
+        let anyTbd = false;
+        for (const c of (it.recipe || [])) {
+          if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * p.make);
+          else anyTbd = true;
+        }
+        if (anyTbd) tbd.push(`${p.make}× ${it.name}`);
+      }
     }
     const sub = it.cake
       ? (p.make > 0 ? `${p.make} halves · slice ${Math.ceil(p.make / 2)} whole${Math.ceil(p.make / 2) === 1 ? '' : 's'}` : 'sliced half creme cake')
-      : (it.components || []).join(' · ');
+      : recipeSummary(it);
 
     const row = document.createElement('div');
     row.className = 'pull-item' + (p.done ? ' done' : '');
@@ -825,19 +852,38 @@ function renderProduction() {
   $('prodSummary').innerHTML = planned === 0
     ? 'Set how many to make with the + buttons.'
     : `<strong>${totalPlatters}</strong> platter${totalPlatters === 1 ? '' : 's'} · <strong>${totalHalves}</strong> creme-cake halves · ${doneCount}/${planned} produced`;
+
+  // Prep totals (component rollup)
+  const prepEl = $('prodPrep');
+  if (!prep.size && !wholesToSlice && !tbd.length) { prepEl.innerHTML = ''; return; }
+  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1])
+    .map(([n, q]) => `<div class="prep-row"><span>${escapeHtml(n)}</span><b>${q}</b></div>`);
+  if (wholesToSlice) rows.push(`<div class="prep-row"><span>Creme cake wholes to slice</span><b>${wholesToSlice}</b></div>`);
+  let html = `<div class="prep-head">🧾 Prep totals — bake / portion this</div>${rows.join('')}`;
+  if (tbd.length) html += `<div class="prep-tbd">Piece counts TBD: ${escapeHtml(tbd.join(', '))}</div>`;
+  prepEl.innerHTML = html;
 }
 
 function productionText() {
   const lines = [`Production plan — ${fmtDate(stripTime(new Date()))}`];
   let lastGroup = null;
+  const prep = new Map(); let wholes = 0;
   for (const it of PRODUCTION) {
     const p = state.prod[it.id] || { make: 0 };
     if (!p.make) continue;
     if (it.group !== lastGroup) { lines.push(`-- ${it.group} --`); lastGroup = it.group; }
     const extra = it.cake ? ` (slice ${Math.ceil(p.make / 2)})` : '';
     lines.push(`[${p.done ? 'x' : ' '}] ${p.make}x ${it.name}${extra}`);
+    if (it.cake) wholes += Math.ceil(p.make / 2);
+    else for (const c of (it.recipe || [])) if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * p.make);
   }
-  return lines.length > 1 ? lines.join('\n') : 'Production plan is empty.';
+  if (lines.length === 1) return 'Production plan is empty.';
+  if (prep.size || wholes) {
+    lines.push('', 'Prep totals:');
+    [...prep.entries()].sort((a, b) => b[1] - a[1]).forEach(([n, q]) => lines.push(`  ${n}: ${q}`));
+    if (wholes) lines.push(`  Creme cake wholes to slice: ${wholes}`);
+  }
+  return lines.join('\n');
 }
 async function copyProduction() {
   const text = productionText();
