@@ -320,7 +320,7 @@ function renderList() {
          <div class="name">${it.holiday ? '🎄 ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
          <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
        </div>`;
-    tap.addEventListener('click', () => openSheet(it));
+    tap.addEventListener('click', () => isDesktop() ? openItemEditor(it) : openSheet(it));
 
     const badge = document.createElement('span');
     badge.className = 'badge' + (it.pkgDate ? ' pkg' : '');
@@ -348,6 +348,8 @@ function matches(it, term) {
   return it.name.toLowerCase().includes(term) || it.category.toLowerCase().includes(term)
     || (TABLE_NAME[it._table] || '').toLowerCase().includes(term);
 }
+
+const isDesktop = () => window.matchMedia('(min-width: 720px)').matches;
 
 /* ---------------- Detail sheet ---------------- */
 function openSheet(it) {
@@ -378,12 +380,11 @@ function renderShelf(it) {
 let editorKey = null;       // key of item being edited; null = adding new
 let editorFromSheet = false;
 
-function openItemEditor(it) {
+function openItemEditor(it, fromSheet) {
   editorKey = it ? it._key : null;
-  editorFromSheet = !!it;
-  // hide the detail sheet underneath so the two don't overlap (keep state.current
-  // so Cancel can return to it)
-  if (it) { state.current = it; $('sheet').hidden = true; $('sheetBackdrop').hidden = true; }
+  editorFromSheet = !!fromSheet;
+  // when opened from the detail sheet, hide it so the two don't overlap
+  if (fromSheet && it) { state.current = it; $('sheet').hidden = true; $('sheetBackdrop').hidden = true; }
   $('editorTitle').textContent = it ? 'Edit item' : 'Add item';
   const par = (it && it.par) || {};
   $('edName').value = it ? it.name : '';
@@ -437,22 +438,35 @@ function readEditor() {
   };
 }
 
-function saveItemEditor() {
-  const f = readEditor(); if (!f) return;
-  let key = editorKey;
+// Persist the current editor fields without closing (used for auto-save).
+function commitEditor() {
+  if ($('itemEditor').hidden) return false;
+  const f = readEditor(); if (!f) return false;   // needs a name first
   if (editorKey) {
     const added = state.cust.added.find((a) => a._key === editorKey);
     if (added) Object.assign(added, f, { pkgDate: f.days == null });
     else state.cust.patches[editorKey] = f;
   } else {
-    key = 'a:' + (f.upc ? 'u' + f.upc : Date.now().toString(36) + Math.floor(Math.random() * 1e4));
-    state.cust.added.push(Object.assign({ _key: key }, f, { pkgDate: f.days == null }));
+    // first valid save of a new item — create it, then keep editing the same item
+    editorKey = 'a:' + (f.upc ? 'u' + f.upc : Date.now().toString(36) + Math.floor(Math.random() * 1e4));
+    state.cust.added.push(Object.assign({ _key: editorKey }, f, { pkgDate: f.days == null }));
+    $('edDelete').style.display = '';
+    $('editorTitle').textContent = 'Edit item';
   }
   saveCustomizations();
-  closeItemEditor();
   refreshCatalog();
+  return true;
+}
+
+let autoSaveTimer = null;
+function scheduleAutoSave() { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(commitEditor, 350); }
+
+function saveItemEditor() {
+  commitEditor();
+  const key = editorKey;
+  closeItemEditor();
   const updated = state.items.find((i) => i._key === key);
-  if (editorFromSheet && updated) openSheet(updated); else if (editorFromSheet) closeSheet();
+  if (editorFromSheet && updated) openSheet(updated);
 }
 
 function deleteItemEditor() {
@@ -1319,8 +1333,8 @@ function wireEvents() {
   $('scanClose').addEventListener('click', closeScanner);
   $('scanAddBtn').addEventListener('click', scanAddNew);
   // item editor
-  $('shelfEditBtn').addEventListener('click', () => { if (state.current) openItemEditor(state.current); });
-  $('edScanUpc').addEventListener('click', () => openScanner('capture', (code) => { $('edUpc').value = code; }));
+  $('shelfEditBtn').addEventListener('click', () => { if (state.current) openItemEditor(state.current, true); });
+  $('edScanUpc').addEventListener('click', () => openScanner('capture', (code) => { $('edUpc').value = code; commitEditor(); }));
   $('addItemBtn').addEventListener('click', () => openItemEditor(null));
   $('holidayToggle').addEventListener('click', toggleHoliday);
   $('cakeToggle').addEventListener('click', toggleCake);
@@ -1330,8 +1344,12 @@ function wireEvents() {
   $('edCancel').addEventListener('click', cancelItemEditor);
   $('editorClose').addEventListener('click', cancelItemEditor);
   $('editorBackdrop').addEventListener('click', cancelItemEditor);
-  $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; });
-  $('edHoliday').addEventListener('change', (e) => { $('edSeasonField').hidden = !e.target.checked; });
+  $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; commitEditor(); });
+  $('edHoliday').addEventListener('change', (e) => { $('edSeasonField').hidden = !e.target.checked; commitEditor(); });
+  // auto-save edits as you type / change
+  ['edName', 'edCategory', 'edUpc', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays']
+    .forEach((id) => $(id).addEventListener('input', scheduleAutoSave));
+  ['edTable', 'edSeason', 'edCake'].forEach((id) => $(id).addEventListener('change', commitEditor));
   // export / import
   $('exportBtn').addEventListener('click', exportCatalog);
   $('importBtn').addEventListener('click', () => $('importFile').click());

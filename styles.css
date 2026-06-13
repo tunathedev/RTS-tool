@@ -569,6 +569,7 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .ed-check { flex-direction: row; align-items: center; gap: 8px; grid-column: 1 / -1; font-weight: 600; color: var(--ink); font-size: .85rem; }
 .ed-check input { width: 18px; height: 18px; }
 .editor-actions { flex: 0 0 auto; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.editor-auto { text-align: center; font-size: .72rem; color: var(--ok); font-weight: 700; }
 .editor-actions-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .editor-actions-row .btn-ghost { padding: 9px 14px; font-size: .85rem; }
 
