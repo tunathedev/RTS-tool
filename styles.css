@@ -19,6 +19,8 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* the hidden attribute must always win over component display rules */
+[hidden] { display: none !important; }
 
 html, body {
   margin: 0;
