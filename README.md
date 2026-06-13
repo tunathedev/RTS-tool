@@ -43,16 +43,28 @@ Each item in `data/products.json` supports:
 | `days` / `pkgDate` | Shelf life in days, or follow printed package date |
 | `image` | Direct product image URL |
 | `upc` | Barcode digits (matched by the scanner) |
-| `par` | `{ "tall": N, "deep": M }` — par level layout |
+| `par` | `{ "tall": N, "wide": W, "deep": M }` — par level layout |
 
-Populate `image`, `upc`, and `par` in bulk from a spreadsheet:
+**Build the catalog from a planogram export** (the primary data source — ~192
+SKUs with UPC, image, and par). Shelf-life days are derived by matching each
+item's type to the quick-sheet values; types not on the sheet fall back to
+"follow package date" (never an invented number):
+
+```bash
+node tools/import-planogram.js path/to/planogram.csv   # writes data/products.json
+REVIEW=1 node tools/import-planogram.js path/to/planogram.csv   # + print every assignment
+```
+
+Expected planogram columns: `ID_CONSM_UNT_CD` (UPC), `DSC_ITEM` (description),
+`PROD_FCNG_QTY` (wide), `ROW_DEEP_QTY` (deep), `ROW_HI_QTY` (tall), `image`.
+
+**Or merge a simple spreadsheet** onto existing products by name:
 
 ```bash
 node tools/import-csv.js path/to/products.csv
 ```
 
-CSV columns (header row): `name, image_url, upc, par_tall, par_deep` (+ optional
-`category`). Rows merge onto existing products by name.
+CSV columns: `name, image_url, upc, par_tall, par_deep` (+ optional `category`).
 
 ## Run it
 

@@ -5,12 +5,319 @@
   "lastUpdated": "2026-03-31",
   "categories": [
     {
+      "category": "Bread/Buns",
+      "items": [
+        {
+          "name": "12ct H-E-B Sweet Aloha Rolls",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122071383",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002173547",
+          "par": {
+            "tall": 5,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "24ct H-E-B Sweet Aloha Rolls",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122029439",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003690029",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Avocado Brioche Buns",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "81004433050",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016419013",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Baked Challah Bread 12",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "65784646874",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001430505",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 5
+          }
+        },
+        {
+          "name": "Blueberry Sliced Brioche",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "81004433034",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015878015",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Brioche Hamburgr Bun",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122077177",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005635588",
+          "par": {
+            "tall": 1,
+            "wide": 3,
+            "deep": 5
+          }
+        },
+        {
+          "name": "Brioche Hot Dog Bun",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122085527",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005635582",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Cinnamon Raisin Sliced Brioche",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "81004433035",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015858075",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 5
+          }
+        },
+        {
+          "name": "Cristal Artisan Slice Bread5ct",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "81004433022",
+          "image": "https://images.heb.com/is/image/HEBGrocery/014289016",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 9
+          }
+        },
+        {
+          "name": "Cristal Bagel Bun 4ct",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "85088500877",
+          "image": "https://images.heb.com/is/image/HEBGrocery/014289017",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "H-E-B Aloha Swt Hamburger Buns",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122092537",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002964505",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Aloha Swt Hot Dog Buns 8ct",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122092542",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002964504",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 5
+          }
+        },
+        {
+          "name": "H-E-B Butter Brioche Slice Bread",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122048610",
+          "image": "https://images.heb.com/is/image/HEBGrocery/008405527",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Sweet Aloha Rolls 4ct",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122042257",
+          "image": "https://images.heb.com/is/image/HEBGrocery/004461001",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Izzio Ciabatta Take & Bake",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "65708202702",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015146059",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Jalapeno Cheddar Brioche Bun",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "81004433052",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016400031",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Lemon Sliced Brioche",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "81004433036",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015878016",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Organic Bah Cntry Itln Batard",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "4122097801",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001671521",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Organic Bah Rstd Grlc Batard",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "4122097802",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001671528",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Pretzilla Soft Pretzel Bites",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "67331603651",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002203992",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Roasted Garlic Take & Bake",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "65708202713",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015146539",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Rosemary Garlic Focaccia",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "65708202930",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015146055",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "Rts Hot Cross Buns",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "5178531850",
+          "image": "https://images.heb.com/is/image/HEBGrocery/011411011"
+        },
+        {
+          "name": "Sf Style Sourdough Take & Bake",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "65708202704",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015146058",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        }
+      ]
+    },
+    {
       "category": "Babka",
       "items": [
         {
-          "name": "Molly's Babka Chocolate or Cinnamon",
+          "name": "Sliced Chocolate Babka",
           "days": 21,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "73661376046",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015899550",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Sliced Cinnamon Babka",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "73661376047",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015899025",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
         }
       ]
     },
@@ -18,79 +325,16 @@
       "category": "Biscotti",
       "items": [
         {
-          "name": "Biscotti",
+          "name": "H-E-B Vanilla Almond Biscottini",
           "days": null,
-          "pkgDate": true
-        }
-      ]
-    },
-    {
-      "category": "Bread/Buns",
-      "items": [
-        {
-          "name": "Cristal Bread Slices and Bagel Buns",
-          "days": 5,
-          "pkgDate": false
-        },
-        {
-          "name": "H-E-B Brioche Bread",
-          "days": 7,
-          "pkgDate": false
-        },
-        {
-          "name": "EuroPastry Flavored Brioche",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Baked Challah Bread (Miami Onion Roll)",
-          "days": 5,
-          "pkgDate": false
-        },
-        {
-          "name": "Aloha and Brioche Hams and Hots",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Izzio Bread - Focaccia,Ciabatta, SF sourdough, Roasted Garlic",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Red Fruit King Bread",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "Filled King Cakes",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "EuroPastry Irish Soda Bread",
-          "days": 2,
-          "pkgDate": false
-        },
-        {
-          "name": "Cartozzo's Mini King Cake",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Gambino's King Cake",
-          "days": 5,
-          "pkgDate": false
-        },
-        {
-          "name": "Crown Bakeries - Hot Cross Buns",
-          "days": 7,
-          "pkgDate": false
-        },
-        {
-          "name": "King Cake Traditional",
-          "days": 6,
-          "pkgDate": false
+          "pkgDate": true,
+          "upc": "4122055603",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002220038",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
         }
       ]
     },
@@ -98,9 +342,40 @@
       "category": "Bunuelo",
       "items": [
         {
-          "name": "My Nana Bunuelo Chips & Rounds",
+          "name": "My Nanas Bunuelo Chip 9oz",
           "days": 30,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "3439210310",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002149255",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Pan De Polvo",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "22783200000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000410493",
+          "par": {
+            "tall": 2,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Powdered Pan De Polvo",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "23280900000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002058982",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 2
+          }
         }
       ]
     },
@@ -108,84 +383,537 @@
       "category": "Cakes",
       "items": [
         {
-          "name": "Chalet Cake Pops - Current Program",
+          "name": "10 Inch Angel Food Cake",
           "days": 14,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "22762800000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000597354",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 1
+          }
         },
         {
-          "name": "Honey Cake",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "4\" Tiramisu & Limoncello Bowls",
+          "name": "4 In Tiramisu Bowl",
           "days": 7,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "9585601966",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002048914",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
         },
         {
-          "name": "Amore Cake Frozen",
-          "days": 35,
-          "pkgDate": false
-        },
-        {
-          "name": "Angel Food Bars/Dessert Shells/Lady Fingers",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Angel Food Cakes SUGAR FREE",
-          "days": 30,
-          "pkgDate": false
-        },
-        {
-          "name": "Bundt Cakes 7-Up, Mississippi, Louisiana Crunch, Big Red",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Bundt Cakes Café Valley Lemon & Triple Chocolate",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Cake Pops (everyday white, chocolate, & holiday)",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Coffee Cakes Strips",
+          "name": "4 Inch Lemoncello Bowl",
           "days": 7,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "9585601791",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002149266",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
         },
         {
-          "name": "Crème Cake Bites (Cinn, Lemon, 7-up, Red Velvet, Pumpkin)",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Crème Cakes 36oz. SAB",
-          "days": 6,
-          "pkgDate": false
-        },
-        {
-          "name": "Pumpkin Nut Crème Cake",
-          "days": 6,
-          "pkgDate": false
-        },
-        {
-          "name": "Guzel Cakes",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Sliced Loaf Cakes",
-          "days": 6,
-          "pkgDate": false
-        },
-        {
-          "name": "Cake Walk Cake Pops - New upcoming",
+          "name": "7 Up Ring Cake 26 oz",
           "days": 10,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4069768001",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001555623",
+          "par": {
+            "tall": 2,
+            "wide": 3,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Angel Food Cake Bar",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "7121404008",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001657897",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Cafe Valley Big Red Cream Cake",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4069768014",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002952549",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Cafe Valley Honey Bun Cake",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4069763021",
+          "image": "https://images.heb.com/is/image/HEBGrocery/004825661",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Cake, 36oz, Strawberry Creme",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122025616",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001086736",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Chocolate Cream Cake1/2 Cake",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "23233600000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001965085",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Cofecke Strawberry Chs",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122064955",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000481682",
+          "par": {
+            "tall": 4,
+            "wide": 3,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Coffeecake Apple",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122064858",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000481680",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Coffeecake Cheese",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122065629",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000483507",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Dessert Shells 6 Cnt",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "1290000700",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000377281",
+          "par": {
+            "tall": 8,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Drmn Strawberries White Chocolate Shortcake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "77011830009",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001954884",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Gc Poundcake Pecan Praline",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "85003145015",
+          "image": "https://images.heb.com/is/image/HEBGrocery/014510511",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "Gc Pudding Strawberry Key Lime",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "85003145018",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016399529",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Guzel Cakes Banana Pudding",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "85003145010",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010118010",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Guzel Cakes Lot Cookie Butter",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "85003145011",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010117508",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Guzel Cakes Pl Strawberry",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "85003145009",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010114015",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Banana Nut Creme Cake",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122047072",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010248577",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Si Banana Nut Half Crme Ck",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "22713200000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/014077513",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Sock It To Me Creme Cake",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122064117",
+          "image": "https://images.heb.com/is/image/HEBGrocery/007046037",
+          "par": {
+            "tall": 2,
+            "wide": 3,
+            "deep": 1
+          }
+        },
+        {
+          "name": "H-E-B Triple Chocolate Creme Cake",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122022961",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005120547",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Banana Nut",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018342",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878279",
+          "par": {
+            "tall": 2,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Lemon Creme",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018341",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878277",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Marble",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018338",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878276",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Lr 8in Mango Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23240500000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016064535",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Lr 8in Tiramisu Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23254100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015952051",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Lr 8in Truffle Royale Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23319400000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015951725",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Lr Chocolate Truffle Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22622900000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016651016",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Lr Strawberry Lemon Velvet Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22619300000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016654017",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Sab Cream Cake Marble Half",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "22838000000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001822272",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Sab Lemon Cream Cake Half",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "22838100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001816518",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Sab Sock It To Me Cream Cake 1/2",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "22837900000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001816513",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Sab Strawberry Cream Cake Half",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "22837800000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001816517",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        }
+      ]
+    },
+    {
+      "category": "Decorated Cakes",
+      "items": [
+        {
+          "name": "1/4 Buttercream Chocolate Birthday",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22660100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/008728006",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "1/4 Sheet White Birthday Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22634800000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/008726508",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream 1/4 Chocolate Flower Power",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23226000000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016005574",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream 1/4 Vanilla Candles & Confetti",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23225400000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016005573",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream 1/4 Vanilla Flower Power",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23225100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016004699",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream 1/4 Vanilla Vintage Bows",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23225300000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016005570",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream Chocolate 1/4 Candles & Confetti",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23231100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016004706",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Buttercream Chocolate 1/4 Vintage Bows",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23229300000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016004111",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Everyday Reception Cakes",
+          "days": null,
+          "pkgDate": true,
+          "upc": "2320435560",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002073695",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 2
+          }
         }
       ]
     },
@@ -193,9 +921,18 @@
       "category": "Candy",
       "items": [
         {
-          "name": "Palmer Candy (assorted varieties)",
+          "name": "Palmer Valentine Munchy Medley",
           "days": 180,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "7723217307",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003036539"
+        },
+        {
+          "name": "Palmer Valentine Snack Mix",
+          "days": 180,
+          "pkgDate": false,
+          "upc": "7723217308",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003036541"
         }
       ]
     },
@@ -203,39 +940,184 @@
       "category": "Cheesecakes",
       "items": [
         {
-          "name": "Father's Table Cheesecake (freezer)",
-          "days": 35,
-          "pkgDate": false
-        },
-        {
-          "name": "Father's Table Cheesecakes & Slices (refrigeration)",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Cotton Blues Slices (freezer)",
-          "days": null,
-          "pkgDate": true
-        },
-        {
-          "name": "Cotton Blues Slices (refrigeration)",
-          "days": 3,
-          "pkgDate": false
-        },
-        {
-          "name": "HEB Cheesecakes (refrigeration)",
+          "name": "16 oz Strawberry Swirl Cheesecake",
           "days": 7,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "1037416201",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001181440",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 9
+          }
         },
         {
-          "name": "Chuckanut Bay Heart White Raspberry Cheesecake",
-          "days": 21,
-          "pkgDate": false
+          "name": "16 oz Variety Sampler Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037416205",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001181439",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 9
+          }
         },
         {
-          "name": "Chuckanut Bay Heart Chocolate Truffle Cheesecake",
-          "days": 21,
-          "pkgDate": false
+          "name": "40oz Texas Variety Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037440089",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002053393",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "8\" Caramel Turtle Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122048957",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001050826",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "8\" New York Style Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122048960",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001050828",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "8in Pumpkin Swirl Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "73025661073",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001938846",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "9in Strawberry Swirl Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037442061",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000459471",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "9in Variety Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037442065",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000887277",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "9in40oz New York Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037442060",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000459470",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 8
+          }
+        },
+        {
+          "name": "Cbc Blueberry Cheesecake Slice",
+          "days": 3,
+          "pkgDate": false,
+          "upc": "86320400048",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005550005",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 7
+          }
+        },
+        {
+          "name": "Cbc Original Cheesecake Slice",
+          "days": 3,
+          "pkgDate": false,
+          "upc": "86320400045",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005550001",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 7
+          }
+        },
+        {
+          "name": "Cbc Sea Salt Caramel Cheesecake Slc",
+          "days": 3,
+          "pkgDate": false,
+          "upc": "86320400046",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005550002",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 7
+          }
+        },
+        {
+          "name": "Cbc Strawberry Cheesecake Slc",
+          "days": 3,
+          "pkgDate": false,
+          "upc": "86320400047",
+          "image": "https://images.heb.com/is/image/HEBGrocery/005550003",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 7
+          }
+        },
+        {
+          "name": "Ny 2sl Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037422610",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001424510",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Straw 2sl Cheesecake",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "1037422611",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001424497",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 3
+          }
         }
       ]
     },
@@ -243,99 +1125,430 @@
       "category": "Cookies",
       "items": [
         {
-          "name": "5 dozen Fancy Assortment cookies",
+          "name": "Alyssas Healthy Chocobites",
           "days": null,
-          "pkgDate": true
+          "pkgDate": true,
+          "upc": "86716900014",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002925009",
+          "par": {
+            "tall": 4,
+            "wide": 3,
+            "deep": 3
+          }
         },
         {
-          "name": "Alyssa's Cookies (Oatmeal & Vegan)",
+          "name": "Alyssas Oatmeal Bites",
           "days": null,
-          "pkgDate": true
+          "pkgDate": true,
+          "upc": "86716900010",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001912945",
+          "par": {
+            "tall": 3,
+            "wide": 4,
+            "deep": 3
+          }
         },
         {
-          "name": "Cookie Crush cookies",
+          "name": "Alyssas Vegan Bites",
           "days": null,
-          "pkgDate": true
+          "pkgDate": true,
+          "upc": "86716900011",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001914297",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 3
+          }
         },
         {
-          "name": "Cookies in Tub (decorated Bakemex)",
-          "days": null,
-          "pkgDate": true
-        },
-        {
-          "name": "Yatab Mandazi African Beignets",
-          "days": 30,
-          "pkgDate": false
-        },
-        {
-          "name": "Danish Nut Horn cookies",
-          "days": 30,
-          "pkgDate": false
-        },
-        {
-          "name": "Decorating Cookie Kits",
-          "days": 90,
-          "pkgDate": false
-        },
-        {
-          "name": "Ginger Chewies/Snickerdoodles",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Lilly's Black & White Cookies, Linzer Cookies",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Lofthouse Cookies (frosted seasonal & everyday)",
+          "name": "Cookie, Christmas Green Trees",
           "days": 28,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122090697",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000599838",
+          "par": {
+            "tall": 3,
+            "wide": 5,
+            "deep": 3
+          }
         },
         {
-          "name": "Madeleines (assorted flavors)",
-          "days": 30,
-          "pkgDate": false
-        },
-        {
-          "name": "Red & Green Stars cookies",
-          "days": 30,
-          "pkgDate": false
-        },
-        {
-          "name": "Sweet Middle Cookies",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "HEB Chocolate Chip Cookie Snack Packs",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "DVS Cookies",
+          "name": "Cookie, Christmas Red Bells",
           "days": 28,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122090699",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000600490",
+          "par": {
+            "tall": 3,
+            "wide": 5,
+            "deep": 3
+          }
         },
         {
-          "name": "BetterBites Do Bites",
-          "days": 30,
-          "pkgDate": false
+          "name": "Cookie, Easter Pink Bunny",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4122098274",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000620049"
         },
         {
-          "name": "Bakery Fresh Brookie 4ct",
+          "name": "Cookie, Halloween Orange Pumpk",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4122084850",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000592383",
+          "par": {
+            "tall": 5,
+            "wide": 9,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Cookie, Pink Hearts",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4122094588",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000617153"
+        },
+        {
+          "name": "Cookies Valentine Ps Hearts",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "7366403051",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324782"
+        },
+        {
+          "name": "Cookies-Valentine Hearts 5doz.",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "7366400424",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324789"
+        },
+        {
+          "name": "Crown Bk Round Brookie 4ct",
           "days": 12,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "8271872114",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015982085",
+          "par": {
+            "tall": 3,
+            "wide": 4,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Gluten-Free Cravin For Cookies & Cream",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "77011830016",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001956366",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Candy Cookie",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "23205700000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015997537",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Chocolate Chewies 6ct",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "23200800000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015639568",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 4
+          }
+        },
+        {
+          "name": "H-E-B Chocolate Chp Soft Baked Snack Pack",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "4122071871",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002510022",
+          "par": {
+            "tall": 1,
+            "wide": 4,
+            "deep": 4
+          }
+        },
+        {
+          "name": "H-E-B Dble Chocolate Chip Cookies 18ct",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "23217300000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016006531",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Oatmeal Raisin Cookies 18ct",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "23216200000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016006532",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Original Madeleines",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "4122086629",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003084028",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "H-E-B Pumpkin Madeleines",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "4122085437",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003084026",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "H-E-B Snickerdoodle Cookies 18ct",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "23219200000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016008026",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Sugar Cookies 18ct",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "23212400000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016007028",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Red Frosted Cookies",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4980014644",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001847668"
+        },
+        {
+          "name": "Richs Red Velvet Frostd Cookie",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4980014134",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003038168",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Rts Chocolate Chunk 18ct",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "23209400000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016006529",
+          "par": {
+            "tall": 4,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Twc Snickerdoodle Cookies",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "77098190603",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002369511",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Valentines Smoochies",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "3769521230",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002094675"
+        },
+        {
+          "name": "White Frosted Sugar Cookie",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4980026510",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016339019",
+          "par": {
+            "tall": 3,
+            "wide": 4,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Yellow Frosted Cookie",
+          "days": 28,
+          "pkgDate": false,
+          "upc": "4980014646",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001847652"
         }
       ]
     },
     {
-      "category": "Croissants",
+      "category": "Macarons",
       "items": [
         {
-          "name": "Cocktail Croissants Café Valley",
-          "days": 7,
-          "pkgDate": false
+          "name": "Almond Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869202759",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002128670",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Blueberry Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869202762",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002123767",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Blueberry Macarons 6ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23310000000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002180854",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 12
+          }
+        },
+        {
+          "name": "Dark Chocolate Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869202764",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002123771",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Dark Chocolate Orange Macaron 6ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22604700000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010704555",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Pistachio Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869202760",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002123760",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Raspberry Chocolate Macaron 6ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22657100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010676665",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Raspberry Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869202763",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002123769",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Salted Butter Caramel Macaron",
+          "days": null,
+          "pkgDate": true,
+          "upc": "88869210287",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010233511",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 11
+          }
+        },
+        {
+          "name": "Variety Macaron 6ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22662700000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010124509",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 2
+          }
         }
       ]
     },
@@ -343,144 +1556,280 @@
       "category": "Cupcakes",
       "items": [
         {
-          "name": "LaBree's Mini Cucakes",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "LaBree's Large Pumpkin",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Mini Cupcakes (white, chocolate, red velvet, holiday)",
+          "name": "H-E-B Mini Chocolate Cupcakes 12pk",
           "days": 7,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122087465",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001279754",
+          "par": {
+            "tall": 4,
+            "wide": 3,
+            "deep": 2
+          }
         },
         {
-          "name": "Better Bites Cupcakes",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Kimberley's Cupcakes",
-          "days": 21,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Danish/Donuts/Elcairs",
-      "items": [
-        {
-          "name": "Donut Holes (Powdered, Sourcream and Devils Food)",
-          "days": 5,
-          "pkgDate": false
-        },
-        {
-          "name": "Donut Holes (Glazed Yeast)",
-          "days": 2,
-          "pkgDate": false
-        },
-        {
-          "name": "CLYDE'S 12CT YEAST RAISED GLZED DONUTS",
-          "days": 2,
-          "pkgDate": false
-        },
-        {
-          "name": "RICH'S 12CT YEAST RAISED GLZED DONUTS",
-          "days": 3,
-          "pkgDate": false
-        },
-        {
-          "name": "Mini Assorted/Cheese Danish",
+          "name": "H-E-B Mini Gold Cupcakes 12ct",
           "days": 7,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Energy Bars",
-      "items": [
-        {
-          "name": "Sunrise Energy Bars",
-          "days": 45,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Garlic Sticks/Butter",
-      "items": [
-        {
-          "name": "Better Butters",
-          "days": 30,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122054190",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001068413",
+          "par": {
+            "tall": 4,
+            "wide": 3,
+            "deep": 2
+          }
         },
         {
-          "name": "Garlic Butter",
+          "name": "Hh Gluten-Free Mini Cupcakes",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122046771",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002568519",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Kb 12ct Patriot Vanilla Chocolate Cupcakes",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "77098130648",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015535013",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Lb Hal Mini Cupcakes Platter",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122099285",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003192041",
+          "par": {
+            "tall": 6,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Mini Chocolate Christmas Cupcakes 12ct",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122085371",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003191541"
+        },
+        {
+          "name": "Mini Gold Love Cupcakes 12ct",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122087219",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003193012",
+          "par": {
+            "tall": 6,
+            "wide": 3,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Mini Harvest Gold Cupcakes 12ct",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122090490",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003193032",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 4
+          }
+        },
+        {
+          "name": "Vday Mini Cupcakes Platter",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122090620",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003193016"
+        }
+      ]
+    },
+    {
+      "category": "Danish/Donuts/Eclairs",
+      "items": [
+        {
+          "name": "Assorted Mini Danishes",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "70173005010",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001417102",
+          "par": {
+            "tall": 4,
+            "wide": 5,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Cheese Mini Danishes",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "70173005020",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001417101",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Chocolate Eclairs 4 Pk",
           "days": null,
-          "pkgDate": true
-        }
-      ]
-    },
-    {
-      "category": "Gluten Free Items",
-      "items": [
-        {
-          "name": "Gluten Free Cakerie (FROZEN)",
-          "days": 35,
-          "pkgDate": false
+          "pkgDate": true,
+          "upc": "4980014779",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000377282",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 6
+          }
         },
         {
-          "name": "Gluten Free Cakerie",
+          "name": "H-E-B Devil Food Donut Holes",
           "days": 5,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122089838",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002039864",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 6
+          }
         },
         {
-          "name": "Gluten Free Brownies",
-          "days": 14,
-          "pkgDate": false
+          "name": "H-E-B Glazed Donut Holes",
+          "days": 2,
+          "pkgDate": false,
+          "upc": "4122091076",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001853222",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
         },
         {
-          "name": "Gluten Free BSBH Bread & Rolls",
-          "days": 10,
-          "pkgDate": false
+          "name": "H-E-B Powdered Donut Holes",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122083396",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001852945",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
         },
         {
-          "name": "Gluten Free Gillian's Mini Cupcakes",
+          "name": "H-E-B Sour Cream Donut Holes",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122090507",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002093646",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Danish Butter",
           "days": 7,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122018340",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878278",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 1
+          }
         },
         {
-          "name": "Gluten Free Mini Muffins Abe's",
-          "days": 7,
-          "pkgDate": false
-        },
-        {
-          "name": "Gluten Free Muffins Abe's 4ct",
-          "days": 7,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Granola",
-      "items": [
-        {
-          "name": "Granola RTS",
-          "days": 30,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Ice Cream Cakes/Cupcakes",
-      "items": [
-        {
-          "name": "Oreo Premium Ice Cream Cake (blue box)",
+          "name": "Two Bite Patriotic Mini Donuts",
           "days": null,
-          "pkgDate": true
+          "pkgDate": true,
+          "upc": "77098132303",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016362539",
+          "par": {
+            "tall": 6,
+            "wide": 2,
+            "deep": 1
+          }
+        }
+      ]
+    },
+    {
+      "category": "Muffins",
+      "items": [
+        {
+          "name": "Banana Nut Muffin 4ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22637100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/009527008",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Blueberry Muffin 4ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22653300000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/009527508",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Chocolate Chunk Muffin 4ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22632600000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/009524011",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Double Chocolate Chip Muffin 4ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "23222100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/009556012",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Gsb Pistachio Muffin 4ct",
+          "days": null,
+          "pkgDate": true,
+          "upc": "8770990198",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016433542",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 3
+          }
         }
       ]
     },
@@ -488,49 +1837,223 @@
       "category": "Mini Muffins",
       "items": [
         {
-          "name": "Café Valley Mini Muffins",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Mini Muffins",
+          "name": "H-E-B Apl Cinn & Lmn Mini Muffins",
           "days": 5,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Palmiers",
-      "items": [
-        {
-          "name": "Mini Palmiers",
-          "days": 90,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Passover Items",
-      "items": [
-        {
-          "name": "Passover (Raspberry roll, Seven Layer Cake & Apricot roll)",
-          "days": 21,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122085312",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002075965",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
         },
         {
-          "name": "Passover Raspberry Torte",
-          "days": 21,
-          "pkgDate": false
+          "name": "H-E-B Banana Nut Mini Muffins",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122086990",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002075978",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Blueberry Streusel Mini Muffin",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122087150",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002075968",
+          "par": {
+            "tall": 4,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "H-E-B Chocolate Chip Mini Muffins",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122091021",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002075982",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 2
+          }
         }
       ]
     },
     {
-      "category": "Swiss Colony Petite Fours",
+      "category": "Gluten Free Items",
       "items": [
         {
-          "name": "Swiss Colony Petite Fours (everyday & seasonal)",
-          "days": 21,
-          "pkgDate": false
+          "name": "Abe'S Blueberry Muffins 4ct",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4426172047",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015960031",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Abe'S Chocolate Chip Muffins 4ct",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4426172057",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015959531",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Abes Chocolate Chip Muffin 12 Pk",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4426149054",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002086440",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Abes Wild Blueberry Muffin 12 Pk",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4426149044",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002086441",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Genius Gluten-Free Brown Bread",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "81221702038",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002161125",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Genius Gluten-Free Four Seeded Bread",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "81221702002",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001969401",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Genius Gluten-Free Soft White",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "81221702034",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002161123",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Hh Gluten-Free Brownie Bites",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122046765",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002521041",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 2
+          }
+        }
+      ]
+    },
+    {
+      "category": "Granola",
+      "items": [
+        {
+          "name": "H-E-B Berry Crunch Granola",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "4122050213",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002233287",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Non Gmo Spr Sd & Fruit Granola",
+          "days": 30,
+          "pkgDate": false,
+          "upc": "4122037584",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002054925",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 2
+          }
+        }
+      ]
+    },
+    {
+      "category": "Ice Cream Cakes/Cupcakes",
+      "items": [
+        {
+          "name": "Carvel Patriotic Ice Cream Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "1626425201",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016356025",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Oreo Premium Ice Cream Cake Cf Foods",
+          "days": null,
+          "pkgDate": true,
+          "upc": "1626401105",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001705313",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Reeses Peanut Butter Ice Cream Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "1626415295",
+          "image": "https://images.heb.com/is/image/HEBGrocery/003149573",
+          "par": {
+            "tall": 2,
+            "wide": 1,
+            "deep": 2
+          }
         }
       ]
     },
@@ -538,104 +2061,102 @@
       "category": "Pies",
       "items": [
         {
-          "name": "Kenny's Mini Pies",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Chess Pie 8\" (Lemon, Buttermilk, Chocolate)",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "Lemon Meringue Pie (SAB)",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "Willamette Valley White Pumpkin Pie",
-          "days": 5,
-          "pkgDate": false
-        },
-        {
-          "name": "Pecan & Chocolate Pecan Pie 8\"",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "Pecan & Pumpkin Pies 12\" SAB",
-          "days": 4,
-          "pkgDate": false
-        },
-        {
-          "name": "Pumpkin Pie regular and NSA 8\"",
+          "name": "10\" Pumpkin Cream Cheese",
           "days": 3,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "23200700000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/014386556"
         },
         {
-          "name": "Sweet Potato Pie 8\"",
+          "name": "10\" Pumpkin Pie",
           "days": 3,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "22600100000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/010533516"
         },
         {
-          "name": "Apple Caramel Crumb 8\"",
-          "days": 5,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Pretzel Items",
-      "items": [
-        {
-          "name": "Pretzel Rolls and Buns",
+          "name": "8\" Pecan Pie",
           "days": 4,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122031239",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000377291",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
         },
         {
-          "name": "Pretzilla Pretzel Bites",
-          "days": 10,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Stuffing Mix",
-      "items": [
-        {
-          "name": "Stuffing Mix",
-          "days": null,
-          "pkgDate": true
-        }
-      ]
-    },
-    {
-      "category": "Sugar Free",
-      "items": [
-        {
-          "name": "Sugar Free Angel Food Cakes",
-          "days": 30,
-          "pkgDate": false
+          "name": "8\" Pumpkin Pie",
+          "days": 3,
+          "pkgDate": false,
+          "upc": "4122043508",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000377290",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
         },
         {
-          "name": "Sugar Free 7\" Decorated Cakes",
-          "days": 6,
-          "pkgDate": false
+          "name": "8in Lemon Meringue Pie",
+          "days": 4,
+          "pkgDate": false,
+          "upc": "4122084232",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001410944",
+          "par": {
+            "tall": 2,
+            "wide": 2,
+            "deep": 1
+          }
         },
         {
-          "name": "Sugar Free Cookies",
-          "days": null,
-          "pkgDate": true
-        },
-        {
-          "name": "Sugar Free Lemon Cakes",
-          "days": 7,
-          "pkgDate": false
-        },
-        {
-          "name": "Sugar Free Meringue Pies",
+          "name": "Apple Caramel Crumb Pie",
           "days": 5,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "81536001184",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016293534",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Kennys Mini Key Lime Pie",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "71127610285",
+          "image": "https://images.heb.com/is/image/HEBGrocery/011853011",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Kennys Mini Peanut Butter Pie",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "71127650286",
+          "image": "https://images.heb.com/is/image/HEBGrocery/015900026",
+          "par": {
+            "tall": 5,
+            "wide": 1,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Lr Key Lime Pie Cake",
+          "days": null,
+          "pkgDate": true,
+          "upc": "22620700000",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016664522",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 2
+          }
         }
       ]
     },
@@ -643,89 +2164,177 @@
       "category": "Two Bite Items",
       "items": [
         {
-          "name": "Two Bite Brownie bites",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Brownies with Icing Party Tray",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Cinnamon rolls",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Macaroon cookies",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Pecan Tarts Party Tray",
-          "days": 21,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Pumpkin Tarts w/cream cheese",
-          "days": 7,
-          "pkgDate": false
-        },
-        {
-          "name": "Two Bite Scones (blueberry, Orange Cran, & Pumpkin)",
-          "days": 10,
-          "pkgDate": false
-        },
-        {
-          "name": "Flavorful Brownies Bites (cookie butter, Mint & Raspberry)",
-          "days": 14,
-          "pkgDate": false
-        },
-        {
-          "name": "HEB Brownies Snack Pack",
+          "name": "H-E-B Brownies Snack Pack",
           "days": 30,
-          "pkgDate": false
-        }
-      ]
-    },
-    {
-      "category": "Stollen/Panettone",
-      "items": [
-        {
-          "name": "Schlunder Stollen",
-          "days": 60,
-          "pkgDate": false
+          "pkgDate": false,
+          "upc": "4122071872",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002510024",
+          "par": {
+            "tall": 1,
+            "wide": 6,
+            "deep": 4
+          }
         },
         {
-          "name": "Ofner Panettone Assorted",
-          "days": null,
-          "pkgDate": true
-        }
-      ]
-    },
-    {
-      "category": "Fruit Cakes",
-      "items": [
-        {
-          "name": "Fruit cake Cello",
-          "days": 90,
-          "pkgDate": false
+          "name": "H-E-B Two-Bite Brownie Bites",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "4122010951",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001875958",
+          "par": {
+            "tall": 6,
+            "wide": 5,
+            "deep": 2
+          }
         },
         {
-          "name": "Collin Street",
-          "days": null,
-          "pkgDate": true
+          "name": "Two-Bite Blueberry Scones",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "77098106345",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002430124",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Two-Bite Cinnamon Rolls",
+          "days": 14,
+          "pkgDate": false,
+          "upc": "4122085275",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001875945",
+          "par": {
+            "tall": 5,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Two-Bite Macaroons Chocolate Dippd",
+          "days": 21,
+          "pkgDate": false,
+          "upc": "4122085277",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001875943",
+          "par": {
+            "tall": 4,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Two-Bite Orange Cranberry Scones",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "77098106346",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002430125",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Two-Bite Pumpkin Spice Scones",
+          "days": 10,
+          "pkgDate": false,
+          "upc": "77098106341",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002430123",
+          "par": {
+            "tall": 1,
+            "wide": 1,
+            "deep": 1
+          }
         }
       ]
     },
     {
-      "category": "Rosca de Reyes",
+      "category": "Sugar Free",
       "items": [
         {
-          "name": "Rosca de Reyes - Traditional and Filled",
-          "days": 6,
-          "pkgDate": false
+          "name": "Cookies-Sugar-Free Soft Chocolate Chip",
+          "days": null,
+          "pkgDate": true,
+          "upc": "3874982857",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324768",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Cookis-Sugar-Free Soft Lemn Chif",
+          "days": null,
+          "pkgDate": true,
+          "upc": "3874982757",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324769",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Soft Sugar Free Almond Crescen",
+          "days": null,
+          "pkgDate": true,
+          "upc": "3874984357",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001411314",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Soft Sugar Free Oatmeal",
+          "days": null,
+          "pkgDate": true,
+          "upc": "3874983157",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000965220",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 2
+          }
+        }
+      ]
+    },
+    {
+      "category": "Other",
+      "items": [
+        {
+          "name": "Crown Bk Lemon Blondie",
+          "days": null,
+          "pkgDate": true,
+          "upc": "8271872025",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016434038",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Moyers Chocolate Caramel Apple",
+          "days": null,
+          "pkgDate": true,
+          "upc": "62805501200",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002627033"
+        }
+      ]
+    },
+    {
+      "category": "Stuffing Mix",
+      "items": [
+        {
+          "name": "Holiday Stuffing Mix",
+          "days": null,
+          "pkgDate": true,
+          "upc": "7222005151",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001508419"
         }
       ]
     }

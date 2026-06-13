@@ -158,16 +158,15 @@ function renderUpc(it) {
     : '';
 }
 
-/* Par level — "how many tall × how many deep" with a cute icon grid. */
+/* Par level — "tall × wide × deep" with a cute front-of-shelf icon grid. */
 function renderPar(it) {
   const box = $('detailPar');
   const par = it.par;
-  if (!par || !(par.tall || par.deep)) { box.innerHTML = ''; return; }
-  const tall = Math.max(1, par.tall || 1);
-  const deep = Math.max(1, par.deep || 1);
-  const total = tall * deep;
-  // Grid: `deep` columns across, `tall` rows down (capped so it stays cute).
-  const cols = Math.min(deep, 8), rows = Math.min(tall, 6);
+  if (!par || !(par.tall || par.wide || par.deep)) { box.innerHTML = ''; return; }
+  const tall = par.tall || 0, wide = par.wide || 0, deep = par.deep || 0;
+  const total = (tall || 1) * (wide || 1) * (deep || 1);
+  // Front view of the shelf: `wide` facings across × `tall` high.
+  const cols = Math.min(Math.max(wide, 1), 8), rows = Math.min(Math.max(tall, 1), 6);
   let cells = '';
   for (let i = 0; i < cols * rows; i++) cells += '<div class="cell"></div>';
   box.innerHTML =
@@ -175,7 +174,7 @@ function renderPar(it) {
        <div class="par-grid" style="grid-template-columns:repeat(${cols},14px)">${cells}</div>
        <div class="par-meta">
          <div class="par-title">📦 Par level</div>
-         <div class="par-dim">${tall} tall × ${deep} deep</div>
+         <div class="par-dim">${tall} tall × ${wide} wide × ${deep} deep</div>
          <div class="par-total">= ${total} on display</div>
        </div>
      </div>`;
