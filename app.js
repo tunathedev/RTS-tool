@@ -8,7 +8,9 @@
 
 const HEB_SEARCH = (q) => `https://www.heb.com/search?q=${encodeURIComponent(q)}`;
 const LS_KEY = 'rts.pullList.v1';
-const LS_SHELF = 'rts.shelfOverrides.v1';
+const LS_SHELF = 'rts.shelfOverrides.v1';   // legacy (migrated into LS_CUST)
+const LS_CUST = 'rts.catalog.v2';           // user edits: { patches, added, deleted }
+const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
 
 const state = {
   data: null,
@@ -18,7 +20,9 @@ const state = {
   current: null,      // product open in the sheet
   pull: [],           // [{name, qty, done}]
   overrides: {},
-  shelfOv: {},        // upc/name -> { days: N|null } user shelf-life edits
+  base: [],           // base catalog items (with _key)
+  catOrder: new Map(),
+  cust: { patches: {}, added: [], deleted: [] },  // user customizations
   imgCache: new Map(),
   scan: { controls: null, active: false },
 };
@@ -28,21 +32,20 @@ const $ = (id) => document.getElementById(id);
 /* ---------------- init ---------------- */
 async function init() {
   try {
-    state.data = await (await fetch('data/products.json')).json();
+    const saved = localStorage.getItem(LS_BASE);
+    state.data = saved ? JSON.parse(saved) : await (await fetch('data/products.json')).json();
   } catch {
     $('productList').innerHTML =
       `<div class="no-results">Could not load products.json.<br>Run via a local server (see README).</div>`;
     return;
   }
-  try {
-    const ov = await fetch('data/heb-overrides.json');
-    if (ov.ok) state.overrides = await ov.json();
-  } catch {}
 
-  flatten();
-  loadShelfOverrides();
+  buildBase();
+  loadCustomizations();
+  rebuildItems();
   loadPullList();
   buildCategoryFilter();
+  buildCatDatalist();
   renderHeader();
   setToday();
   renderList();
@@ -51,48 +54,81 @@ async function init() {
   loadWeather();
 }
 
-function flatten() {
-  for (const cat of state.data.categories) {
-    for (const it of cat.items) {
-      const obj = { ...it, category: cat.category };
-      obj._defDays = it.days;       // remember the derived defaults for "reset"
-      obj._defPkg = it.pkgDate;
-      state.items.push(obj);
-      state.byName.set(it.name, obj);
-      if (obj.upc) state.byUpc.set(normUpc(obj.upc), obj);
-    }
-  }
-}
-
-/* ---------------- Shelf-life overrides (user edits) ---------------- */
-function ovKey(it) { return it.upc ? 'u:' + normUpc(it.upc) : 'n:' + it.name; }
-
-function loadShelfOverrides() {
-  try { state.shelfOv = JSON.parse(localStorage.getItem(LS_SHELF) || '{}') || {}; }
-  catch { state.shelfOv = {}; }
-  for (const it of state.items) {
-    const ov = state.shelfOv[ovKey(it)];
-    if (ov) { it.days = ov.days; it.pkgDate = ov.days == null; }
-  }
-}
-function saveShelfOverrides() {
-  try { localStorage.setItem(LS_SHELF, JSON.stringify(state.shelfOv)); } catch {}
-}
-function isOverridden(it) { return Object.prototype.hasOwnProperty.call(state.shelfOv, ovKey(it)); }
-
-function applyShelfEdit(it, days) {        // days: number, or null for "package date"
-  state.shelfOv[ovKey(it)] = { days };
-  it.days = days; it.pkgDate = days == null;
-  saveShelfOverrides();
-}
-function resetShelfEdit(it) {
-  delete state.shelfOv[ovKey(it)];
-  it.days = it._defDays; it.pkgDate = it._defPkg;
-  saveShelfOverrides();
-}
-
-// Normalize a UPC/EAN to digits only (drops spaces, dashes, leading zero noise kept).
+// Normalize a UPC/EAN to digits only (drops spaces, dashes).
 function normUpc(code) { return String(code).replace(/\D/g, ''); }
+
+/* ---------------- Catalog: base + user customizations ---------------- */
+function baseKeyOf(it) { return it.upc ? 'u:' + normUpc(it.upc) : 'n:' + it.name; }
+
+function buildBase() {
+  state.base = [];
+  state.catOrder = new Map();
+  state.data.categories.forEach((c) => { if (!state.catOrder.has(c.category)) state.catOrder.set(c.category, state.catOrder.size); });
+  for (const cat of state.data.categories)
+    for (const it of cat.items)
+      state.base.push({ ...it, category: cat.category, _key: baseKeyOf(it) });
+}
+
+function loadCustomizations() {
+  try { state.cust = JSON.parse(localStorage.getItem(LS_CUST) || 'null') || { patches: {}, added: [], deleted: [] }; }
+  catch { state.cust = { patches: {}, added: [], deleted: [] }; }
+  state.cust.patches = state.cust.patches || {};
+  state.cust.added = state.cust.added || [];
+  state.cust.deleted = state.cust.deleted || [];
+  // migrate legacy shelf-only overrides
+  try {
+    const old = JSON.parse(localStorage.getItem(LS_SHELF) || 'null');
+    if (old && typeof old === 'object') {
+      for (const k in old) state.cust.patches[k] = Object.assign({}, state.cust.patches[k], { days: old[k].days });
+      localStorage.removeItem(LS_SHELF);
+      saveCustomizations();
+    }
+  } catch {}
+}
+function saveCustomizations() { try { localStorage.setItem(LS_CUST, JSON.stringify(state.cust)); } catch {} }
+
+function effective(src, patch, key, isAdded) {
+  const days = ('days' in patch) ? patch.days : src.days;
+  return {
+    name: patch.name ?? src.name,
+    category: patch.category ?? src.category,
+    days, pkgDate: days == null,
+    upc: ('upc' in patch ? patch.upc : src.upc) || '',
+    image: ('image' in patch ? patch.image : src.image) || undefined,
+    par: ('par' in patch ? patch.par : src.par) || undefined,
+    boxQty: ('boxQty' in patch ? patch.boxQty : src.boxQty) || undefined,
+    _key: key, _added: !!isAdded,
+    _defDays: src.days, _defPkg: src.pkgDate,
+  };
+}
+
+function rebuildItems() {
+  const list = [];
+  for (const b of state.base) {
+    if (state.cust.deleted.includes(b._key)) continue;
+    list.push(effective(b, state.cust.patches[b._key] || {}, b._key, false));
+  }
+  for (const a of state.cust.added) {
+    if (state.cust.deleted.includes(a._key)) continue;
+    list.push(effective(a, {}, a._key, true));
+  }
+  const order = (cat) => { if (!state.catOrder.has(cat)) state.catOrder.set(cat, state.catOrder.size); return state.catOrder.get(cat); };
+  list.sort((x, y) => order(x.category) - order(y.category) || x.name.localeCompare(y.name));
+  state.items = list;
+  state.byName = new Map(); state.byUpc = new Map();
+  for (const it of list) { state.byName.set(it.name, it); if (it.upc) state.byUpc.set(normUpc(it.upc), it); }
+}
+
+function isOverridden(it) { return it._added || Object.prototype.hasOwnProperty.call(state.cust.patches, it._key); }
+
+function refreshCatalog() {
+  rebuildItems();
+  buildCategoryFilter();
+  buildCatDatalist();
+  renderHeader();
+  renderList();
+  renderPullList();
+}
 
 function renderHeader() {
   const d = state.data.lastUpdated;
@@ -100,15 +136,34 @@ function renderHeader() {
     const dt = parseISO(d);
     $('lastUpdated').textContent = 'Sheet updated ' + fmtDate(dt);
   }
-  $('footerCount').textContent = `${state.items.length} items · ${state.data.categories.length} categories`;
+  const nCats = new Set(state.items.map((i) => i.category)).size;
+  $('footerCount').textContent = `${state.items.length} items · ${nCats} categories`;
+}
+
+function categoryNames() {
+  const seen = [];
+  for (const it of state.items) if (!seen.includes(it.category)) seen.push(it.category);
+  return seen;
 }
 
 function buildCategoryFilter() {
   const sel = $('categoryFilter');
-  for (const cat of state.data.categories) {
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All categories</option>';
+  for (const cat of categoryNames()) {
     const o = document.createElement('option');
-    o.value = cat.category; o.textContent = cat.category;
+    o.value = cat; o.textContent = cat;
     sel.appendChild(o);
+  }
+  if ([...sel.options].some((o) => o.value === cur)) sel.value = cur;
+}
+
+function buildCatDatalist() {
+  const dl = $('catList');
+  if (!dl) return;
+  dl.innerHTML = '';
+  for (const cat of categoryNames()) {
+    const o = document.createElement('option'); o.value = cat; dl.appendChild(o);
   }
 }
 
@@ -172,7 +227,6 @@ function openSheet(it) {
   $('hebLink').href = HEB_SEARCH(hebQuery(it.name));
 
   renderShelf(it);
-  closeShelfEditor();
   renderUpc(it);
   renderPar(it);
   renderSheetResult(it);
@@ -190,40 +244,127 @@ function renderShelf(it) {
     : `Shelf life: <strong>${it.days} ${it.days === 1 ? 'day' : 'days'}</strong> from freezer pull${tag}`;
 }
 
-/* ---- shelf-life editor UI ---- */
-function openShelfEditor() {
-  const it = state.current; if (!it) return;
-  const pkg = it.pkgDate;
-  $('shelfPkgToggle').checked = pkg;
-  $('shelfDaysInput').value = pkg ? '' : it.days;
-  $('shelfDaysInput').disabled = pkg;
-  $('shelfEditor').hidden = false;
-  if (!pkg) $('shelfDaysInput').focus();
-}
-function closeShelfEditor() { $('shelfEditor').hidden = true; }
+/* ---- item editor (edit / add / delete) ---- */
+let editorKey = null;       // key of item being edited; null = adding new
+let editorFromSheet = false;
 
-function saveShelfEdit() {
-  const it = state.current; if (!it) return;
-  const pkg = $('shelfPkgToggle').checked;
+function openItemEditor(it) {
+  editorKey = it ? it._key : null;
+  editorFromSheet = !!it;
+  $('editorTitle').textContent = it ? 'Edit item' : 'Add item';
+  const par = (it && it.par) || {};
+  $('edName').value = it ? it.name : '';
+  $('edCategory').value = it ? it.category : ($('categoryFilter').value || '');
+  $('edUpc').value = it ? (it.upc || '') : '';
+  $('edBox').value = it && it.boxQty ? it.boxQty : '';
+  $('edImage').value = it ? (it.image || '') : '';
+  $('edTall').value = par.tall || ''; $('edWide').value = par.wide || ''; $('edDeep').value = par.deep || '';
+  const pkg = it ? it.pkgDate : false;
+  $('edPkg').checked = pkg;
+  $('edDays').value = it && !pkg ? it.days : '';
+  $('edDays').disabled = pkg;
+  $('edDelete').style.display = it ? '' : 'none';
+  $('edReset').style.display = it && !it._added ? '' : 'none';
+  $('editorBackdrop').hidden = false;
+  $('itemEditor').hidden = false;
+}
+function closeItemEditor() { $('itemEditor').hidden = true; $('editorBackdrop').hidden = true; }
+
+function readEditor() {
+  const name = $('edName').value.trim();
+  if (!name) { $('edName').focus(); return null; }
+  const pkg = $('edPkg').checked;
   let days = null;
-  if (!pkg) {
-    days = parseInt($('shelfDaysInput').value, 10);
-    if (!Number.isFinite(days) || days < 0) { $('shelfDaysInput').focus(); return; }
+  if (!pkg) { const d = parseInt($('edDays').value, 10); days = Number.isFinite(d) && d >= 0 ? d : null; }
+  const pos = (id) => { const n = parseInt($(id).value, 10); return Number.isFinite(n) && n > 0 ? n : 0; };
+  const tall = pos('edTall'), wide = pos('edWide'), deep = pos('edDeep');
+  const box = pos('edBox');
+  return {
+    name,
+    category: $('edCategory').value.trim() || 'Other',
+    upc: normUpc($('edUpc').value),
+    image: $('edImage').value.trim(),
+    boxQty: box || null,
+    par: (tall || wide || deep) ? { tall, wide, deep } : null,
+    days: pkg ? null : days,
+  };
+}
+
+function saveItemEditor() {
+  const f = readEditor(); if (!f) return;
+  let key = editorKey;
+  if (editorKey) {
+    const added = state.cust.added.find((a) => a._key === editorKey);
+    if (added) Object.assign(added, f, { pkgDate: f.days == null });
+    else state.cust.patches[editorKey] = f;
+  } else {
+    key = 'a:' + (f.upc ? 'u' + f.upc : Date.now().toString(36) + Math.floor(Math.random() * 1e4));
+    state.cust.added.push(Object.assign({ _key: key }, f, { pkgDate: f.days == null }));
   }
-  applyShelfEdit(it, pkg ? null : days);
-  afterShelfChange(it);
+  saveCustomizations();
+  closeItemEditor();
+  refreshCatalog();
+  const updated = state.items.find((i) => i._key === key);
+  if (editorFromSheet && updated) openSheet(updated); else if (editorFromSheet) closeSheet();
 }
-function doResetShelf() {
-  const it = state.current; if (!it) return;
-  resetShelfEdit(it);
-  afterShelfChange(it);
+
+function deleteItemEditor() {
+  if (!editorKey) return;
+  if (!confirm('Delete this item from the catalog?')) return;
+  const added = state.cust.added.find((a) => a._key === editorKey);
+  if (added) state.cust.added = state.cust.added.filter((a) => a._key !== editorKey);
+  else { if (!state.cust.deleted.includes(editorKey)) state.cust.deleted.push(editorKey); delete state.cust.patches[editorKey]; }
+  saveCustomizations();
+  closeItemEditor(); closeSheet(); refreshCatalog();
 }
-function afterShelfChange(it) {
-  closeShelfEditor();
-  renderShelf(it);
-  renderSheetResult(it);
-  renderList();
-  renderPullList();
+
+function resetItemEditor() {
+  if (!editorKey) return;
+  delete state.cust.patches[editorKey];
+  state.cust.deleted = state.cust.deleted.filter((k) => k !== editorKey);
+  saveCustomizations();
+  closeItemEditor(); refreshCatalog();
+  const updated = state.items.find((i) => i._key === editorKey);
+  if (updated) openSheet(updated); else closeSheet();
+}
+
+/* ---- export / import catalog ---- */
+function exportCatalog() {
+  const cats = [];
+  for (const c of categoryNames()) {
+    const items = state.items.filter((i) => i.category === c).map((i) => {
+      const o = { name: i.name, days: i.days, pkgDate: i.pkgDate };
+      if (i.upc) o.upc = i.upc;
+      if (i.image) o.image = i.image;
+      if (i.par) o.par = i.par;
+      if (i.boxQty) o.boxQty = i.boxQty;
+      return o;
+    });
+    cats.push({ category: c, items });
+  }
+  const out = Object.assign({}, state.data, { categories: cats, exportedAt: new Date().toISOString() });
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'products.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importCatalog(file) {
+  const r = new FileReader();
+  r.onload = () => {
+    let data;
+    try { data = JSON.parse(r.result); } catch { alert('That file is not valid JSON.'); return; }
+    if (!data || !Array.isArray(data.categories)) { alert('That JSON does not look like a products catalog.'); return; }
+    if (!confirm('Replace the current catalog with this file? Your local edits will be cleared.')) return;
+    state.data = data;
+    try { localStorage.setItem(LS_BASE, JSON.stringify(data)); } catch {}
+    state.cust = { patches: {}, added: [], deleted: [] };
+    saveCustomizations();
+    buildBase(); refreshCatalog();
+    alert('Imported ' + state.items.length + ' products.');
+  };
+  r.readAsText(file);
 }
 
 function renderUpc(it) {
@@ -294,7 +435,7 @@ function loadPullList() {
     const saved = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
     // keep only items that still exist in the dataset
     state.pull = saved.filter((p) => state.byName.has(p.name))
-      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done }));
+      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done, labels: !!p.labels }));
   } catch { state.pull = []; }
 }
 function savePullList() {
@@ -305,11 +446,16 @@ function inList(name) { return state.pull.some((p) => p.name === name); }
 function toggleList(name) {
   const i = state.pull.findIndex((p) => p.name === name);
   if (i >= 0) state.pull.splice(i, 1);
-  else state.pull.push({ name, qty: 1, done: false });
+  else state.pull.push({ name, qty: 1, done: false, labels: false });
   savePullList();
   renderList();
   renderPullList();
   updateSheetAddBtn();
+}
+
+// boxes needed for a quantity given items-per-box
+function boxesFor(it, qty) {
+  return it && it.boxQty ? Math.ceil(qty / it.boxQty) : null;
 }
 
 function setQty(name, delta) {
@@ -324,6 +470,14 @@ function toggleDone(name) {
   const p = state.pull.find((x) => x.name === name);
   if (!p) return;
   p.done = !p.done;
+  savePullList();
+  renderPullList();
+}
+
+function toggleLabels(name) {
+  const p = state.pull.find((x) => x.name === name);
+  if (!p) return;
+  p.labels = !p.labels;
   savePullList();
   renderPullList();
 }
@@ -344,24 +498,36 @@ function renderPullList() {
   $('pullListWrap').hidden = n === 0;
   if (n === 0) return;
 
+  const ordered = state.items.filter((it) => inList(it.name));
   const totalQty = state.pull.reduce((s, p) => s + p.qty, 0);
   const doneCount = state.pull.filter((p) => p.done).length;
-  $('pullSummary').textContent =
-    `${n} item${n === 1 ? '' : 's'} · ${totalQty} to pull · ${doneCount}/${n} pulled · pulled ${fmtDate(getPullDate())}`;
+  const labeledCount = state.pull.filter((p) => p.labels).length;
+  let totalBoxes = 0, boxKnown = false;
+  for (const it of ordered) {
+    const p = state.pull.find((x) => x.name === it.name);
+    const b = boxesFor(it, p.qty);
+    if (b != null) { totalBoxes += b; boxKnown = true; }
+  }
+  $('pullSummary').innerHTML =
+    `${n} item${n === 1 ? '' : 's'} · ${totalQty} to pull` +
+    (boxKnown ? ` · <strong>${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}</strong>` : '') +
+    ` · ${doneCount}/${n} pulled · ${labeledCount}/${n} labeled · pulled ${fmtDate(getPullDate())}`;
 
-  // group by category, preserve dataset order
   const wrap = $('pullItems');
   wrap.innerHTML = '';
-  const ordered = state.items.filter((it) => inList(it.name));
   for (const it of ordered) {
     const p = state.pull.find((x) => x.name === it.name);
     const row = document.createElement('div');
-    row.className = 'pull-item' + (p.done ? ' done' : '');
+    row.className = 'pull-item' + (p.done ? ' done' : '') + (p.labels ? ' labeled' : '');
 
     const sell = it.pkgDate
       ? `<span class="pull-sellby pkg">Pkg date</span>`
       : (() => { const sb = sellByFor(it); const { cls } = freshness(sb);
                  return `<span class="pull-sellby ${cls}">${fmtDate(sb)}</span>`; })();
+    const boxes = boxesFor(it, p.qty);
+    const boxHtml = boxes != null
+      ? `<span class="pull-boxes">${boxes} box${boxes === 1 ? '' : 'es'}</span>`
+      : `<span class="pull-boxes unknown">box qty —</span>`;
 
     row.innerHTML = `
       <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} aria-label="Mark pulled" />
@@ -374,9 +540,14 @@ function renderPullList() {
         <span>${p.qty}</span>
         <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
       </div>
+      <div class="pull-flags">
+        <label class="label-toggle"><input type="checkbox" ${p.labels ? 'checked' : ''} aria-label="Labels printed" /> labels</label>
+        ${boxHtml}
+      </div>
       <button type="button" class="remove-btn" aria-label="Remove">🗑️</button>`;
 
     row.querySelector('.pull-check').addEventListener('change', () => toggleDone(it.name));
+    row.querySelector('.label-toggle input').addEventListener('change', () => toggleLabels(it.name));
     row.querySelector('[data-act="dec"]').addEventListener('click', () => setQty(it.name, -1));
     row.querySelector('[data-act="inc"]').addEventListener('click', () => setQty(it.name, +1));
     row.querySelector('.remove-btn').addEventListener('click', () => toggleList(it.name));
@@ -387,11 +558,16 @@ function renderPullList() {
 function pullListText() {
   const lines = [`Pull List — pulled ${fmtDate(getPullDate())}`];
   const ordered = state.items.filter((it) => inList(it.name));
+  let totalBoxes = 0, boxKnown = false;
   for (const it of ordered) {
     const p = state.pull.find((x) => x.name === it.name);
     const sb = it.pkgDate ? 'pkg date' : 'sell by ' + fmtDate(sellByFor(it));
-    lines.push(`[${p.done ? 'x' : ' '}] ${p.qty}x ${it.name} — ${sb}`);
+    const b = boxesFor(it, p.qty);
+    if (b != null) { totalBoxes += b; boxKnown = true; }
+    const boxStr = b != null ? ` (${b} box${b === 1 ? '' : 'es'})` : '';
+    lines.push(`[${p.done ? 'x' : ' '}] ${p.qty}x ${it.name} — ${sb}${boxStr}`);
   }
+  if (boxKnown) lines.push(`Total: ${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}`);
   return lines.join('\n');
 }
 
@@ -701,14 +877,24 @@ function wireEvents() {
   $('wxRefresh').addEventListener('click', loadWeather);
   $('scanFab').addEventListener('click', openScanner);
   $('scanClose').addEventListener('click', closeScanner);
-  $('shelfEditBtn').addEventListener('click', openShelfEditor);
-  $('shelfSaveBtn').addEventListener('click', saveShelfEdit);
-  $('shelfResetBtn').addEventListener('click', doResetShelf);
-  $('shelfCancelBtn').addEventListener('click', closeShelfEditor);
-  $('shelfPkgToggle').addEventListener('change', (e) => { $('shelfDaysInput').disabled = e.target.checked; });
+  // item editor
+  $('shelfEditBtn').addEventListener('click', () => { if (state.current) openItemEditor(state.current); });
+  $('addItemBtn').addEventListener('click', () => openItemEditor(null));
+  $('edSave').addEventListener('click', saveItemEditor);
+  $('edDelete').addEventListener('click', deleteItemEditor);
+  $('edReset').addEventListener('click', resetItemEditor);
+  $('edCancel').addEventListener('click', closeItemEditor);
+  $('editorClose').addEventListener('click', closeItemEditor);
+  $('editorBackdrop').addEventListener('click', closeItemEditor);
+  $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; });
+  // export / import
+  $('exportBtn').addEventListener('click', exportCatalog);
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', (e) => { if (e.target.files[0]) importCatalog(e.target.files[0]); e.target.value = ''; });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('scanModal').hidden) closeScanner();
+    else if (!$('itemEditor').hidden) closeItemEditor();
     else if (!$('sheet').hidden) closeSheet();
   });
 }

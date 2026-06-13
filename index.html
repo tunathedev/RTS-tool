@@ -63,6 +63,12 @@
           <option value="">All categories</option>
         </select>
       </div>
+      <div class="manage-row">
+        <button type="button" class="chip-btn" id="addItemBtn">➕ Add item</button>
+        <button type="button" class="chip-btn" id="exportBtn">⬇️ Export</button>
+        <button type="button" class="chip-btn" id="importBtn">⬆️ Import</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+      </div>
       <div class="count" id="resultCount"></div>
       <div id="productList" class="product-list"></div>
     </section>
@@ -104,6 +110,52 @@
     <div class="scan-status" id="scanStatus">Point the camera at a UPC barcode…</div>
   </div>
 
+  <!-- ITEM EDITOR modal -->
+  <div class="sheet-backdrop" id="editorBackdrop" hidden></div>
+  <div class="sheet editor-sheet" id="itemEditor" role="dialog" aria-modal="true" aria-label="Edit item" hidden>
+    <button class="sheet-close" id="editorClose" aria-label="Close">✕</button>
+    <h2 id="editorTitle" class="editor-title">Edit item</h2>
+    <div class="editor-grid">
+      <label class="ed-field ed-wide">Name
+        <input type="text" id="edName" autocomplete="off" />
+      </label>
+      <label class="ed-field ed-wide">Category
+        <input type="text" id="edCategory" list="catList" autocomplete="off" />
+        <datalist id="catList"></datalist>
+      </label>
+      <label class="ed-field">UPC
+        <input type="text" id="edUpc" inputmode="numeric" autocomplete="off" />
+      </label>
+      <label class="ed-field">Items per box
+        <input type="number" id="edBox" min="0" inputmode="numeric" />
+      </label>
+      <label class="ed-field ed-wide">Image URL
+        <input type="text" id="edImage" autocomplete="off" placeholder="https://images.heb.com/…" />
+      </label>
+      <label class="ed-field ed-third">Par tall
+        <input type="number" id="edTall" min="0" inputmode="numeric" />
+      </label>
+      <label class="ed-field ed-third">Par wide
+        <input type="number" id="edWide" min="0" inputmode="numeric" />
+      </label>
+      <label class="ed-field ed-third">Par deep
+        <input type="number" id="edDeep" min="0" inputmode="numeric" />
+      </label>
+      <label class="ed-field">Shelf life (days)
+        <input type="number" id="edDays" min="0" max="365" inputmode="numeric" />
+      </label>
+      <label class="ed-field ed-check"><input type="checkbox" id="edPkg" /> Follow package date</label>
+    </div>
+    <div class="editor-actions">
+      <button type="button" class="btn btn-block" id="edSave">Save</button>
+      <div class="editor-actions-row">
+        <button type="button" class="btn-ghost" id="edReset">Reset to default</button>
+        <button type="button" class="btn-ghost btn-ghost-danger" id="edDelete">Delete</button>
+        <button type="button" class="btn-ghost" id="edCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- DETAIL SHEET (bottom sheet on mobile / modal on desktop) -->
   <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
   <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Product details" hidden>
@@ -114,24 +166,10 @@
         <div class="detail-category" id="detailCategory"></div>
         <h2 id="detailName"></h2>
         <div class="shelf" id="detailShelf"></div>
-        <button type="button" class="shelf-edit-link" id="shelfEditBtn">✏️ Edit shelf life</button>
+        <button type="button" class="shelf-edit-link" id="shelfEditBtn">✏️ Edit item</button>
         <div class="upc" id="detailUpc"></div>
       </div>
     </div>
-
-    <div class="shelf-editor" id="shelfEditor" hidden>
-      <div class="shelf-editor-row">
-        <label for="shelfDaysInput">Shelf life (days)</label>
-        <input type="number" id="shelfDaysInput" min="0" max="365" inputmode="numeric" />
-      </div>
-      <label class="shelf-pkg"><input type="checkbox" id="shelfPkgToggle" /> Follow printed package date (no calculation)</label>
-      <div class="shelf-editor-actions">
-        <button type="button" class="btn" id="shelfSaveBtn">Save</button>
-        <button type="button" class="btn-ghost" id="shelfResetBtn">Reset to default</button>
-        <button type="button" class="btn-ghost" id="shelfCancelBtn">Cancel</button>
-      </div>
-    </div>
-
     <div class="par-block" id="detailPar"></div>
     <div class="sheet-result" id="sheetResult"></div>
     <div class="sheet-actions">

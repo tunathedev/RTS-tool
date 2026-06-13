@@ -27,9 +27,16 @@ It also pulls **product images from HEB.com** for the selected item.
   (Uses ZXing; works on iOS Safari / Android Chrome over HTTPS or localhost.)
 - 📦 **Par levels** — each product shows its par as *tall × wide × deep* with a
   cute icon grid and total-on-display.
-- ✏️ **Editable shelf life** — tap *Edit shelf life* on any product to set the
-  days (or "follow package date"); saved on the device and reflected everywhere.
-  Derived defaults can be reset anytime.
+- ✏️ **Edit / add / delete items** — tap *Edit item* on any product (or *➕ Add
+  item* in Browse) to change name, category, UPC, image, par, **items-per-box**,
+  and shelf life. Saved on the device; *Reset to default* restores derived values.
+- 📦 **Boxes needed** — set *items per box* and the pull list shows boxes to pull
+  per item (`ceil(qty ÷ box)`) and a total.
+- 🏷️ **Labels-printed toggle** — check off each pull-list item once its date
+  labels are printed (separate from the *pulled* check).
+- 🔄 **Export / Import** — *Export* downloads the full catalog as `products.json`
+  (commit it to share corrections across everyone's devices); *Import* loads a
+  catalog file.
 - 🌤️ **Weather** — San Antonio 78252, three 3-hour blocks + a demand "sell tip".
 - 🖼️ **Product images** — a direct image URL per product (from the data), with an
   HEB.com lookup / "View on HEB.com" fallback (see *Images* below).
