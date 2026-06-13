@@ -12,6 +12,7 @@ const LS_SHELF = 'rts.shelfOverrides.v1';   // legacy (migrated into LS_CUST)
 const LS_CUST = 'rts.catalog.v2';           // user edits: { patches, added, deleted }
 const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
 const LS_WX = 'rts.wxCollapsed';
+const LS_HOLIDAY = 'rts.hideHoliday';
 
 const state = {
   data: null,
@@ -24,6 +25,7 @@ const state = {
   base: [],           // base catalog items (with _key)
   catOrder: new Map(),
   cust: { patches: {}, added: [], deleted: [] },  // user customizations
+  hideHoliday: false,
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
@@ -43,6 +45,7 @@ async function init() {
 
   buildBase();
   loadCustomizations();
+  loadHolidayPref();
   rebuildItems();
   loadPullList();
   buildCategoryFilter();
@@ -53,6 +56,7 @@ async function init() {
   renderPullList();
   wireEvents();
   applyWxCollapsed();
+  syncHolidayBtn();
   loadWeather();
 }
 
@@ -100,6 +104,7 @@ function effective(src, patch, key, isAdded) {
     par: ('par' in patch ? patch.par : src.par) || undefined,
     boxQty: ('boxQty' in patch ? patch.boxQty : src.boxQty) || undefined,
     table: ('table' in patch ? patch.table : src.table) || undefined,
+    holiday: ('holiday' in patch ? patch.holiday : src.holiday) || false,
     _key: key, _added: !!isAdded,
     _defDays: src.days, _defPkg: src.pkgDate,
   };
@@ -152,6 +157,21 @@ function rebuildItems() {
 }
 
 function isOverridden(it) { return it._added || Object.prototype.hasOwnProperty.call(state.cust.patches, it._key); }
+
+function loadHolidayPref() {
+  try { state.hideHoliday = localStorage.getItem(LS_HOLIDAY) === '1'; } catch { state.hideHoliday = false; }
+}
+function toggleHoliday() {
+  state.hideHoliday = !state.hideHoliday;
+  try { localStorage.setItem(LS_HOLIDAY, state.hideHoliday ? '1' : '0'); } catch {}
+  syncHolidayBtn();
+  renderList();
+}
+function syncHolidayBtn() {
+  const btn = $('holidayToggle');
+  btn.classList.toggle('active', state.hideHoliday);
+  btn.textContent = state.hideHoliday ? '🎄 Holiday: hidden' : '🎄 Holiday: shown';
+}
 
 function refreshCatalog() {
   rebuildItems();
@@ -210,6 +230,7 @@ function renderList() {
   let shown = 0, lastCat = null, lastTable = null;
 
   for (const it of state.items) {
+    if (state.hideHoliday && it.holiday) continue;
     if (tableFilter && String(it._table) !== tableFilter) continue;
     if (term && !matches(it, term)) continue;
 
@@ -231,7 +252,7 @@ function renderList() {
     const tap = document.createElement('div');
     tap.className = 'tap';
     tap.innerHTML =
-      `<div class="name">${escapeHtml(it.name)}</div>
+      `<div class="name">${it.holiday ? '🎄 ' : ''}${escapeHtml(it.name)}</div>
        <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>`;
     tap.addEventListener('click', () => openSheet(it));
 
@@ -304,6 +325,7 @@ function openItemEditor(it) {
   $('edBox').value = it && it.boxQty ? it.boxQty : '';
   $('edImage').value = it ? (it.image || '') : '';
   $('edTall').value = par.tall || ''; $('edWide').value = par.wide || ''; $('edDeep').value = par.deep || '';
+  $('edHoliday').checked = it ? !!it.holiday : false;
   const pkg = it ? it.pkgDate : false;
   $('edPkg').checked = pkg;
   $('edDays').value = it && !pkg ? it.days : '';
@@ -337,6 +359,7 @@ function readEditor() {
     image: $('edImage').value.trim(),
     boxQty: box || null,
     par: (tall || wide || deep) ? { tall, wide, deep } : null,
+    holiday: $('edHoliday').checked,
     days: pkg ? null : days,
   };
 }
@@ -1021,6 +1044,7 @@ function wireEvents() {
   $('shelfEditBtn').addEventListener('click', () => { if (state.current) openItemEditor(state.current); });
   $('edScanUpc').addEventListener('click', () => openScanner('capture', (code) => { $('edUpc').value = code; }));
   $('addItemBtn').addEventListener('click', () => openItemEditor(null));
+  $('holidayToggle').addEventListener('click', toggleHoliday);
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);

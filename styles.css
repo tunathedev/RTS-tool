@@ -473,6 +473,7 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
   border-radius: 999px; padding: 7px 13px; font-size: .82rem; font-weight: 700; cursor: pointer;
 }
 .chip-btn:hover { background: #fafafa; border-color: #d8dbe0; }
+.chip-btn.active { background: var(--heb); color: #fff; border-color: var(--heb); }
 
 /* ---------- Item editor modal ---------- */
 #editorBackdrop { z-index: 65; }

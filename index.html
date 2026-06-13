@@ -83,6 +83,7 @@
       </div>
       <div class="manage-row">
         <button type="button" class="chip-btn" id="addItemBtn">➕ Add item</button>
+        <button type="button" class="chip-btn" id="holidayToggle">🎄 Holiday: shown</button>
         <button type="button" class="chip-btn" id="exportBtn" hidden>⬇️ Export</button>
         <button type="button" class="chip-btn" id="importBtn" hidden>⬆️ Import</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden />
@@ -179,6 +180,7 @@
         <input type="number" id="edDays" min="0" max="365" inputmode="numeric" />
       </label>
       <label class="ed-field ed-check"><input type="checkbox" id="edPkg" /> Follow package date</label>
+      <label class="ed-field ed-check"><input type="checkbox" id="edHoliday" /> 🎄 Holiday / seasonal item</label>
     </div>
     <div class="editor-actions">
       <button type="button" class="btn btn-block" id="edSave">Save</button>
