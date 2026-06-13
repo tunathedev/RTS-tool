@@ -43,6 +43,7 @@ async function init() {
   renderList();
   renderPullList();
   wireEvents();
+  loadWeather();
 }
 
 function flatten() {
@@ -325,6 +326,116 @@ function onPullDateChange() {
 
 function setToday() { $('pullDate').value = toISO(new Date()); onPullDateChange(); }
 
+/* ---------------- Weather (San Antonio 78252) ----------------
+ * Three 3-hour blocks for the next 9 hours, to anticipate demand.
+ * Open-Meteo: free, no API key, CORS-enabled (works on GitHub Pages). */
+const WX = { lat: 29.356, lon: -98.697, tz: 'America/Chicago', label: 'San Antonio · 78252' };
+
+// WMO weather codes → emoji + short label.
+const WMO = {
+  0: ['☀️', 'Clear'], 1: ['🌤️', 'Mostly clear'], 2: ['⛅', 'Partly cloudy'], 3: ['☁️', 'Cloudy'],
+  45: ['🌫️', 'Fog'], 48: ['🌫️', 'Icy fog'],
+  51: ['🌦️', 'Lt drizzle'], 53: ['🌦️', 'Drizzle'], 55: ['🌦️', 'Hvy drizzle'],
+  56: ['🌧️', 'Frz drizzle'], 57: ['🌧️', 'Frz drizzle'],
+  61: ['🌧️', 'Lt rain'], 63: ['🌧️', 'Rain'], 65: ['🌧️', 'Hvy rain'],
+  66: ['🌧️', 'Frz rain'], 67: ['🌧️', 'Frz rain'],
+  71: ['🌨️', 'Lt snow'], 73: ['🌨️', 'Snow'], 75: ['🌨️', 'Hvy snow'], 77: ['🌨️', 'Snow'],
+  80: ['🌦️', 'Showers'], 81: ['🌦️', 'Showers'], 82: ['⛈️', 'Hvy showers'],
+  85: ['🌨️', 'Snow showers'], 86: ['🌨️', 'Snow showers'],
+  95: ['⛈️', 'T-storms'], 96: ['⛈️', 'T-storms'], 99: ['⛈️', 'Hail storms'],
+};
+const wmo = (code) => WMO[code] || ['🌡️', '—'];
+
+async function loadWeather() {
+  const box = $('wxBullets');
+  box.innerHTML = `<div class="wx-msg">Loading weather…</div>`;
+  $('wxTip').innerHTML = '';
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX.lat}&longitude=${WX.lon}`
+    + `&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m`
+    + `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=${encodeURIComponent(WX.tz)}`
+    + `&forecast_days=2&timeformat=unixtime`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('http ' + res.status);
+    const data = await res.json();
+    renderWeather(data.hourly);
+  } catch {
+    box.innerHTML = `<div class="wx-err">Weather unavailable right now. Tap ↻ to retry.</div>`;
+  }
+}
+
+function renderWeather(h) {
+  if (!h || !Array.isArray(h.time)) {
+    $('wxBullets').innerHTML = `<div class="wx-err">Weather unavailable right now.</div>`;
+    return;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  let start = h.time.findIndex((t) => t >= now);
+  if (start < 0) start = 0;
+
+  const blocks = [];
+  for (let b = 0; b < 3; b++) {
+    const idx = [];
+    for (let k = 0; k < 3; k++) {
+      const i = start + b * 3 + k;
+      if (i < h.time.length) idx.push(i);
+    }
+    if (!idx.length) break;
+    const temps = idx.map((i) => h.temperature_2m[i]);
+    const pops = idx.map((i) => h.precipitation_probability[i] ?? 0);
+    const winds = idx.map((i) => h.wind_speed_10m[i] ?? 0);
+    const code = Math.max(...idx.map((i) => h.weather_code[i] ?? 0));
+    blocks.push({
+      startSec: h.time[idx[0]],
+      endSec: h.time[idx[idx.length - 1]] + 3600,
+      tMin: Math.round(Math.min(...temps)),
+      tMax: Math.round(Math.max(...temps)),
+      pop: Math.max(...pops),
+      wind: Math.round(Math.max(...winds)),
+      code,
+    });
+  }
+
+  $('wxBullets').innerHTML = blocks.map((b) => {
+    const [emoji, label] = wmo(b.code);
+    const temp = b.tMin === b.tMax ? `${b.tMax}°` : `${b.tMin}–${b.tMax}°`;
+    return `<div class="wx-bullet">
+      <div class="wx-emoji">${emoji}</div>
+      <div class="wx-when">${blockLabel(b.startSec, b.endSec)}</div>
+      <div class="wx-temp">${temp}</div>
+      <div class="wx-cond">${escapeHtml(label)}<br><span class="wx-rain">${b.pop}%</span> · ${b.wind}mph</div>
+    </div>`;
+  }).join('');
+
+  $('wxTip').innerHTML = sellTip(blocks);
+}
+
+function blockLabel(startSec, endSec) {
+  const a = hourParts(startSec), b = hourParts(endSec);
+  return a.ap === b.ap ? `${a.h}–${b.h} ${b.ap}` : `${a.h} ${a.ap}–${b.h} ${b.ap}`;
+}
+function hourParts(sec) {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone: WX.tz, hour: 'numeric', hour12: true })
+    .formatToParts(new Date(sec * 1000));
+  return {
+    h: parts.find((p) => p.type === 'hour').value,
+    ap: (parts.find((p) => p.type === 'dayPeriod') || {}).value || '',
+  };
+}
+
+/* A bakery-oriented demand hint based on the next 9 hours. */
+function sellTip(blocks) {
+  if (!blocks.length) return '';
+  const maxTemp = Math.max(...blocks.map((b) => b.tMax));
+  const maxPop = Math.max(...blocks.map((b) => b.pop));
+  let tip;
+  if (maxPop >= 50) tip = 'Rain likely — lean into grab-and-go comfort (coffee cakes, pies, breads, pretzels) and coffee pairings.';
+  else if (maxTemp >= 90) tip = 'Hot &amp; dry — push lighter/chilled sellers (ice cream cakes, two-bite items, lighter pastries); heavy breads may slow.';
+  else if (maxTemp <= 50) tip = 'Cold — comfort bakes move well (cinnamon rolls, babka, pies, stollen) plus hot-drink pairings.';
+  else tip = 'Mild — steady demand; feature seasonal favorites and fresh bread.';
+  return `<strong>Sell tip:</strong> ${tip}`;
+}
+
 /* ---------------- HEB image ---------------- */
 function hebQuery(name) {
   return name
@@ -415,6 +526,7 @@ function wireEvents() {
   $('sheetAddBtn').addEventListener('click', () => { if (state.current) toggleList(state.current.name); });
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
+  $('wxRefresh').addEventListener('click', loadWeather);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
 }
 

@@ -56,6 +56,35 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: #fff;
 }
 
+/* ---------- Weather ---------- */
+.weather {
+  max-width: var(--maxw); margin: 0 auto 4px; padding: 10px 12px 12px;
+}
+.wx-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.wx-title { font-size: .8rem; font-weight: 700; color: var(--muted); }
+.wx-refresh {
+  border: 1px solid var(--line); background: #fff; color: var(--muted);
+  width: 28px; height: 28px; border-radius: 8px; font-size: 1rem; line-height: 1; cursor: pointer;
+}
+.wx-bullets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wx-bullet {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 8px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.wx-emoji { font-size: 1.5rem; line-height: 1; }
+.wx-when { font-size: .72rem; font-weight: 700; color: var(--muted); margin-top: 4px; }
+.wx-temp { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
+.wx-cond { font-size: .68rem; color: var(--muted); margin-top: 3px; line-height: 1.25; }
+.wx-rain { color: #2563eb; font-weight: 700; }
+.wx-msg, .wx-err { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: .82rem; padding: 10px; }
+.wx-err { color: var(--bad); }
+.wx-tip {
+  margin-top: 9px; font-size: .76rem; line-height: 1.35; color: #5b4a1a;
+  background: #fffaf0; border: 1px solid #f0e2bd; border-radius: 10px; padding: 8px 10px;
+}
+.wx-tip:empty { display: none; }
+.wx-tip strong { color: #7a5b00; }
+
 /* ---------- Tabs ---------- */
 .tabs {
   position: sticky; top: 0; z-index: 20;

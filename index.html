@@ -33,6 +33,16 @@
     </div>
   </div>
 
+  <!-- Weather: next three 3-hour blocks for San Antonio 78252 -->
+  <section class="weather" id="weather" aria-label="Local weather forecast">
+    <div class="wx-head">
+      <span class="wx-title">⛅ San Antonio · 78252 — next 9 hrs</span>
+      <button type="button" class="wx-refresh" id="wxRefresh" aria-label="Refresh weather" title="Refresh">↻</button>
+    </div>
+    <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
+    <div class="wx-tip" id="wxTip"></div>
+  </section>
+
   <!-- Tabs -->
   <nav class="tabs" role="tablist">
     <button class="tab active" id="tabBrowse" role="tab" aria-selected="true">Browse</button>
