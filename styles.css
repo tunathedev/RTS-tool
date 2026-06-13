@@ -65,6 +65,31 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: #fff;
 }
 
+/* ---------- Shelf-life editor ---------- */
+.shelf-edit-link {
+  margin-top: 6px; background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--heb-dark); font-weight: 700; font-size: .8rem;
+}
+.shelf-edit-link:hover { text-decoration: underline; }
+.edited-tag {
+  display: inline-block; margin-left: 6px; font-size: .64rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .4px; color: #fff; background: var(--fresh);
+  padding: 1px 6px; border-radius: 999px; vertical-align: middle;
+}
+.shelf-editor {
+  margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+  background: #fbfdff;
+}
+.shelf-editor-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.shelf-editor-row label { font-size: .85rem; font-weight: 700; }
+#shelfDaysInput { width: 90px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 16px; }
+#shelfDaysInput:disabled { background: #f1f2f4; color: var(--muted); }
+.shelf-pkg { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--ink); }
+.shelf-pkg input { width: 18px; height: 18px; }
+.shelf-editor-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.shelf-editor-actions .btn { padding: 9px 14px; font-size: .85rem; }
+.shelf-editor-actions .btn-ghost { padding: 9px 12px; font-size: .85rem; }
+
 /* ---------- Par level + UPC (in detail sheet) ---------- */
 .upc { font-size: .76rem; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
 .upc .upc-num { font-weight: 700; color: var(--ink); letter-spacing: .5px; }

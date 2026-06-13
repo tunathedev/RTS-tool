@@ -114,9 +114,24 @@
         <div class="detail-category" id="detailCategory"></div>
         <h2 id="detailName"></h2>
         <div class="shelf" id="detailShelf"></div>
+        <button type="button" class="shelf-edit-link" id="shelfEditBtn">✏️ Edit shelf life</button>
         <div class="upc" id="detailUpc"></div>
       </div>
     </div>
+
+    <div class="shelf-editor" id="shelfEditor" hidden>
+      <div class="shelf-editor-row">
+        <label for="shelfDaysInput">Shelf life (days)</label>
+        <input type="number" id="shelfDaysInput" min="0" max="365" inputmode="numeric" />
+      </div>
+      <label class="shelf-pkg"><input type="checkbox" id="shelfPkgToggle" /> Follow printed package date (no calculation)</label>
+      <div class="shelf-editor-actions">
+        <button type="button" class="btn" id="shelfSaveBtn">Save</button>
+        <button type="button" class="btn-ghost" id="shelfResetBtn">Reset to default</button>
+        <button type="button" class="btn-ghost" id="shelfCancelBtn">Cancel</button>
+      </div>
+    </div>
+
     <div class="par-block" id="detailPar"></div>
     <div class="sheet-result" id="sheetResult"></div>
     <div class="sheet-actions">

@@ -1274,7 +1274,7 @@
         },
         {
           "name": "H-E-B Chocolate Chp Soft Baked Snack Pack",
-          "days": 21,
+          "days": 7,
           "pkgDate": false,
           "upc": "4122071871",
           "image": "https://images.heb.com/is/image/HEBGrocery/002510022",
@@ -1286,7 +1286,7 @@
         },
         {
           "name": "H-E-B Dble Chocolate Chip Cookies 18ct",
-          "days": 21,
+          "days": 7,
           "pkgDate": false,
           "upc": "23217300000",
           "image": "https://images.heb.com/is/image/HEBGrocery/016006531",
@@ -1298,7 +1298,7 @@
         },
         {
           "name": "H-E-B Oatmeal Raisin Cookies 18ct",
-          "days": 21,
+          "days": 7,
           "pkgDate": false,
           "upc": "23216200000",
           "image": "https://images.heb.com/is/image/HEBGrocery/016006532",
@@ -1334,7 +1334,7 @@
         },
         {
           "name": "H-E-B Snickerdoodle Cookies 18ct",
-          "days": 10,
+          "days": 7,
           "pkgDate": false,
           "upc": "23219200000",
           "image": "https://images.heb.com/is/image/HEBGrocery/016008026",
@@ -1346,7 +1346,7 @@
         },
         {
           "name": "H-E-B Sugar Cookies 18ct",
-          "days": 21,
+          "days": 7,
           "pkgDate": false,
           "upc": "23212400000",
           "image": "https://images.heb.com/is/image/HEBGrocery/016007028",
@@ -1377,7 +1377,7 @@
         },
         {
           "name": "Rts Chocolate Chunk 18ct",
-          "days": 21,
+          "days": 7,
           "pkgDate": false,
           "upc": "23209400000",
           "image": "https://images.heb.com/is/image/HEBGrocery/016006529",
@@ -1773,8 +1773,8 @@
       "items": [
         {
           "name": "Banana Nut Muffin 4ct",
-          "days": null,
-          "pkgDate": true,
+          "days": 5,
+          "pkgDate": false,
           "upc": "22637100000",
           "image": "https://images.heb.com/is/image/HEBGrocery/009527008",
           "par": {
@@ -1785,8 +1785,8 @@
         },
         {
           "name": "Blueberry Muffin 4ct",
-          "days": null,
-          "pkgDate": true,
+          "days": 5,
+          "pkgDate": false,
           "upc": "22653300000",
           "image": "https://images.heb.com/is/image/HEBGrocery/009527508",
           "par": {
@@ -1797,8 +1797,8 @@
         },
         {
           "name": "Chocolate Chunk Muffin 4ct",
-          "days": null,
-          "pkgDate": true,
+          "days": 5,
+          "pkgDate": false,
           "upc": "22632600000",
           "image": "https://images.heb.com/is/image/HEBGrocery/009524011",
           "par": {
@@ -1809,8 +1809,8 @@
         },
         {
           "name": "Double Chocolate Chip Muffin 4ct",
-          "days": null,
-          "pkgDate": true,
+          "days": 5,
+          "pkgDate": false,
           "upc": "23222100000",
           "image": "https://images.heb.com/is/image/HEBGrocery/009556012",
           "par": {
@@ -1821,8 +1821,8 @@
         },
         {
           "name": "Gsb Pistachio Muffin 4ct",
-          "days": null,
-          "pkgDate": true,
+          "days": 5,
+          "pkgDate": false,
           "upc": "8770990198",
           "image": "https://images.heb.com/is/image/HEBGrocery/016433542",
           "par": {

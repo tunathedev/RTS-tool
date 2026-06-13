@@ -119,6 +119,7 @@ const RULES = [
   D(['GRANOLA'], 30, 'Granola'),
 
   // Cookies
+  { all: ['18CT'], days: 7, cat: 'Cookies' },                    // HEB 18-count cookie packs
   D(['SNICKERDOODLE', 'CHEWIES', 'GINGER'], 10, 'Cookies'),
   D(['MADELEINE'], 30, 'Cookies'),
   { all: ['BROOKIE'], days: 12, cat: 'Cookies' },
@@ -129,8 +130,7 @@ const RULES = [
   { any: ['SNACK PACK', 'SNACK PAK'], all: [], days: 30, cat: 'Two Bite Items', _snackBrownie: true }, // brownies snack pack 30 handled below
   { all: ['ALYSSA'], days: null, cat: 'Cookies' },
   { all: ['DO BITES'], days: 30, cat: 'Cookies' },
-  { any: ['SNACK PACK', 'SNACK PAK'], all: [], not: ['BROWNIE'], days: 21, cat: 'Cookies' }, // HEB cookie snack packs
-  { all: ['18CT'], days: 21, cat: 'Cookies' },                   // HEB 18-count cookie packs
+  { any: ['SNACK PACK', 'SNACK PAK'], all: [], not: ['BROWNIE'], days: 7, cat: 'Cookies' }, // HEB cookie snack packs
   { all: ['COOKIE'], any: ['CANDY', 'CHUNK'], days: 21, cat: 'Cookies' },
   { all: ['COOKIES'], days: 21, cat: 'Cookies' },
 
@@ -146,6 +146,7 @@ const RULES = [
   // Muffins
   { any: ["ABE'S", 'ABES'], all: [], days: 7, cat: 'Gluten Free Items' },
   { all: ['MINI'], any: ['MUFFIN', 'MUFFN', 'MFFN'], days: 5, cat: 'Mini Muffins' },
+  { any: ['MUFFIN', 'MUFFN', 'MFFN'], all: [], days: 5, cat: 'Muffins' },
 
   // Cakes
   { any: ['CREME CAKE', 'CREAM CAKE', 'CRME CK', 'CRME CAKE'], all: [], days: 6, cat: 'Cakes' },

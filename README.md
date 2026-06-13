@@ -25,8 +25,11 @@ It also pulls **product images from HEB.com** for the selected item.
 - 📷 **UPC scanner** — tap the floating **Scan** button to scan a product
   barcode with the device camera; the matching product card opens automatically.
   (Uses ZXing; works on iOS Safari / Android Chrome over HTTPS or localhost.)
-- 📦 **Par levels** — each product can show its par as *how many tall × how many
-  deep* with a cute icon grid.
+- 📦 **Par levels** — each product shows its par as *tall × wide × deep* with a
+  cute icon grid and total-on-display.
+- ✏️ **Editable shelf life** — tap *Edit shelf life* on any product to set the
+  days (or "follow package date"); saved on the device and reflected everywhere.
+  Derived defaults can be reset anytime.
 - 🌤️ **Weather** — San Antonio 78252, three 3-hour blocks + a demand "sell tip".
 - 🖼️ **Product images** — a direct image URL per product (from the data), with an
   HEB.com lookup / "View on HEB.com" fallback (see *Images* below).

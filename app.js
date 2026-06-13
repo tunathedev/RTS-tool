@@ -8,6 +8,7 @@
 
 const HEB_SEARCH = (q) => `https://www.heb.com/search?q=${encodeURIComponent(q)}`;
 const LS_KEY = 'rts.pullList.v1';
+const LS_SHELF = 'rts.shelfOverrides.v1';
 
 const state = {
   data: null,
@@ -17,6 +18,7 @@ const state = {
   current: null,      // product open in the sheet
   pull: [],           // [{name, qty, done}]
   overrides: {},
+  shelfOv: {},        // upc/name -> { days: N|null } user shelf-life edits
   imgCache: new Map(),
   scan: { controls: null, active: false },
 };
@@ -38,6 +40,7 @@ async function init() {
   } catch {}
 
   flatten();
+  loadShelfOverrides();
   loadPullList();
   buildCategoryFilter();
   renderHeader();
@@ -52,11 +55,40 @@ function flatten() {
   for (const cat of state.data.categories) {
     for (const it of cat.items) {
       const obj = { ...it, category: cat.category };
+      obj._defDays = it.days;       // remember the derived defaults for "reset"
+      obj._defPkg = it.pkgDate;
       state.items.push(obj);
       state.byName.set(it.name, obj);
       if (obj.upc) state.byUpc.set(normUpc(obj.upc), obj);
     }
   }
+}
+
+/* ---------------- Shelf-life overrides (user edits) ---------------- */
+function ovKey(it) { return it.upc ? 'u:' + normUpc(it.upc) : 'n:' + it.name; }
+
+function loadShelfOverrides() {
+  try { state.shelfOv = JSON.parse(localStorage.getItem(LS_SHELF) || '{}') || {}; }
+  catch { state.shelfOv = {}; }
+  for (const it of state.items) {
+    const ov = state.shelfOv[ovKey(it)];
+    if (ov) { it.days = ov.days; it.pkgDate = ov.days == null; }
+  }
+}
+function saveShelfOverrides() {
+  try { localStorage.setItem(LS_SHELF, JSON.stringify(state.shelfOv)); } catch {}
+}
+function isOverridden(it) { return Object.prototype.hasOwnProperty.call(state.shelfOv, ovKey(it)); }
+
+function applyShelfEdit(it, days) {        // days: number, or null for "package date"
+  state.shelfOv[ovKey(it)] = { days };
+  it.days = days; it.pkgDate = days == null;
+  saveShelfOverrides();
+}
+function resetShelfEdit(it) {
+  delete state.shelfOv[ovKey(it)];
+  it.days = it._defDays; it.pkgDate = it._defPkg;
+  saveShelfOverrides();
 }
 
 // Normalize a UPC/EAN to digits only (drops spaces, dashes, leading zero noise kept).
@@ -137,11 +169,10 @@ function openSheet(it) {
   state.current = it;
   $('detailCategory').textContent = it.category;
   $('detailName').textContent = it.name;
-  $('detailShelf').innerHTML = it.pkgDate
-    ? `Shelf life: <strong>Follow printed package date</strong>`
-    : `Shelf life: <strong>${it.days} ${it.days === 1 ? 'day' : 'days'}</strong> from freezer pull`;
   $('hebLink').href = HEB_SEARCH(hebQuery(it.name));
 
+  renderShelf(it);
+  closeShelfEditor();
   renderUpc(it);
   renderPar(it);
   renderSheetResult(it);
@@ -150,6 +181,49 @@ function openSheet(it) {
 
   $('sheetBackdrop').hidden = false;
   $('sheet').hidden = false;
+}
+
+function renderShelf(it) {
+  const tag = isOverridden(it) ? ' <span class="edited-tag">edited</span>' : '';
+  $('detailShelf').innerHTML = it.pkgDate
+    ? `Shelf life: <strong>Follow printed package date</strong>${tag}`
+    : `Shelf life: <strong>${it.days} ${it.days === 1 ? 'day' : 'days'}</strong> from freezer pull${tag}`;
+}
+
+/* ---- shelf-life editor UI ---- */
+function openShelfEditor() {
+  const it = state.current; if (!it) return;
+  const pkg = it.pkgDate;
+  $('shelfPkgToggle').checked = pkg;
+  $('shelfDaysInput').value = pkg ? '' : it.days;
+  $('shelfDaysInput').disabled = pkg;
+  $('shelfEditor').hidden = false;
+  if (!pkg) $('shelfDaysInput').focus();
+}
+function closeShelfEditor() { $('shelfEditor').hidden = true; }
+
+function saveShelfEdit() {
+  const it = state.current; if (!it) return;
+  const pkg = $('shelfPkgToggle').checked;
+  let days = null;
+  if (!pkg) {
+    days = parseInt($('shelfDaysInput').value, 10);
+    if (!Number.isFinite(days) || days < 0) { $('shelfDaysInput').focus(); return; }
+  }
+  applyShelfEdit(it, pkg ? null : days);
+  afterShelfChange(it);
+}
+function doResetShelf() {
+  const it = state.current; if (!it) return;
+  resetShelfEdit(it);
+  afterShelfChange(it);
+}
+function afterShelfChange(it) {
+  closeShelfEditor();
+  renderShelf(it);
+  renderSheetResult(it);
+  renderList();
+  renderPullList();
 }
 
 function renderUpc(it) {
@@ -627,6 +701,11 @@ function wireEvents() {
   $('wxRefresh').addEventListener('click', loadWeather);
   $('scanFab').addEventListener('click', openScanner);
   $('scanClose').addEventListener('click', closeScanner);
+  $('shelfEditBtn').addEventListener('click', openShelfEditor);
+  $('shelfSaveBtn').addEventListener('click', saveShelfEdit);
+  $('shelfResetBtn').addEventListener('click', doResetShelf);
+  $('shelfCancelBtn').addEventListener('click', closeShelfEditor);
+  $('shelfPkgToggle').addEventListener('change', (e) => { $('shelfDaysInput').disabled = e.target.checked; });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('scanModal').hidden) closeScanner();
