@@ -36,33 +36,57 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 /* ---------- Header ---------- */
 .topbar {
   background:
-    radial-gradient(120% 140% at 50% -20%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
+    radial-gradient(120% 160% at 18% -40%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
     linear-gradient(135deg, #E31837 0%, #C4122B 55%, #A20F20 100%);
   color: #fff;
-  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px;
   box-shadow: inset 0 -3px 0 rgba(0,0,0,.14), 0 2px 10px rgba(0,0,0,.12);
-  text-align: center;
 }
-.topbar-inner { max-width: var(--maxw); margin: 0 auto; }
+.topbar-inner {
+  max-width: var(--maxw); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.brand-left { min-width: 0; }
 .howdy {
-  font-family: var(--font-head); font-weight: 700; font-size: .92rem;
-  letter-spacing: .2px; opacity: .96; margin: 0 0 3px;
+  font-family: var(--font-head); font-weight: 700; font-size: .82rem;
+  letter-spacing: .2px; opacity: .95; margin: 0 0 2px;
 }
 .app-title {
-  font-family: var(--font-head); font-weight: 900; font-size: 1.75rem;
-  letter-spacing: -.5px; line-height: 1.04; margin: 0;
+  font-family: var(--font-head); font-weight: 900; font-size: 1.45rem;
+  letter-spacing: -.5px; line-height: 1.02; margin: 0;
   text-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
 .app-title-50 {
-  background: #fff; color: var(--heb); border-radius: 7px;
-  padding: 0 7px; margin: 0 1px; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  background: #fff; color: var(--heb); border-radius: 6px;
+  padding: 0 6px; margin: 0 1px; box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
-.app-sub {
-  font-size: .68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-  opacity: .92; margin: 7px 0 0;
+/* live weather chip in the header */
+.wx-chip {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
+  color: #fff; border-radius: 999px; padding: 8px 13px; cursor: pointer;
+  backdrop-filter: blur(2px);
 }
-.app-updated { font-size: .68rem; opacity: .78; margin: 4px 0 0; }
-.app-updated:empty { display: none; }
+.wx-chip:active { transform: scale(.97); }
+.wx-chip-icon { font-size: 1.1rem; line-height: 1; }
+.wx-chip-temp { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; }
+
+/* ---------- Dashboard cards ---------- */
+.dash { max-width: var(--maxw); margin: 0 auto; padding: 12px 12px 4px; display: flex; flex-direction: column; gap: 10px; }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.card-label {
+  font-family: var(--font-head); font-size: .72rem; font-weight: 800;
+  letter-spacing: .5px; text-transform: uppercase; color: var(--heb-dark);
+}
+.card-hint { font-size: .72rem; color: var(--muted); margin-top: 8px; }
+.date-card .date-main {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 8px; flex-wrap: wrap;
+}
+.date-today { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; color: var(--ink); }
 
 /* ---------- Alert ---------- */
 .alert {
@@ -70,12 +94,7 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   text-align: center; font-size: .85rem; padding: 8px 14px;
 }
 
-/* ---------- Pull-date bar ---------- */
-.pulldate-bar {
-  max-width: var(--maxw); margin: 0 auto; padding: 10px 12px;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-}
-.pulldate-bar label { font-size: .82rem; font-weight: 700; color: var(--muted); }
+/* ---------- Pull-date controls ---------- */
 .pulldate-controls { display: flex; gap: 8px; }
 #pullDate {
   padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: #fff;
@@ -174,28 +193,26 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 }
 .ed-scan:active { transform: scale(.96); }
 
-/* ---------- Weather ---------- */
-.weather {
-  max-width: var(--maxw); margin: 0 auto 4px; padding: 10px 12px 12px;
+/* ---------- Weather card ---------- */
+.weather { padding-bottom: 12px; }
+.wx-bar {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: none; border: none; padding: 0; cursor: pointer; text-align: left;
 }
-.wx-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.wx-toggle {
-  display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0;
-  background: none; border: none; padding: 4px 0; cursor: pointer; text-align: left;
-}
-.wx-chevron { font-size: .7rem; color: var(--muted); transition: transform .18s; }
+.wx-chevron { font-size: .72rem; color: var(--muted); transition: transform .18s; }
 .weather.collapsed .wx-chevron { transform: rotate(-90deg); }
-.wx-title { font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wx-now { font-size: .95rem; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.weather.collapsed { padding-bottom: 12px; }
 .weather.collapsed .wx-body { display: none; }
-/* collapsed = minimal preview: just current temp + icon */
-.weather.collapsed .wx-title { display: none; }
-.weather:not(.collapsed) .wx-now { display: none; }
+.wx-body { margin-top: 10px; }
+.wx-refresh-text {
+  margin-top: 8px; background: none; border: none; color: var(--heb-dark);
+  font-weight: 700; font-size: .76rem; cursor: pointer; padding: 2px 0;
+}
 
 /* expanded: current-conditions detail */
 .wx-current {
   display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+  background: #fbfdff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
 }
 .wx-current:empty { display: none; }
 .wx-cur-emoji { font-size: 2.2rem; line-height: 1; }
@@ -225,16 +242,13 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 .wx-rain { color: #2563eb; font-weight: 700; }
 .wx-msg, .wx-err { flex: 1; text-align: center; color: var(--muted); font-size: .82rem; padding: 10px; }
 .wx-err { color: var(--bad); }
-.wx-tip-wrap { max-width: var(--maxw); margin: 0 auto; padding: 2px 12px 6px; }
-.wx-tip-wrap:has(.wx-tip:empty) { display: none; }
-.wx-tip {
-  font-size: .78rem; line-height: 1.35; color: #5b4a1a;
-  background: #fffaf0; border: 1px solid #f0e2bd; border-radius: 10px; padding: 9px 12px;
-}
-.tip-head { font-family: var(--font-head); font-weight: 800; color: #7a5b00; font-size: .8rem; margin-bottom: 4px; }
+/* Sell-tip card */
+.tip-card { background: #fffaf0; border-color: #f0e2bd; }
+.tip-card:has(.wx-tip:empty) { display: none; }
+.wx-tip { font-size: .78rem; line-height: 1.35; color: #5b4a1a; }
+.tip-head { font-family: var(--font-head); font-weight: 800; color: #7a5b00; font-size: .8rem; margin-bottom: 5px; }
 .tip-list { margin: 0; padding-left: 18px; }
 .tip-list li { margin: 3px 0; }
-.wx-tip:empty { display: none; }
 .wx-tip strong { color: #7a5b00; }
 
 /* ---------- Tabs ---------- */

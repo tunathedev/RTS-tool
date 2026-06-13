@@ -619,12 +619,21 @@ function freshness(sellBy) {
 }
 
 function onPullDateChange() {
+  updateDateLabel();
   renderList();
   renderPullList();
   if (state.current) renderSheetResult(state.current);
 }
 
 function setToday() { $('pullDate').value = toISO(new Date()); onPullDateChange(); }
+
+function updateDateLabel() {
+  const d = parseISO($('pullDate').value);
+  if (!d) { $('todayLabel').textContent = ''; return; }
+  const isToday = d.getTime() === stripTime(new Date()).getTime();
+  const fmt = d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  $('todayLabel').textContent = (isToday ? 'Today · ' : '') + fmt;
+}
 
 /* ---------------- Weather (San Antonio 78252) ----------------
  * Three 3-hour blocks for the next 9 hours, to anticipate demand.
@@ -652,8 +661,10 @@ function toggleWeather() {
   try { localStorage.setItem(LS_WX, collapsed ? '1' : '0'); } catch {}
 }
 function applyWxCollapsed() {
-  let c = false; try { c = localStorage.getItem(LS_WX) === '1'; } catch {}
-  if (c) { $('weather').classList.add('collapsed'); $('wxToggle').setAttribute('aria-expanded', 'false'); }
+  let v = null; try { v = localStorage.getItem(LS_WX); } catch {}
+  const collapsed = v === null ? true : v === '1';   // default collapsed
+  $('weather').classList.toggle('collapsed', collapsed);
+  $('wxToggle').setAttribute('aria-expanded', String(!collapsed));
 }
 
 async function loadWeather() {
@@ -694,7 +705,8 @@ function renderWeather(data) {
   const cur = data.current || {};
   const curTemp = Math.round(cur.temperature_2m ?? today.hi ?? 0);
   const [ce, clabel] = wmo(cur.weather_code ?? today.code ?? 0);
-  $('wxNow').textContent = `${curTemp}° ${ce}`;
+  $('wxChipTemp').textContent = `${curTemp}°`;
+  $('wxChipIcon').textContent = ce;
   $('wxCurrent').innerHTML =
     `<div class="wx-cur-emoji">${ce}</div>
      <div class="wx-cur-main">
@@ -960,6 +972,7 @@ function wireEvents() {
   $('clearBtn').addEventListener('click', clearList);
   $('wxRefresh').addEventListener('click', loadWeather);
   $('wxToggle').addEventListener('click', toggleWeather);
+  $('wxChip').addEventListener('click', toggleWeather);
   $('scanFab').addEventListener('click', () => openScanner('lookup'));
   $('scanClose').addEventListener('click', closeScanner);
   $('scanAddBtn').addEventListener('click', scanAddNew);

@@ -15,44 +15,54 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <p class="howdy">🤠 Howdy, Partner!</p>
-      <h1 class="app-title">SA<span class="app-title-50">50</span> Bakery Tools</h1>
-      <p class="app-sub">Sell-By · Pull List · Par · Scan · Weather</p>
-      <p class="app-updated" id="lastUpdated"></p>
+      <div class="brand-left">
+        <p class="howdy">🤠 Howdy, Partner!</p>
+        <h1 class="app-title">SA<span class="app-title-50">50</span> Bakery Tools</h1>
+      </div>
+      <button type="button" class="wx-chip" id="wxChip" aria-label="Toggle weather">
+        <span class="wx-chip-icon" id="wxChipIcon">⛅</span>
+        <span class="wx-chip-temp" id="wxChipTemp">—°</span>
+      </button>
     </div>
   </header>
 
+  <!-- Food-safety reminder -->
   <div class="alert" role="note">
     ⚠️ <strong>Date all RTS items immediately</strong> when pulled from the freezer.
   </div>
 
-  <!-- Global pull date: drives every sell-by calculation -->
-  <div class="pulldate-bar">
-    <label for="pullDate">Pulled from freezer</label>
-    <div class="pulldate-controls">
-      <input type="date" id="pullDate" />
-      <button type="button" class="btn-ghost" id="todayBtn">Today</button>
-    </div>
-  </div>
+  <div class="dash">
+    <!-- Dating date: drives every sell-by calculation -->
+    <section class="card date-card">
+      <div class="card-label">📅 Dating date</div>
+      <div class="date-main">
+        <div class="date-today" id="todayLabel"></div>
+        <div class="pulldate-controls">
+          <input type="date" id="pullDate" aria-label="Date pulled from freezer" />
+          <button type="button" class="btn-ghost" id="todayBtn">Today</button>
+        </div>
+      </div>
+      <div class="card-hint">Sell-by dates are calculated from this date. <span id="lastUpdated"></span></div>
+    </section>
 
-  <!-- Weather: next three 3-hour blocks for San Antonio 78252 -->
-  <section class="weather" id="weather" aria-label="Local weather forecast">
-    <div class="wx-head">
-      <button type="button" class="wx-toggle" id="wxToggle" aria-expanded="true">
+    <!-- Weather (collapsible) -->
+    <section class="card weather collapsed" id="weather" aria-label="Local weather">
+      <button type="button" class="wx-bar" id="wxToggle" aria-expanded="false">
+        <span class="card-label">⛅ Weather · San Antonio 78252</span>
         <span class="wx-chevron" aria-hidden="true">▾</span>
-        <span class="wx-title">⛅ San Antonio · 78252 — hourly</span>
-        <span class="wx-now" id="wxNow"></span>
       </button>
-      <button type="button" class="wx-refresh" id="wxRefresh" aria-label="Refresh weather" title="Refresh">↻</button>
-    </div>
-    <div class="wx-body" id="wxBody">
-      <div class="wx-current" id="wxCurrent"></div>
-      <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
-    </div>
-  </section>
+      <div class="wx-body" id="wxBody">
+        <div class="wx-current" id="wxCurrent"></div>
+        <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
+        <button type="button" class="wx-refresh-text" id="wxRefresh">↻ Refresh forecast</button>
+      </div>
+    </section>
 
-  <!-- Sell tip lives outside the weather box so it stays visible -->
-  <div class="wx-tip-wrap"><div class="wx-tip" id="wxTip"></div></div>
+    <!-- Today's sell tips -->
+    <section class="card tip-card" id="tipCard">
+      <div class="wx-tip" id="wxTip"></div>
+    </section>
+  </div>
 
   <!-- Tabs -->
   <nav class="tabs" role="tablist">
