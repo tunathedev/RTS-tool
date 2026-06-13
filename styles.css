@@ -1,16 +1,21 @@
 :root {
-  --heb: #ee3124;
-  --heb-dark: #c4271c;
-  --ink: #1d2128;
+  /* H-E-B brand palette — primary red #E31837 (Pantone 185 C) on white */
+  --heb: #E31837;
+  --heb-dark: #B5122B;
+  --heb-darker: #8E0F22;
+  --ink: #232a31;
   --muted: #6b7280;
-  --line: #e5e7eb;
-  --bg: #f4f5f7;
+  --line: #e6e8eb;
+  --bg: #f5f6f8;
   --panel: #ffffff;
+  --fresh: #00857C;       /* HEB "fresh" teal accent */
   --ok: #1a8a3c;
-  --warn: #b8860b;
-  --bad: #c0392b;
+  --warn: #c98a00;
+  --bad: #cf1a2b;
   --radius: 14px;
   --maxw: 760px;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-head: "Archivo", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -19,25 +24,29 @@ html, body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
 main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 
 /* ---------- Top bar ---------- */
 .topbar {
-  background: linear-gradient(135deg, var(--heb), var(--heb-dark));
+  background: var(--heb);
   color: #fff;
   padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px 12px;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
 }
 .brand { display: flex; align-items: center; gap: 11px; max-width: var(--maxw); margin: 0 auto; }
 .brand-mark {
-  background: #fff; color: var(--heb); font-weight: 800; letter-spacing: .5px;
-  padding: 6px 10px; border-radius: 10px; font-size: 17px;
+  background: #fff; color: var(--heb);
+  font-family: var(--font-head); font-weight: 900; letter-spacing: .5px;
+  padding: 6px 11px; border-radius: 8px; font-size: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
-.brand-text h1 { font-size: 1.1rem; margin: 0; font-weight: 700; }
-.subtitle { margin: 0; font-size: .75rem; opacity: .9; }
+.brand-text h1 { font-family: var(--font-head); font-size: 1.15rem; margin: 0; font-weight: 800; letter-spacing: -.2px; }
+.subtitle { margin: 0; font-size: .75rem; opacity: .92; font-weight: 500; }
 
 /* ---------- Alert ---------- */
 .alert {
@@ -325,3 +334,14 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
   }
   .sheet-actions { flex-direction: row; }
 }
+
+/* ---------- H-E-B branding cohesion ---------- */
+.brand-text h1, h2, .sellby-date, .par-meta .par-title, .wx-temp, .fab-text {
+  font-family: var(--font-head);
+}
+.cat-header { font-family: var(--font-head); font-weight: 800; }
+.tab { font-family: var(--font-head); font-weight: 700; }
+.btn { font-family: var(--font-head); font-weight: 700; letter-spacing: .2px; }
+.brand-mark { line-height: 1.1; }
+/* HEB-style focus ring */
+input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
