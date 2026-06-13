@@ -95,6 +95,9 @@
     <button class="tab" id="tabList" role="tab" aria-selected="false">
       Pull List <span class="tab-count" id="listCount">0</span>
     </button>
+    <button class="tab" id="tabProd" role="tab" aria-selected="false">
+      Production <span class="tab-count" id="prodCount">0</span>
+    </button>
   </nav>
 
   <main>
@@ -134,6 +137,17 @@
           <button type="button" class="btn btn-ghost-danger" id="clearBtn">Clear list</button>
         </div>
       </div>
+    </section>
+
+    <!-- PRODUCTION VIEW -->
+    <section id="prodView" class="view" role="tabpanel" hidden>
+      <div class="prod-summary" id="prodSummary"></div>
+      <div id="prodItems" class="pull-items"></div>
+      <div class="pull-actions">
+        <button type="button" class="btn" id="prodCopyBtn">📋 Copy plan</button>
+        <button type="button" class="btn btn-ghost-danger" id="prodClearBtn">Clear plan</button>
+      </div>
+      <div class="prod-note">📦 Component counts &amp; container/box math — coming next.</div>
     </section>
   </main>
 

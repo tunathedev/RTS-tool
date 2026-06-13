@@ -14,6 +14,7 @@ const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
 const LS_WX = 'rts.wxCollapsed';
 const LS_HOLIDAY = 'rts.hideHoliday';
 const LS_CAKE = 'rts.hideCake';
+const LS_PROD = 'rts.production.v1';
 
 const state = {
   data: null,
@@ -28,6 +29,7 @@ const state = {
   cust: { patches: {}, added: [], deleted: [] },  // user customizations
   hideHoliday: false,
   hideCake: false,
+  prod: {},           // production plan: id -> { make, done }
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
@@ -51,12 +53,14 @@ async function init() {
   loadCakePref();
   rebuildItems();
   loadPullList();
+  loadProduction();
   buildCategoryFilter();
   buildCatDatalist();
   renderHeader();
   setToday();
   renderList();
   renderPullList();
+  renderProduction();
   wireEvents();
   applyWxCollapsed();
   syncHolidayBtn();
@@ -730,6 +734,118 @@ function flashBtn(btn, msg) {
   setTimeout(() => { btn.textContent = old; }, 1500);
 }
 
+/* ---------------- Production (platters & sliced half creme cakes) ---------------- */
+const PRODUCTION = [
+  { id: 'plt-doughnut', group: 'Platters', name: 'Doughnut Platter', components: ['Glazed', 'Chocolate', 'Powdered'] },
+  { id: 'plt-cookie', group: 'Platters', name: 'Cookie Platter', components: ['Oatmeal', 'Sugar', 'Candy', 'Chunk'] },
+  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookie + Brownie Platter', components: ['Oatmeal', 'Sugar', 'Candy', 'Chunk', 'Brownie Bites'] },
+  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Platter', components: ['Lemon', 'Marble', 'Danish'] },
+  { id: 'plt-pdp-half', group: 'Platters', name: 'Pan de Polvo (Half & Half)', components: ['Powdered Sugar', 'Cinnamon'] },
+  { id: 'plt-pdp-cinn', group: 'Platters', name: 'Pan de Polvo (Cinnamon)', components: ['Cinnamon'] },
+  { id: 'cake-marble', group: 'Sliced Half Creme Cakes', name: 'Marble', cake: true },
+  { id: 'cake-lemon', group: 'Sliced Half Creme Cakes', name: 'Lemon', cake: true },
+  { id: 'cake-strawberry', group: 'Sliced Half Creme Cakes', name: 'Strawberry', cake: true },
+  { id: 'cake-banananut', group: 'Sliced Half Creme Cakes', name: 'Banana Nut', cake: true },
+  { id: 'cake-triplechoc', group: 'Sliced Half Creme Cakes', name: 'Triple Chocolate', cake: true },
+  { id: 'cake-sockit', group: 'Sliced Half Creme Cakes', name: 'Sock It To Me', cake: true },
+];
+
+function loadProduction() {
+  try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
+}
+function saveProduction() { try { localStorage.setItem(LS_PROD, JSON.stringify(state.prod)); } catch {} }
+function prodOf(id) { return state.prod[id] || (state.prod[id] = { make: 0, done: false }); }
+
+function setProdMake(id, delta) {
+  const p = prodOf(id);
+  p.make = Math.max(0, p.make + delta);
+  if (p.make === 0) p.done = false;
+  saveProduction(); renderProduction();
+}
+function toggleProdDone(id) {
+  const p = prodOf(id);
+  if (!p.make) return;
+  p.done = !p.done;
+  saveProduction(); renderProduction();
+}
+function clearProduction() {
+  if (!Object.keys(state.prod).length) return;
+  if (!confirm('Clear the whole production plan?')) return;
+  state.prod = {};
+  saveProduction(); renderProduction();
+}
+
+function updateProdCount() {
+  const n = PRODUCTION.filter((it) => (state.prod[it.id] || {}).make > 0).length;
+  $('prodCount').textContent = n;
+}
+
+function renderProduction() {
+  updateProdCount();
+  const wrap = $('prodItems');
+  wrap.innerHTML = '';
+  let lastGroup = null;
+  let totalPlatters = 0, totalHalves = 0, doneCount = 0, planned = 0;
+
+  for (const it of PRODUCTION) {
+    const p = state.prod[it.id] || { make: 0, done: false };
+    if (it.group !== lastGroup) {
+      const h = document.createElement('div');
+      h.className = 'cat-header'; h.textContent = it.group;
+      wrap.appendChild(h); lastGroup = it.group;
+    }
+    if (p.make > 0) {
+      planned++;
+      if (p.done) doneCount++;
+      if (it.cake) totalHalves += p.make; else totalPlatters += p.make;
+    }
+    const sub = it.cake
+      ? (p.make > 0 ? `${p.make} halves · slice ${Math.ceil(p.make / 2)} whole${Math.ceil(p.make / 2) === 1 ? '' : 's'}` : 'sliced half creme cake')
+      : (it.components || []).join(' · ');
+
+    const row = document.createElement('div');
+    row.className = 'pull-item' + (p.done ? ' done' : '');
+    row.innerHTML = `
+      <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} ${p.make ? '' : 'disabled'} aria-label="Mark produced" />
+      <div class="pull-main">
+        <div class="pull-name">${escapeHtml(it.name)}</div>
+        <div class="pull-sub">${escapeHtml(sub)}</div>
+      </div>
+      <div class="qty">
+        <button type="button" data-act="dec" aria-label="Decrease">−</button>
+        <span>${p.make}</span>
+        <button type="button" data-act="inc" aria-label="Increase">+</button>
+      </div>`;
+    row.querySelector('.pull-check').addEventListener('change', () => toggleProdDone(it.id));
+    row.querySelector('[data-act="dec"]').addEventListener('click', () => setProdMake(it.id, -1));
+    row.querySelector('[data-act="inc"]').addEventListener('click', () => setProdMake(it.id, +1));
+    wrap.appendChild(row);
+  }
+
+  $('prodSummary').innerHTML = planned === 0
+    ? 'Set how many to make with the + buttons.'
+    : `<strong>${totalPlatters}</strong> platter${totalPlatters === 1 ? '' : 's'} · <strong>${totalHalves}</strong> creme-cake halves · ${doneCount}/${planned} produced`;
+}
+
+function productionText() {
+  const lines = [`Production plan — ${fmtDate(stripTime(new Date()))}`];
+  let lastGroup = null;
+  for (const it of PRODUCTION) {
+    const p = state.prod[it.id] || { make: 0 };
+    if (!p.make) continue;
+    if (it.group !== lastGroup) { lines.push(`-- ${it.group} --`); lastGroup = it.group; }
+    const extra = it.cake ? ` (slice ${Math.ceil(p.make / 2)})` : '';
+    lines.push(`[${p.done ? 'x' : ' '}] ${p.make}x ${it.name}${extra}`);
+  }
+  return lines.length > 1 ? lines.join('\n') : 'Production plan is empty.';
+}
+async function copyProduction() {
+  const text = productionText();
+  try { if (navigator.share) { await navigator.share({ title: 'Production plan', text }); return; } } catch {}
+  try { await navigator.clipboard.writeText(text); flashBtn($('prodCopyBtn'), '✓ Copied'); }
+  catch { prompt('Copy your production plan:', text); }
+}
+
 /* ---------------- date + freshness ---------------- */
 function getPullDate() { return parseISO($('pullDate').value) || stripTime(new Date()); }
 function sellByFor(it) { return it.pkgDate ? null : addDays(getPullDate(), it.days); }
@@ -1074,13 +1190,13 @@ function escapeHtml(s) {
 }
 
 function switchTab(which) {
-  const browse = which === 'browse';
-  $('tabBrowse').classList.toggle('active', browse);
-  $('tabList').classList.toggle('active', !browse);
-  $('tabBrowse').setAttribute('aria-selected', browse);
-  $('tabList').setAttribute('aria-selected', !browse);
-  $('browseView').hidden = !browse;
-  $('listView').hidden = browse;
+  const tabs = [['browse', 'tabBrowse', 'browseView'], ['list', 'tabList', 'listView'], ['prod', 'tabProd', 'prodView']];
+  for (const [name, tabId, viewId] of tabs) {
+    const on = which === name;
+    $(tabId).classList.toggle('active', on);
+    $(tabId).setAttribute('aria-selected', String(on));
+    $(viewId).hidden = !on;
+  }
 }
 
 function wireEvents() {
@@ -1090,6 +1206,9 @@ function wireEvents() {
   $('todayBtn').addEventListener('click', setToday);
   $('tabBrowse').addEventListener('click', () => switchTab('browse'));
   $('tabList').addEventListener('click', () => switchTab('list'));
+  $('tabProd').addEventListener('click', () => switchTab('prod'));
+  $('prodCopyBtn').addEventListener('click', copyProduction);
+  $('prodClearBtn').addEventListener('click', clearProduction);
   $('sheetClose').addEventListener('click', closeSheet);
   $('sheetBackdrop').addEventListener('click', closeSheet);
   $('sheetAddBtn').addEventListener('click', () => { if (state.current) toggleList(state.current.name); });
