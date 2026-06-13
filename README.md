@@ -169,3 +169,25 @@ Source sheet last updated **3/31/2026**.
 | `data/products.json` | Shelf-life dataset |
 | `data/heb-overrides.json` | Optional manual image pins |
 | `data/image-cache.json` | Auto-generated image lookup cache |
+
+## Global sync (optional, all devices)
+
+By default the app is **device-only** — pull list, production plan, item edits,
+and case-pack sizes save to each device's browser (localStorage). To sync those
+**live across every device**, turn on Firebase Realtime Database:
+
+1. Create a free project at <https://console.firebase.google.com> (Spark plan).
+2. **Build → Realtime Database → Create database → Start in test mode.**
+3. **Project settings → Your apps → Web app** → copy the config object
+   (must include `databaseURL`).
+4. Paste it into `sync-config.js` as `window.SYNC_CONFIG = { … }` and commit.
+
+The footer shows **☁︎ Global sync on** when active. What syncs: catalog edits
+(`cust`), pull list (`pull`), production plan (`prod`), case-pack sizes
+(`compBox`). Device-only by design: PIN unlock, weather collapse, holiday/cake
+view toggles.
+
+Notes: test-mode rules make the database open read/write — fine behind the PIN
+for a small team, but for tighter control add Realtime Database rules or Auth.
+When sync first connects, the cloud copy becomes the source of truth (a device
+with only local edits will be overwritten by the shared data).

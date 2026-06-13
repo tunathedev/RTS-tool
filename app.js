@@ -68,6 +68,7 @@ async function init() {
   syncHolidayBtn();
   syncCakeBtn();
   loadWeather();
+  initSync();
 }
 
 // Normalize a UPC/EAN to digits only (drops spaces, dashes).
@@ -101,7 +102,7 @@ function loadCustomizations() {
     }
   } catch {}
 }
-function saveCustomizations() { try { localStorage.setItem(LS_CUST, JSON.stringify(state.cust)); } catch {} }
+function saveCustomizations() { try { localStorage.setItem(LS_CUST, JSON.stringify(state.cust)); } catch {} pushSync('cust', state.cust); }
 
 function effective(src, patch, key, isAdded) {
   const days = ('days' in patch) ? patch.days : src.days;
@@ -601,6 +602,7 @@ function loadPullList() {
 }
 function savePullList() {
   try { localStorage.setItem(LS_KEY, JSON.stringify(state.pull)); } catch {}
+  pushSync('pull', state.pull);
 }
 function inList(name) { return state.pull.some((p) => p.name === name); }
 
@@ -787,8 +789,8 @@ function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
   try { state.compBox = JSON.parse(localStorage.getItem(LS_COMPBOX) || '{}') || {}; } catch { state.compBox = {}; }
 }
-function saveProduction() { try { localStorage.setItem(LS_PROD, JSON.stringify(state.prod)); } catch {} }
-function saveCompBox() { try { localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
+function saveProduction() { try { localStorage.setItem(LS_PROD, JSON.stringify(state.prod)); } catch {} pushSync('prod', state.prod); }
+function saveCompBox() { try { localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} pushSync('compBox', state.compBox); }
 function setCompBox(name) {
   const cur = state.compBox[name] || '';
   const v = prompt(`How many "${name}" come per box (case pack)?`, cur);
@@ -1394,6 +1396,56 @@ function setupLock() {
     if (/^[0-9]$/.test(e.key)) press(e.key);
     else if (e.key === 'Backspace') { e.preventDefault(); press('del'); }
   });
+}
+
+/* ---------------- Global sync (optional · Firebase Realtime DB) ----------------
+ * Off by default. Add your Firebase config in sync-config.js to enable live
+ * sync of the catalog, pull list, production plan and case-pack sizes across
+ * all devices. Until then everything stays device-only (localStorage). */
+const sync = { on: false, applying: false, mod: null, db: null, seen: new Set() };
+const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox'];
+
+function setSyncStatus(t) { const el = $('syncStatus'); if (el) el.textContent = t; }
+function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : state.compBox; }
+function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
+
+function pushSync(path, value, force) {
+  if (!sync.on || (sync.applying && !force)) return;
+  try { sync.mod.set(sync.mod.ref(sync.db, 'rts/' + path), { data: value == null ? null : value, ts: Date.now() }); } catch {}
+}
+
+function onRemote(path, wrapper) {
+  const first = !sync.seen.has(path); sync.seen.add(path);
+  if (wrapper == null) { if (first) pushSync(path, localOf(path), true); return; } // seed cloud from this device
+  const data = wrapper.data;
+  if (data == null) return;
+  sync.applying = true;
+  try {
+    if (path === 'cust') {
+      state.cust = { patches: data.patches || {}, added: asArr(data.added), deleted: asArr(data.deleted) };
+      saveCustomizations(); rebuildItems(); buildCategoryFilter(); buildCatDatalist(); renderHeader(); renderList(); renderPullList();
+    } else if (path === 'pull') {
+      state.pull = asArr(data); savePullList(); renderPullList(); renderList();
+    } else if (path === 'prod') {
+      state.prod = data || {}; saveProduction(); renderProduction();
+    } else if (path === 'compBox') {
+      state.compBox = data || {}; saveCompBox(); renderProduction();
+    }
+  } finally { sync.applying = false; }
+}
+
+async function initSync() {
+  const cfg = window.SYNC_CONFIG;
+  if (!cfg || !cfg.databaseURL) { setSyncStatus(''); return; }
+  setSyncStatus('☁︎ connecting…');
+  try {
+    const appMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const dbMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    const app = appMod.initializeApp(cfg);
+    sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
+    for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
+    setSyncStatus('☁︎ Global sync on');
+  } catch (e) { sync.on = false; setSyncStatus('⚠︎ sync unavailable (offline?)'); }
 }
 
 setupLock();
