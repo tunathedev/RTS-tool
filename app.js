@@ -114,6 +114,7 @@ const TABLES = [
   { n: 4, name: 'Mexican Pastry' },
   { n: 5, name: 'Sugar Free & Gluten Free' },
   { n: 6, name: 'Cupcakes & Freezer' },
+  { n: 7, name: 'Doughnuts' },
 ];
 const TABLE_NAME = Object.fromEntries(TABLES.map((t) => [t.n, t.name]));
 const CATEGORY_TABLE = {
@@ -125,7 +126,11 @@ const CATEGORY_TABLE = {
   'Gluten Free Items': 5, 'Sugar Free': 5,
   'Cupcakes': 6, 'Ice Cream Cakes/Cupcakes': 6,
 };
-function tableFor(it) { return it.table || CATEGORY_TABLE[it.category] || 2; }
+function tableFor(it) {
+  if (it.table) return it.table;
+  if (/donut|doughnut/i.test(it.name)) return 7;   // doughnuts get their own table
+  return CATEGORY_TABLE[it.category] || 2;
+}
 
 function rebuildItems() {
   const list = [];
