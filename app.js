@@ -311,9 +311,15 @@ function renderList() {
 
     const tap = document.createElement('div');
     tap.className = 'tap';
+    const thumb = it.image
+      ? `<img src="${escapeHtml(it.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('empty');this.remove();" />`
+      : '';
     tap.innerHTML =
-      `<div class="name">${it.holiday ? '🎄 ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
-       <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>`;
+      `<div class="product-thumb${it.image ? '' : ' empty'}">${thumb}</div>
+       <div class="tap-text">
+         <div class="name">${it.holiday ? '🎄 ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
+         <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
+       </div>`;
     tap.addEventListener('click', () => openSheet(it));
 
     const badge = document.createElement('span');
