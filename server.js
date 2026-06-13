@@ -8,7 +8,7 @@
  *      cached to data/image-cache.json so repeat lookups are instant.
  *
  * Zero dependencies — Node's built-in modules only.
- *   Run:  node server.js   then open  http://localhost:3000
+ *   Run:  node server.js   then open  http://localhost:3500
  *
  * Note: HEB uses bot protection. If a live lookup is blocked, the API returns
  * an empty result and the app falls back to its "View on HEB.com" link, which
@@ -22,7 +22,7 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3500;
 const ROOT = __dirname;
 const CACHE_FILE = path.join(ROOT, 'data', 'image-cache.json');
 
