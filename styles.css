@@ -22,46 +22,30 @@
 /* the hidden attribute must always win over component display rules */
 [hidden] { display: none !important; }
 
-/* ---------- PIN lock screen ---------- */
+/* ---------- PIN lock screen (simple, no frills) ---------- */
 .lock {
   position: fixed; inset: 0; z-index: 1000;
-  background:
-    radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%),
-    linear-gradient(160deg, #E31837 0%, #C4122B 55%, #8E0F22 100%);
-  color: #fff; display: flex; align-items: center; justify-content: center;
-  padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 24px;
+  background: #E31837; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(env(safe-area-inset-top,0px) + 24px) 24px 24px;
 }
-.lock-inner { width: 100%; max-width: 320px; text-align: center; }
-.lock-emblem {
-  font-family: var(--font-head); font-weight: 900; font-size: 2.2rem; letter-spacing: -1px;
-  text-shadow: 0 2px 4px rgba(0,0,0,.25);
-}
-.lock-emblem span { background: #fff; color: var(--heb); border-radius: 8px; padding: 0 8px; margin-left: 2px; }
-.lock-title { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; opacity: .95; margin-top: 2px; }
-.lock-sub { font-size: .85rem; opacity: .9; margin-top: 16px; }
-.lock-dots { display: flex; justify-content: center; gap: 16px; margin: 16px 0 6px; }
-.lock-dots span {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.8); transition: background .12s, transform .12s;
-}
-.lock-dots span.on { background: #fff; transform: scale(1.05); }
-.lock-error { min-height: 20px; font-size: .8rem; font-weight: 700; color: #ffe08a; }
-.lock-keys {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px;
-}
+.lock-inner { width: 100%; max-width: 280px; text-align: center; }
+.lock-title { font-family: var(--font-head); font-weight: 800; font-size: 1.25rem; }
+.lock-sub { font-size: .9rem; margin-top: 14px; }
+.lock-dots { display: flex; justify-content: center; gap: 16px; margin: 14px 0 6px; }
+.lock-dots span { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
+.lock-dots span.on { background: #fff; }
+.lock-error { min-height: 18px; font-size: .8rem; font-weight: 700; }
+.lock-hint { font-size: .8rem; color: #fff; margin: 2px 0 18px; }
+.lock-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .lock-keys button {
-  height: 68px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35);
-  background: rgba(255,255,255,.14); color: #fff;
-  font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; cursor: pointer;
+  height: 58px; border-radius: 10px; border: 1px solid #fff;
+  background: transparent; color: #fff;
+  font-family: var(--font-head); font-weight: 700; font-size: 1.4rem; cursor: pointer;
 }
-.lock-keys button:active { background: rgba(255,255,255,.3); transform: scale(.96); }
-.lock-del { font-size: 1.3rem !important; }
+.lock-keys button:active { background: rgba(255,255,255,.25); }
+.lock-del { font-size: 1.15rem !important; }
 .lock-spacer { visibility: hidden; }
-.lock.shake { animation: lockShake .4s; }
-@keyframes lockShake {
-  10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); }
-  30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); }
-}
 
 html, body {
   margin: 0;
