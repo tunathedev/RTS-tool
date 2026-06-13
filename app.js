@@ -13,6 +13,7 @@ const LS_CUST = 'rts.catalog.v2';           // user edits: { patches, added, del
 const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
 const LS_WX = 'rts.wxCollapsed';
 const LS_HOLIDAY = 'rts.hideHoliday';
+const LS_CAKE = 'rts.hideCake';
 
 const state = {
   data: null,
@@ -26,6 +27,7 @@ const state = {
   catOrder: new Map(),
   cust: { patches: {}, added: [], deleted: [] },  // user customizations
   hideHoliday: false,
+  hideCake: false,
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
@@ -46,6 +48,7 @@ async function init() {
   buildBase();
   loadCustomizations();
   loadHolidayPref();
+  loadCakePref();
   rebuildItems();
   loadPullList();
   buildCategoryFilter();
@@ -57,6 +60,7 @@ async function init() {
   wireEvents();
   applyWxCollapsed();
   syncHolidayBtn();
+  syncCakeBtn();
   loadWeather();
 }
 
@@ -106,6 +110,7 @@ function effective(src, patch, key, isAdded) {
     table: ('table' in patch ? patch.table : src.table) || undefined,
     holiday: ('holiday' in patch ? patch.holiday : src.holiday) || false,
     seasonTable: ('seasonTable' in patch ? patch.seasonTable : src.seasonTable) || undefined,
+    cakeSide: ('cakeSide' in patch ? patch.cakeSide : src.cakeSide) || false,
     _key: key, _added: !!isAdded,
     _defDays: src.days, _defPkg: src.pkgDate,
   };
@@ -185,6 +190,21 @@ function syncHolidayBtn() {
   btn.textContent = state.hideHoliday ? '🎄 Holiday: hidden' : '🎄 Holiday: shown';
 }
 
+function loadCakePref() {
+  try { state.hideCake = localStorage.getItem(LS_CAKE) === '1'; } catch { state.hideCake = false; }
+}
+function toggleCake() {
+  state.hideCake = !state.hideCake;
+  try { localStorage.setItem(LS_CAKE, state.hideCake ? '1' : '0'); } catch {}
+  syncCakeBtn();
+  renderList();
+}
+function syncCakeBtn() {
+  const btn = $('cakeToggle');
+  btn.classList.toggle('active', state.hideCake);
+  btn.textContent = state.hideCake ? '🎂 Cake side: hidden' : '🎂 Cake side: shown';
+}
+
 function refreshCatalog() {
   rebuildItems();
   buildCategoryFilter();
@@ -253,6 +273,8 @@ function renderList() {
   for (const it of state.items) {
     // holiday toggle hides seasonal items (unless explicitly filtering a season)
     if (state.hideHoliday && it.holiday && !seasonFilter) continue;
+    // cake-side items are hidden from the shelves when the toggle is on
+    if (state.hideCake && it.cakeSide) continue;
     if (tableFilter) {
       if (seasonFilter) { if (!(it.holiday && it._season === filterNum)) continue; }
       else { if (it.holiday || it._table !== filterNum) continue; }
@@ -283,7 +305,7 @@ function renderList() {
     const tap = document.createElement('div');
     tap.className = 'tap';
     tap.innerHTML =
-      `<div class="name">${it.holiday ? '🎄 ' : ''}${escapeHtml(it.name)}</div>
+      `<div class="name">${it.holiday ? '🎄 ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
        <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>`;
     tap.addEventListener('click', () => openSheet(it));
 
@@ -361,6 +383,7 @@ function openItemEditor(it) {
   $('edHoliday').checked = it ? !!it.holiday : false;
   $('edSeason').value = it && it.seasonTable ? String(it.seasonTable) : '1';
   $('edSeasonField').hidden = !$('edHoliday').checked;
+  $('edCake').checked = it ? !!it.cakeSide : false;
   const pkg = it ? it.pkgDate : false;
   $('edPkg').checked = pkg;
   $('edDays').value = it && !pkg ? it.days : '';
@@ -396,6 +419,7 @@ function readEditor() {
     par: (tall || wide || deep) ? { tall, wide, deep } : null,
     holiday: $('edHoliday').checked,
     seasonTable: $('edHoliday').checked ? (parseInt($('edSeason').value, 10) || 1) : null,
+    cakeSide: $('edCake').checked,
     days: pkg ? null : days,
   };
 }
@@ -1081,6 +1105,7 @@ function wireEvents() {
   $('edScanUpc').addEventListener('click', () => openScanner('capture', (code) => { $('edUpc').value = code; }));
   $('addItemBtn').addEventListener('click', () => openItemEditor(null));
   $('holidayToggle').addEventListener('click', toggleHoliday);
+  $('cakeToggle').addEventListener('click', toggleCake);
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);
