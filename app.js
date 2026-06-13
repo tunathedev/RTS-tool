@@ -889,6 +889,15 @@ function renderProduction() {
   if (tbd.length) html += `<div class="prep-tbd">Piece counts TBD: ${escapeHtml(tbd.join(', '))}</div>`;
   prepEl.innerHTML = html;
   prepEl.querySelectorAll('.prep-box').forEach((b) => b.addEventListener('click', () => setCompBox(b.dataset.comp)));
+
+  // Packaging — one container + one date label per finished platter/tray/half
+  const packEl = $('prodPack');
+  const units = totalPlatters + totalHalves;
+  packEl.innerHTML = units === 0 ? '' :
+    `<div class="prep-head pack">📦 Packaging</div>
+     <div class="prep-row"><span class="prep-name">Containers needed</span><span class="prep-qty"><b>${units}</b></span></div>
+     <div class="prep-row"><span class="prep-name">Labels needed</span><span class="prep-qty"><b>${units}</b></span></div>
+     <div class="prep-tbd">${totalPlatters} platter/tray${totalPlatters === 1 ? '' : 's'} · ${totalHalves} cake half${totalHalves === 1 ? '' : 'ves'} — 1 container &amp; 1 label each</div>`;
 }
 
 function productionText() {
@@ -917,6 +926,9 @@ function productionText() {
     if (wholes) lines.push(`  Creme cake wholes to slice: ${wholes}`);
     if (totalBoxes) lines.push(`  TOTAL BOXES TO PULL: ${totalBoxes}`);
   }
+  let units = 0;
+  for (const it of PRODUCTION) units += (state.prod[it.id] || {}).make || 0;
+  if (units) { lines.push('', `Containers needed: ${units}`, `Labels needed: ${units}`); }
   return lines.join('\n');
 }
 async function copyProduction() {

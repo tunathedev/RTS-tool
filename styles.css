@@ -411,6 +411,11 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
   border-top: 1px solid #bfe6c8; font-weight: 800; color: var(--ok); font-size: .9rem;
 }
 .prep-tbd { margin-top: 8px; font-size: .74rem; color: var(--muted); }
+.prod-pack:empty { display: none; }
+.prod-pack { margin: 10px 14px 0; border: 1px solid #cfe0f7; background: #eef4fd; border-radius: 12px; padding: 10px 12px; }
+.prod-pack .prep-head.pack { color: #1d4ed8; }
+.prod-pack .prep-row { border-bottom-color: #d8e5f8; }
+.prod-pack .prep-qty b { color: #1d4ed8; }
 
 /* ---------- Pull list ---------- */
 .pull-summary { padding: 12px 14px; font-size: .82rem; color: var(--muted); border-bottom: 1px solid var(--line); }
