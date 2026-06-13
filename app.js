@@ -25,7 +25,7 @@ const state = {
   catOrder: new Map(),
   cust: { patches: {}, added: [], deleted: [] },  // user customizations
   imgCache: new Map(),
-  scan: { controls: null, active: false },
+  scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -744,9 +744,12 @@ function sellTip(blocks) {
  * opens the matching product card. */
 const ZXING_CDN = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm';
 
-async function openScanner() {
-  const modal = $('scanModal');
-  modal.hidden = false;
+async function openScanner(mode = 'lookup', onCapture = null) {
+  state.scan.mode = mode;
+  state.scan.onCapture = onCapture;
+  state.scan.lastCode = '';
+  $('scanAddBtn').hidden = true;
+  $('scanModal').hidden = false;
   setScanStatus('Starting camera…');
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     setScanStatus('Camera not supported on this device/browser.', 'err');
@@ -756,7 +759,7 @@ async function openScanner() {
     const { BrowserMultiFormatReader } = await import(ZXING_CDN);
     const reader = new BrowserMultiFormatReader();
     state.scan.active = true;
-    setScanStatus('Point the camera at a UPC barcode…');
+    setScanStatus(mode === 'capture' ? 'Scan a barcode to fill the UPC…' : 'Point the camera at a UPC barcode…');
     state.scan.controls = await reader.decodeFromConstraints(
       { video: { facingMode: { ideal: 'environment' } } },
       $('scanVideo'),
@@ -772,23 +775,44 @@ async function openScanner() {
 
 function onScan(raw) {
   const code = normUpc(raw);
+  if (!code) return;
+  // capture mode: hand the code back (e.g. to the editor's UPC field)
+  if (state.scan.mode === 'capture') {
+    state.scan.active = false;
+    setScanStatus(`✓ ${code}`, 'ok');
+    const cb = state.scan.onCapture;
+    setTimeout(() => { closeScanner(); if (cb) cb(code); }, 300);
+    return;
+  }
   const match = state.byUpc.get(code);
   if (match) {
     setScanStatus(`✓ ${match.name}`, 'ok');
     state.scan.active = false;
     setTimeout(() => { closeScanner(); openSheet(match); }, 350);
   } else {
-    // keep scanning, but report what was read
-    setScanStatus(`No product matches ${code}. Keep scanning…`, 'err');
+    // unknown barcode — offer to add it as a new item on the spot
+    state.scan.lastCode = code;
+    setScanStatus(`No product matches ${code}.`, 'err');
+    $('scanAddBtn').hidden = false;
   }
+}
+
+function scanAddNew() {
+  const code = state.scan.lastCode;
+  closeScanner();
+  openItemEditor(null);
+  $('edUpc').value = code;
 }
 
 function closeScanner() {
   state.scan.active = false;
+  state.scan.mode = 'lookup';
+  state.scan.onCapture = null;
   try { state.scan.controls && state.scan.controls.stop(); } catch {}
   state.scan.controls = null;
   const v = $('scanVideo');
   if (v && v.srcObject) { v.srcObject.getTracks().forEach((t) => t.stop()); v.srcObject = null; }
+  $('scanAddBtn').hidden = true;
   $('scanModal').hidden = true;
 }
 
@@ -892,10 +916,12 @@ function wireEvents() {
   $('clearBtn').addEventListener('click', clearList);
   $('wxRefresh').addEventListener('click', loadWeather);
   $('wxToggle').addEventListener('click', toggleWeather);
-  $('scanFab').addEventListener('click', openScanner);
+  $('scanFab').addEventListener('click', () => openScanner('lookup'));
   $('scanClose').addEventListener('click', closeScanner);
+  $('scanAddBtn').addEventListener('click', scanAddNew);
   // item editor
   $('shelfEditBtn').addEventListener('click', () => { if (state.current) openItemEditor(state.current); });
+  $('edScanUpc').addEventListener('click', () => openScanner('capture', (code) => { $('edUpc').value = code; }));
   $('addItemBtn').addEventListener('click', () => openItemEditor(null));
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);

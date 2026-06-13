@@ -115,6 +115,7 @@
       <div class="scan-reticle"></div>
     </div>
     <div class="scan-status" id="scanStatus">Point the camera at a UPC barcode…</div>
+    <button type="button" class="scan-add" id="scanAddBtn" hidden>➕ Add item with this UPC</button>
   </div>
 
   <!-- ITEM EDITOR modal -->
@@ -131,7 +132,10 @@
         <datalist id="catList"></datalist>
       </label>
       <label class="ed-field">UPC
-        <input type="text" id="edUpc" inputmode="numeric" autocomplete="off" />
+        <div class="ed-upc-row">
+          <input type="text" id="edUpc" inputmode="numeric" autocomplete="off" />
+          <button type="button" class="ed-scan" id="edScanUpc" aria-label="Scan UPC" title="Scan barcode">📷</button>
+        </div>
       </label>
       <label class="ed-field">Items per box
         <input type="number" id="edBox" min="0" inputmode="numeric" />

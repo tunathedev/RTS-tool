@@ -146,6 +146,19 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 }
 .scan-status.ok { color: #6ee7a0; font-weight: 700; }
 .scan-status.err { color: #ff9b8a; }
+.scan-add {
+  display: block; margin: 0 auto 22px; background: var(--heb); color: #fff; border: none;
+  font-weight: 800; font-size: .95rem; padding: 12px 18px; border-radius: 11px; cursor: pointer;
+}
+
+/* editor UPC field with inline scan button */
+.ed-upc-row { display: flex; gap: 6px; }
+.ed-upc-row input { flex: 1; min-width: 0; }
+.ed-scan {
+  flex: 0 0 auto; width: 44px; border: 1px solid var(--line); background: #fff;
+  border-radius: 9px; font-size: 1.1rem; cursor: pointer;
+}
+.ed-scan:active { transform: scale(.96); }
 
 /* ---------- Weather ---------- */
 .weather {
