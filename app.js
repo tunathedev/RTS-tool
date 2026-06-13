@@ -99,10 +99,33 @@ function effective(src, patch, key, isAdded) {
     image: ('image' in patch ? patch.image : src.image) || undefined,
     par: ('par' in patch ? patch.par : src.par) || undefined,
     boxQty: ('boxQty' in patch ? patch.boxQty : src.boxQty) || undefined,
+    table: ('table' in patch ? patch.table : src.table) || undefined,
     _key: key, _added: !!isAdded,
     _defDays: src.days, _defPkg: src.pkgDate,
   };
 }
+
+/* Physical tables, in floor-walk order. Each product maps to a table either
+ * explicitly (it.table) or via its category. */
+const TABLES = [
+  { n: 1, name: 'Breakfast' },
+  { n: 2, name: 'Cookies, Cakes & Brownies' },
+  { n: 3, name: 'Breads' },
+  { n: 4, name: 'Mexican Pastry' },
+  { n: 5, name: 'Sugar Free & Gluten Free' },
+  { n: 6, name: 'Cupcakes & Freezer' },
+];
+const TABLE_NAME = Object.fromEntries(TABLES.map((t) => [t.n, t.name]));
+const CATEGORY_TABLE = {
+  'Bread/Buns': 3, 'Babka': 3, 'Stollen/Panettone': 3,
+  'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Granola': 1, 'Scones': 1,
+  'Bunuelo': 4, 'Rosca de Reyes': 4,
+  'Cakes': 2, 'Decorated Cakes': 2, 'Candy': 2, 'Cheesecakes': 2, 'Cookies': 2,
+  'Macarons': 2, 'Pies': 2, 'Two Bite Items': 2, 'Fruit Cakes': 2,
+  'Gluten Free Items': 5, 'Sugar Free': 5,
+  'Cupcakes': 6, 'Ice Cream Cakes/Cupcakes': 6,
+};
+function tableFor(it) { return it.table || CATEGORY_TABLE[it.category] || 2; }
 
 function rebuildItems() {
   const list = [];
@@ -115,7 +138,9 @@ function rebuildItems() {
     list.push(effective(a, {}, a._key, true));
   }
   const order = (cat) => { if (!state.catOrder.has(cat)) state.catOrder.set(cat, state.catOrder.size); return state.catOrder.get(cat); };
-  list.sort((x, y) => order(x.category) - order(y.category) || x.name.localeCompare(y.name));
+  for (const it of list) it._table = tableFor(it);
+  // sort by physical table, then category, then name
+  list.sort((x, y) => x._table - y._table || order(x.category) - order(y.category) || x.name.localeCompare(y.name));
   state.items = list;
   state.byName = new Map(); state.byUpc = new Map();
   for (const it of list) { state.byName.set(it.name, it); if (it.upc) state.byUpc.set(normUpc(it.upc), it); }
@@ -151,10 +176,12 @@ function categoryNames() {
 function buildCategoryFilter() {
   const sel = $('categoryFilter');
   const cur = sel.value;
-  sel.innerHTML = '<option value="">All categories</option>';
-  for (const cat of categoryNames()) {
+  sel.innerHTML = '<option value="">All tables</option>';
+  const present = new Set(state.items.map((i) => i._table));
+  for (const t of TABLES) {
+    if (!present.has(t.n)) continue;
     const o = document.createElement('option');
-    o.value = cat; o.textContent = cat;
+    o.value = String(t.n); o.textContent = `${t.n} · ${t.name}`;
     sel.appendChild(o);
   }
   if ([...sel.options].some((o) => o.value === cur)) sel.value = cur;
@@ -172,15 +199,21 @@ function buildCatDatalist() {
 /* ---------------- Browse list ---------------- */
 function renderList() {
   const term = $('search').value.trim().toLowerCase();
-  const catFilter = $('categoryFilter').value;
+  const tableFilter = $('categoryFilter').value;
   const list = $('productList');
   list.innerHTML = '';
-  let shown = 0, lastCat = null;
+  let shown = 0, lastCat = null, lastTable = null;
 
   for (const it of state.items) {
-    if (catFilter && it.category !== catFilter) continue;
+    if (tableFilter && String(it._table) !== tableFilter) continue;
     if (term && !matches(it, term)) continue;
 
+    if (it._table !== lastTable) {
+      const th = document.createElement('div');
+      th.className = 'table-header';
+      th.innerHTML = `<span class="table-num">${it._table}</span> ${escapeHtml(TABLE_NAME[it._table] || 'Other')}`;
+      list.appendChild(th); lastTable = it._table; lastCat = null;
+    }
     if (it.category !== lastCat) {
       const h = document.createElement('div');
       h.className = 'cat-header'; h.textContent = it.category;
@@ -214,11 +247,12 @@ function renderList() {
 
   if (shown === 0) list.innerHTML = `<div class="no-results">No products match “${escapeHtml(term)}”.</div>`;
   $('resultCount').textContent =
-    `${shown} ${shown === 1 ? 'product' : 'products'}` + (catFilter ? ` in ${catFilter}` : '');
+    `${shown} ${shown === 1 ? 'product' : 'products'}` + (tableFilter ? ` · Table ${tableFilter} · ${TABLE_NAME[tableFilter]}` : '');
 }
 
 function matches(it, term) {
-  return it.name.toLowerCase().includes(term) || it.category.toLowerCase().includes(term);
+  return it.name.toLowerCase().includes(term) || it.category.toLowerCase().includes(term)
+    || (TABLE_NAME[it._table] || '').toLowerCase().includes(term);
 }
 
 /* ---------------- Detail sheet ---------------- */
@@ -259,7 +293,8 @@ function openItemEditor(it) {
   $('editorTitle').textContent = it ? 'Edit item' : 'Add item';
   const par = (it && it.par) || {};
   $('edName').value = it ? it.name : '';
-  $('edCategory').value = it ? it.category : ($('categoryFilter').value || '');
+  $('edCategory').value = it ? it.category : '';
+  $('edTable').value = it && it.table ? String(it.table) : '';
   $('edUpc').value = it ? (it.upc || '') : '';
   $('edBox').value = it && it.boxQty ? it.boxQty : '';
   $('edImage').value = it ? (it.image || '') : '';
@@ -292,6 +327,7 @@ function readEditor() {
   return {
     name,
     category: $('edCategory').value.trim() || 'Other',
+    table: parseInt($('edTable').value, 10) || null,
     upc: normUpc($('edUpc').value),
     image: $('edImage').value.trim(),
     boxQty: box || null,

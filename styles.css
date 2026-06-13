@@ -289,10 +289,22 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
 
 /* ---------- Product list ---------- */
 .product-list { /* natural page scroll on mobile */ }
+.table-header {
+  position: sticky; top: 54px; z-index: 6;
+  display: flex; align-items: center; gap: 9px;
+  background: linear-gradient(135deg, var(--heb), var(--heb-dark)); color: #fff;
+  font-family: var(--font-head); font-weight: 800; font-size: .95rem;
+  padding: 10px 14px;
+}
+.table-header .table-num {
+  flex: 0 0 auto; width: 24px; height: 24px; border-radius: 7px;
+  background: #fff; color: var(--heb); display: inline-flex; align-items: center; justify-content: center;
+  font-size: .85rem; font-weight: 900;
+}
 .cat-header {
-  position: sticky; top: 56px; background: #fafafa; color: var(--heb-dark);
+  background: #fafafa; color: var(--heb-dark);
   font-weight: 700; font-size: .7rem; letter-spacing: .6px; text-transform: uppercase;
-  padding: 8px 14px; border-bottom: 1px solid var(--line); z-index: 5;
+  padding: 7px 14px; border-bottom: 1px solid var(--line);
 }
 .product-item {
   display: flex; align-items: center; gap: 10px;
@@ -474,8 +486,8 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; padding: 2px 2px 4px;
 }
 .ed-field { display: flex; flex-direction: column; font-size: .76rem; font-weight: 700; color: var(--muted); gap: 4px; }
-.ed-field input[type="text"], .ed-field input[type="number"] {
-  padding: 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 16px; color: var(--ink); font-weight: 500;
+.ed-field input[type="text"], .ed-field input[type="number"], .ed-field select {
+  padding: 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 16px; color: var(--ink); font-weight: 500; background: #fff;
 }
 .ed-wide { grid-column: 1 / -1; }
 .ed-third { grid-column: span 1; }

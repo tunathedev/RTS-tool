@@ -77,8 +77,8 @@
     <section id="browseView" class="view" role="tabpanel">
       <div class="search-row">
         <input type="search" id="search" placeholder="Search (brioche, king cake, donut…)" autocomplete="off" aria-label="Search products" />
-        <select id="categoryFilter" aria-label="Filter by category">
-          <option value="">All categories</option>
+        <select id="categoryFilter" aria-label="Filter by table">
+          <option value="">All tables</option>
         </select>
       </div>
       <div class="manage-row">
@@ -138,9 +138,20 @@
       <label class="ed-field ed-wide">Name
         <input type="text" id="edName" autocomplete="off" />
       </label>
-      <label class="ed-field ed-wide">Category
+      <label class="ed-field">Category
         <input type="text" id="edCategory" list="catList" autocomplete="off" />
         <datalist id="catList"></datalist>
+      </label>
+      <label class="ed-field">Table (floor layout)
+        <select id="edTable">
+          <option value="">Auto (by category)</option>
+          <option value="1">1 · Breakfast</option>
+          <option value="2">2 · Cookies, Cakes &amp; Brownies</option>
+          <option value="3">3 · Breads</option>
+          <option value="4">4 · Mexican Pastry</option>
+          <option value="5">5 · Sugar Free &amp; Gluten Free</option>
+          <option value="6">6 · Cupcakes &amp; Freezer</option>
+        </select>
       </label>
       <label class="ed-field">UPC
         <div class="ed-upc-row">
