@@ -768,7 +768,7 @@ function sellTip(ctx) {
   // 4) time of day
   if (hour < 11) tips.push(`🌅 Morning — donuts, muffins, coffee cakes, croissants, fresh bread.`);
   else if (hour < 16) tips.push(`🍪 Afternoon — cookies, cupcakes, single-serve treats.`);
-  else tips.push(`🌆 Evening — dinner breads + tonight's desserts; mark down day-dated items.`);
+  else tips.push(`🌆 Evening — dinner breads + tonight's desserts.`);
 
   const top = tips.slice(0, 3);
   return `<div class="tip-head">💡 Sell tips</div><ul class="tip-list">${top.map((t) => `<li>${t}</li>`).join('')}</ul>`;
