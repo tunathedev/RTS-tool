@@ -110,25 +110,25 @@ function effective(src, patch, key, isAdded) {
 const TABLES = [
   { n: 1, name: 'Breakfast' },
   { n: 2, name: 'Cookies, Cakes & Brownies' },
-  { n: 3, name: 'Breads' },
+  { n: 3, name: 'Doughnuts' },
   { n: 4, name: 'Mexican Pastry' },
   { n: 5, name: 'Sugar Free & Gluten Free' },
-  { n: 6, name: 'Cupcakes & Freezer' },
-  { n: 7, name: 'Doughnuts' },
+  { n: 6, name: 'Breads' },
+  { n: 7, name: 'Cupcakes & Freezer' },
 ];
 const TABLE_NAME = Object.fromEntries(TABLES.map((t) => [t.n, t.name]));
 const CATEGORY_TABLE = {
-  'Bread/Buns': 3, 'Babka': 3, 'Stollen/Panettone': 3,
-  'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Granola': 1, 'Scones': 1,
-  'Bunuelo': 4, 'Rosca de Reyes': 4,
-  'Cakes': 2, 'Decorated Cakes': 2, 'Candy': 2, 'Cheesecakes': 2, 'Cookies': 2,
+  'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Scones': 1,
+  'Cakes': 2, 'Decorated Cakes': 2, 'Candy': 2, 'Cookies': 2,
   'Macarons': 2, 'Pies': 2, 'Two Bite Items': 2, 'Fruit Cakes': 2,
-  'Gluten Free Items': 5, 'Sugar Free': 5,
-  'Cupcakes': 6, 'Ice Cream Cakes/Cupcakes': 6,
+  'Babka': 4, 'Bunuelo': 4, 'Rosca de Reyes': 4,
+  'Granola': 5, 'Gluten Free Items': 5, 'Sugar Free': 5,
+  'Bread/Buns': 6, 'Stollen/Panettone': 6,
+  'Cheesecakes': 7, 'Cupcakes': 7, 'Ice Cream Cakes/Cupcakes': 7,
 };
 function tableFor(it) {
   if (it.table) return it.table;
-  if (/donut|doughnut/i.test(it.name)) return 7;   // doughnuts get their own table
+  if (/donut|doughnut/i.test(it.name)) return 3;   // doughnuts get their own table
   return CATEGORY_TABLE[it.category] || 2;
 }
 
