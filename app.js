@@ -11,12 +11,14 @@ const LS_KEY = 'rts.pullList.v1';
 
 const state = {
   data: null,
-  items: [],          // flattened {name, days, pkgDate, category}
+  items: [],          // flattened {name, days, pkgDate, category, image?, upc?, par?}
   byName: new Map(),
+  byUpc: new Map(),   // normalized UPC -> product
   current: null,      // product open in the sheet
   pull: [],           // [{name, qty, done}]
   overrides: {},
   imgCache: new Map(),
+  scan: { controls: null, active: false },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -52,9 +54,13 @@ function flatten() {
       const obj = { ...it, category: cat.category };
       state.items.push(obj);
       state.byName.set(it.name, obj);
+      if (obj.upc) state.byUpc.set(normUpc(obj.upc), obj);
     }
   }
 }
+
+// Normalize a UPC/EAN to digits only (drops spaces, dashes, leading zero noise kept).
+function normUpc(code) { return String(code).replace(/\D/g, ''); }
 
 function renderHeader() {
   const d = state.data.lastUpdated;
@@ -136,12 +142,43 @@ function openSheet(it) {
     : `Shelf life: <strong>${it.days} ${it.days === 1 ? 'day' : 'days'}</strong> from freezer pull`;
   $('hebLink').href = HEB_SEARCH(hebQuery(it.name));
 
+  renderUpc(it);
+  renderPar(it);
   renderSheetResult(it);
   updateSheetAddBtn();
   loadImage(it);
 
   $('sheetBackdrop').hidden = false;
   $('sheet').hidden = false;
+}
+
+function renderUpc(it) {
+  $('detailUpc').innerHTML = it.upc
+    ? `UPC <span class="upc-num">${escapeHtml(String(it.upc))}</span>`
+    : '';
+}
+
+/* Par level — "how many tall × how many deep" with a cute icon grid. */
+function renderPar(it) {
+  const box = $('detailPar');
+  const par = it.par;
+  if (!par || !(par.tall || par.deep)) { box.innerHTML = ''; return; }
+  const tall = Math.max(1, par.tall || 1);
+  const deep = Math.max(1, par.deep || 1);
+  const total = tall * deep;
+  // Grid: `deep` columns across, `tall` rows down (capped so it stays cute).
+  const cols = Math.min(deep, 8), rows = Math.min(tall, 6);
+  let cells = '';
+  for (let i = 0; i < cols * rows; i++) cells += '<div class="cell"></div>';
+  box.innerHTML =
+    `<div class="par-card">
+       <div class="par-grid" style="grid-template-columns:repeat(${cols},14px)">${cells}</div>
+       <div class="par-meta">
+         <div class="par-title">📦 Par level</div>
+         <div class="par-dim">${tall} tall × ${deep} deep</div>
+         <div class="par-total">= ${total} on display</div>
+       </div>
+     </div>`;
 }
 
 function closeSheet() {
@@ -436,6 +473,66 @@ function sellTip(blocks) {
   return `<strong>Sell tip:</strong> ${tip}`;
 }
 
+/* ---------------- UPC barcode scanner ----------------
+ * On-device camera scan via ZXing (loaded from CDN). Works on iOS Safari and
+ * Android Chrome over HTTPS (GitHub Pages) or localhost. Scans a UPC/EAN and
+ * opens the matching product card. */
+const ZXING_CDN = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm';
+
+async function openScanner() {
+  const modal = $('scanModal');
+  modal.hidden = false;
+  setScanStatus('Starting camera…');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setScanStatus('Camera not supported on this device/browser.', 'err');
+    return;
+  }
+  try {
+    const { BrowserMultiFormatReader } = await import(ZXING_CDN);
+    const reader = new BrowserMultiFormatReader();
+    state.scan.active = true;
+    setScanStatus('Point the camera at a UPC barcode…');
+    state.scan.controls = await reader.decodeFromConstraints(
+      { video: { facingMode: { ideal: 'environment' } } },
+      $('scanVideo'),
+      (result) => { if (result && state.scan.active) onScan(result.getText()); }
+    );
+  } catch (e) {
+    const msg = (e && e.name === 'NotAllowedError')
+      ? 'Camera permission denied. Allow camera access and try again.'
+      : 'Could not start the scanner. Check your connection and camera permissions.';
+    setScanStatus(msg, 'err');
+  }
+}
+
+function onScan(raw) {
+  const code = normUpc(raw);
+  const match = state.byUpc.get(code);
+  if (match) {
+    setScanStatus(`✓ ${match.name}`, 'ok');
+    state.scan.active = false;
+    setTimeout(() => { closeScanner(); openSheet(match); }, 350);
+  } else {
+    // keep scanning, but report what was read
+    setScanStatus(`No product matches ${code}. Keep scanning…`, 'err');
+  }
+}
+
+function closeScanner() {
+  state.scan.active = false;
+  try { state.scan.controls && state.scan.controls.stop(); } catch {}
+  state.scan.controls = null;
+  const v = $('scanVideo');
+  if (v && v.srcObject) { v.srcObject.getTracks().forEach((t) => t.stop()); v.srcObject = null; }
+  $('scanModal').hidden = true;
+}
+
+function setScanStatus(text, cls = '') {
+  const el = $('scanStatus');
+  el.textContent = text;
+  el.className = 'scan-status' + (cls ? ' ' + cls : '');
+}
+
 /* ---------------- HEB image ---------------- */
 function hebQuery(name) {
   return name
@@ -448,6 +545,8 @@ function hebQuery(name) {
 async function loadImage(it) {
   const wrap = $('detailImg');
   const key = it.name;
+  // 0) Direct image URL from the product data (spreadsheet) wins.
+  if (it.image) { showImage(it, it.image); return; }
   const pin = state.overrides[key];
   if (pin && pin.image) { showImage(it, pin.image); return; }
   if (state.imgCache.has(key)) {
@@ -527,7 +626,13 @@ function wireEvents() {
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
   $('wxRefresh').addEventListener('click', loadWeather);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+  $('scanFab').addEventListener('click', openScanner);
+  $('scanClose').addEventListener('click', closeScanner);
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!$('scanModal').hidden) closeScanner();
+    else if (!$('sheet').hidden) closeSheet();
+  });
 }
 
 init();

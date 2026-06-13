@@ -22,9 +22,37 @@ It also pulls **product images from HEB.com** for the selected item.
   The **Pull List** tab shows each item's sell-by date, lets you set quantities,
   check items off as you pull them, and **copy/share** the whole list as text.
   Your list is saved on the device (localStorage).
-- 🖼️ **HEB.com images** for the selected product (see *Images* below).
+- 📷 **UPC scanner** — tap the floating **Scan** button to scan a product
+  barcode with the device camera; the matching product card opens automatically.
+  (Uses ZXing; works on iOS Safari / Android Chrome over HTTPS or localhost.)
+- 📦 **Par levels** — each product can show its par as *how many tall × how many
+  deep* with a cute icon grid.
+- 🌤️ **Weather** — San Antonio 78252, three 3-hour blocks + a demand "sell tip".
+- 🖼️ **Product images** — a direct image URL per product (from the data), with an
+  HEB.com lookup / "View on HEB.com" fallback (see *Images* below).
 - ⚠️ Prominent reminder: *date all RTE items immediately when pulled from the
   freezer.*
+
+### Product data fields
+
+Each item in `data/products.json` supports:
+
+| Field | Meaning |
+|-------|---------|
+| `name` | Product name |
+| `days` / `pkgDate` | Shelf life in days, or follow printed package date |
+| `image` | Direct product image URL |
+| `upc` | Barcode digits (matched by the scanner) |
+| `par` | `{ "tall": N, "deep": M }` — par level layout |
+
+Populate `image`, `upc`, and `par` in bulk from a spreadsheet:
+
+```bash
+node tools/import-csv.js path/to/products.csv
+```
+
+CSV columns (header row): `name, image_url, upc, par_tall, par_deep` (+ optional
+`category`). Rows merge onto existing products by name.
 
 ## Run it
 
