@@ -723,7 +723,12 @@ function renderWeather(data) {
   }).join('');
 
   const maxPop = Math.max(today.pop || 0, ...hours.map((x) => x.pop));
-  $('wxTip').innerHTML = sellTip([{ temp: today.hi ?? curTemp, pop: maxPop }]);
+  const maxWind = Math.max(Math.round(cur.wind_speed_10m ?? 0), ...hours.map((x) => x.wind));
+  const dp = new Intl.DateTimeFormat('en-US', { timeZone: WX.tz, weekday: 'short', hour: 'numeric', hour12: false })
+    .formatToParts(new Date());
+  const wd = (dp.find((p) => p.type === 'weekday') || {}).value || '';
+  const hr = parseInt((dp.find((p) => p.type === 'hour') || {}).value, 10) || 0;
+  $('wxTip').innerHTML = sellTip({ hi: today.hi ?? curTemp, maxPop, maxWind, weekday: wd, hour: hr % 24 });
 }
 
 function hourLabel(sec) { const p = hourParts(sec); return `${p.h} ${p.ap}`; }
@@ -740,17 +745,33 @@ function hourParts(sec) {
   };
 }
 
-/* A bakery-oriented demand hint based on the next 9 hours. */
-function sellTip(blocks) {
-  if (!blocks.length) return '';
-  const maxTemp = Math.max(...blocks.map((b) => b.temp ?? b.tMax));
-  const maxPop = Math.max(...blocks.map((b) => b.pop));
-  let tip;
-  if (maxPop >= 50) tip = 'Rain likely — lean into grab-and-go comfort (coffee cakes, pies, breads, pretzels) and coffee pairings.';
-  else if (maxTemp >= 90) tip = 'Hot &amp; dry — push lighter/chilled sellers (ice cream cakes, two-bite items, lighter pastries); heavy breads may slow.';
-  else if (maxTemp <= 50) tip = 'Cold — comfort bakes move well (cinnamon rolls, babka, pies, stollen) plus hot-drink pairings.';
-  else tip = 'Mild — steady demand; feature seasonal favorites and fresh bread.';
-  return `<strong>Sell tip:</strong> ${tip}`;
+/* Bakery demand hints from weather + day-of-week + time of day.
+ * Returns 2–3 ranked bullets. ctx: { hi, maxPop, maxWind, weekday, hour } */
+function sellTip(ctx) {
+  const { hi, maxPop, maxWind, weekday, hour } = ctx;
+  const tips = [];
+
+  // 1) dominant weather condition
+  if (maxPop >= 60) tips.push(`🌧️ Rain likely (${maxPop}%) — grab-and-go comfort: coffee cakes, pies, breads, pretzels; push coffee pairings.`);
+  else if (hi >= 90) tips.push(`🔥 Hot (${hi}°) — feature chilled &amp; light: ice cream cakes, two-bite items, lighter pastries; ease off heavy breads.`);
+  else if (hi <= 50) tips.push(`❄️ Cold (${hi}°) — comfort bakes: cinnamon rolls, babka, pies, stollen + hot-drink pairings.`);
+  else if (maxPop >= 30) tips.push(`🌦️ Showers possible (${maxPop}%) — keep grab-and-go stocked.`);
+  else tips.push(`🌤️ Mild (${hi}°) — steady demand; feature seasonal favorites &amp; fresh bread.`);
+
+  // 2) wind (only when notable)
+  if (maxWind >= 20) tips.push(`💨 Windy (${maxWind} mph) — fewer browsers; tighten bake-ahead on perishables.`);
+
+  // 3) day of week
+  if (weekday === 'Sat' || weekday === 'Sun') tips.push(`🎉 Weekend — celebration sells: cakes, cupcakes, party trays, family packs.`);
+  else if (weekday === 'Fri') tips.push(`🛒 Friday — weekend stock-up; bump breads, rolls &amp; cakes.`);
+
+  // 4) time of day
+  if (hour < 11) tips.push(`🌅 Morning — donuts, muffins, coffee cakes, croissants, fresh bread.`);
+  else if (hour < 16) tips.push(`🍪 Afternoon — cookies, cupcakes, single-serve treats.`);
+  else tips.push(`🌆 Evening — dinner breads + tonight's desserts; mark down day-dated items.`);
+
+  const top = tips.slice(0, 3);
+  return `<div class="tip-head">💡 Sell tips</div><ul class="tip-list">${top.map((t) => `<li>${t}</li>`).join('')}</ul>`;
 }
 
 /* ---------------- UPC barcode scanner ----------------

@@ -217,6 +217,9 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   font-size: .78rem; line-height: 1.35; color: #5b4a1a;
   background: #fffaf0; border: 1px solid #f0e2bd; border-radius: 10px; padding: 9px 12px;
 }
+.tip-head { font-family: var(--font-head); font-weight: 800; color: #7a5b00; font-size: .8rem; margin-bottom: 4px; }
+.tip-list { margin: 0; padding-left: 18px; }
+.tip-list li { margin: 3px 0; }
 .wx-tip:empty { display: none; }
 .wx-tip strong { color: #7a5b00; }
 
