@@ -529,8 +529,12 @@ function renderPullList() {
       ? `<span class="pull-boxes">${boxes} box${boxes === 1 ? '' : 'es'}</span>`
       : `<span class="pull-boxes unknown">box qty —</span>`;
 
+    const thumb = it.image
+      ? `<img src="${escapeHtml(it.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('empty');this.remove();" />`
+      : '';
     row.innerHTML = `
       <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} aria-label="Mark pulled" />
+      <div class="pull-thumb${it.image ? '' : ' empty'}">${thumb}</div>
       <div class="pull-main">
         <div class="pull-name">${escapeHtml(it.name)}</div>
         <div class="pull-sub">${escapeHtml(it.category)} · sell by ${sell}</div>
@@ -659,43 +663,35 @@ function renderWeather(h) {
   let start = h.time.findIndex((t) => t >= now);
   if (start < 0) start = 0;
 
-  const blocks = [];
-  for (let b = 0; b < 3; b++) {
-    const idx = [];
-    for (let k = 0; k < 3; k++) {
-      const i = start + b * 3 + k;
-      if (i < h.time.length) idx.push(i);
-    }
-    if (!idx.length) break;
-    const temps = idx.map((i) => h.temperature_2m[i]);
-    const pops = idx.map((i) => h.precipitation_probability[i] ?? 0);
-    const winds = idx.map((i) => h.wind_speed_10m[i] ?? 0);
-    const code = Math.max(...idx.map((i) => h.weather_code[i] ?? 0));
-    blocks.push({
-      startSec: h.time[idx[0]],
-      endSec: h.time[idx[idx.length - 1]] + 3600,
-      tMin: Math.round(Math.min(...temps)),
-      tMax: Math.round(Math.max(...temps)),
-      pop: Math.max(...pops),
-      wind: Math.round(Math.max(...winds)),
-      code,
+  const HOURS = 12;
+  const hours = [];
+  for (let k = 0; k < HOURS; k++) {
+    const i = start + k;
+    if (i >= h.time.length) break;
+    hours.push({
+      sec: h.time[i],
+      temp: Math.round(h.temperature_2m[i]),
+      pop: h.precipitation_probability[i] ?? 0,
+      wind: Math.round(h.wind_speed_10m[i] ?? 0),
+      code: h.weather_code[i] ?? 0,
     });
   }
 
-  $('wxBullets').innerHTML = blocks.map((b) => {
+  $('wxBullets').innerHTML = hours.map((b, k) => {
     const [emoji, label] = wmo(b.code);
-    const temp = b.tMin === b.tMax ? `${b.tMax}°` : `${b.tMin}–${b.tMax}°`;
-    return `<div class="wx-bullet">
+    const when = k === 0 ? 'Now' : hourLabel(b.sec);
+    return `<div class="wx-bullet" title="${escapeHtml(label)}">
+      <div class="wx-when">${when}</div>
       <div class="wx-emoji">${emoji}</div>
-      <div class="wx-when">${blockLabel(b.startSec, b.endSec)}</div>
-      <div class="wx-temp">${temp}</div>
-      <div class="wx-cond">${escapeHtml(label)}<br><span class="wx-rain">${b.pop}%</span> · ${b.wind}mph</div>
+      <div class="wx-temp">${b.temp}°</div>
+      <div class="wx-cond"><span class="wx-rain">${b.pop}%</span></div>
     </div>`;
   }).join('');
 
-  $('wxTip').innerHTML = sellTip(blocks);
+  $('wxTip').innerHTML = sellTip(hours);
 }
 
+function hourLabel(sec) { const p = hourParts(sec); return `${p.h} ${p.ap}`; }
 function blockLabel(startSec, endSec) {
   const a = hourParts(startSec), b = hourParts(endSec);
   return a.ap === b.ap ? `${a.h}–${b.h} ${b.ap}` : `${a.h} ${a.ap}–${b.h} ${b.ap}`;
@@ -712,7 +708,7 @@ function hourParts(sec) {
 /* A bakery-oriented demand hint based on the next 9 hours. */
 function sellTip(blocks) {
   if (!blocks.length) return '';
-  const maxTemp = Math.max(...blocks.map((b) => b.tMax));
+  const maxTemp = Math.max(...blocks.map((b) => b.temp ?? b.tMax));
   const maxPop = Math.max(...blocks.map((b) => b.pop));
   let tip;
   if (maxPop >= 50) tip = 'Rain likely — lean into grab-and-go comfort (coffee cakes, pies, breads, pretzels) and coffee pairings.';

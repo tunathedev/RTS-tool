@@ -157,17 +157,21 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   border: 1px solid var(--line); background: #fff; color: var(--muted);
   width: 28px; height: 28px; border-radius: 8px; font-size: 1rem; line-height: 1; cursor: pointer;
 }
-.wx-bullets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wx-bullets {
+  display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+}
 .wx-bullet {
+  flex: 0 0 auto; width: 58px; scroll-snap-align: start;
   background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-  padding: 10px 8px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  padding: 9px 6px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.05);
 }
 .wx-emoji { font-size: 1.5rem; line-height: 1; }
 .wx-when { font-size: .72rem; font-weight: 700; color: var(--muted); margin-top: 4px; }
 .wx-temp { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
 .wx-cond { font-size: .68rem; color: var(--muted); margin-top: 3px; line-height: 1.25; }
 .wx-rain { color: #2563eb; font-weight: 700; }
-.wx-msg, .wx-err { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: .82rem; padding: 10px; }
+.wx-msg, .wx-err { flex: 1; text-align: center; color: var(--muted); font-size: .82rem; padding: 10px; }
 .wx-err { color: var(--bad); }
 .wx-tip {
   margin-top: 9px; font-size: .76rem; line-height: 1.35; color: #5b4a1a;
@@ -261,6 +265,12 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
   border-bottom: 1px solid #f1f2f4;
 }
 .pull-item.done { background: #f6faf7; }
+.pull-thumb {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 8px; overflow: hidden;
+  background: #f4f5f7; border: 1px solid var(--line);
+}
+.pull-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pull-thumb.empty { display: none; }
 .pull-item.done .pull-name { text-decoration: line-through; color: var(--muted); }
 .pull-check {
   flex: 0 0 auto; width: 26px; height: 26px; accent-color: var(--ok); cursor: pointer;

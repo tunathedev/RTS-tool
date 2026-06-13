@@ -281,7 +281,7 @@ function sortItems(a) { return a.sort((x, y) => x.name.localeCompare(y.name)); }
 const out = {
   title: 'RTS Shelf Life Quick Sheet',
   source: 'READY TO EAT ITEM SHELF LIFE DATES',
-  note: 'ALL RTE ITEMS MUST BE DATED IMMEDIATELY once taken out of the freezer',
+  note: 'ALL RTS ITEMS MUST BE DATED IMMEDIATELY once taken out of the freezer',
   lastUpdated: '2026-03-31',
   categories,
 };
