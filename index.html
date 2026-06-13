@@ -13,6 +13,31 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>" />
 </head>
 <body>
+  <!-- PIN lock screen -->
+  <div class="lock" id="lockScreen">
+    <div class="lock-inner">
+      <div class="lock-emblem">SA<span>50</span></div>
+      <div class="lock-title">Bakery Tools</div>
+      <div class="lock-sub">🔒 Enter PIN to unlock</div>
+      <div class="lock-dots" id="lockDots"><span></span><span></span><span></span><span></span></div>
+      <div class="lock-error" id="lockError"></div>
+      <div class="lock-keys" id="lockKeys">
+        <button type="button" data-k="1">1</button>
+        <button type="button" data-k="2">2</button>
+        <button type="button" data-k="3">3</button>
+        <button type="button" data-k="4">4</button>
+        <button type="button" data-k="5">5</button>
+        <button type="button" data-k="6">6</button>
+        <button type="button" data-k="7">7</button>
+        <button type="button" data-k="8">8</button>
+        <button type="button" data-k="9">9</button>
+        <span class="lock-spacer"></span>
+        <button type="button" data-k="0">0</button>
+        <button type="button" data-k="del" class="lock-del" aria-label="Delete">⌫</button>
+      </div>
+    </div>
+  </div>
+
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand-left">

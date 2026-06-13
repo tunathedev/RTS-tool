@@ -1101,4 +1101,39 @@ function wireEvents() {
   });
 }
 
+/* ---------------- PIN lock screen ---------------- */
+function setupLock() {
+  const PIN = '1905';
+  const lock = $('lockScreen');
+  if (!lock) return;
+  try { if (sessionStorage.getItem('rts.unlocked') === '1') { lock.hidden = true; return; } } catch {}
+  let entered = '';
+  const renderDots = () => {
+    [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < entered.length));
+  };
+  function press(k) {
+    if (k === 'del') { entered = entered.slice(0, -1); $('lockError').textContent = ''; renderDots(); return; }
+    if (!/^[0-9]$/.test(k) || entered.length >= 4) return;
+    entered += k; renderDots();
+    if (entered.length < 4) return;
+    if (entered === PIN) {
+      try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
+      lock.hidden = true;
+    } else {
+      $('lockError').textContent = 'Wrong PIN — try again';
+      lock.classList.add('shake');
+      setTimeout(() => { lock.classList.remove('shake'); entered = ''; renderDots(); }, 450);
+    }
+  }
+  $('lockKeys').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (b) press(b.dataset.k);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (lock.hidden) return;
+    if (/^[0-9]$/.test(e.key)) press(e.key);
+    else if (e.key === 'Backspace') { e.preventDefault(); press('del'); }
+  });
+}
+
+setupLock();
 init();
