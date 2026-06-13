@@ -170,7 +170,8 @@ function rebuildItems() {
 function isOverridden(it) { return it._added || Object.prototype.hasOwnProperty.call(state.cust.patches, it._key); }
 
 function loadHolidayPref() {
-  try { state.hideHoliday = localStorage.getItem(LS_HOLIDAY) === '1'; } catch { state.hideHoliday = false; }
+  let v = null; try { v = localStorage.getItem(LS_HOLIDAY); } catch {}
+  state.hideHoliday = v === null ? true : v === '1';   // default: holiday items hidden
 }
 function toggleHoliday() {
   state.hideHoliday = !state.hideHoliday;
@@ -734,10 +735,10 @@ function updateDateLabel() {
   $('todayLabel').textContent = (isToday ? 'Today · ' : '') + fmt;
 }
 
-/* ---------------- Weather (San Antonio 78252) ----------------
+/* ---------------- Weather (San Antonio 78253) ----------------
  * Three 3-hour blocks for the next 9 hours, to anticipate demand.
  * Open-Meteo: free, no API key, CORS-enabled (works on GitHub Pages). */
-const WX = { lat: 29.356, lon: -98.697, tz: 'America/Chicago', label: 'San Antonio · 78252' };
+const WX = { lat: 29.466, lon: -98.800, tz: 'America/Chicago', label: 'San Antonio · 78253' };
 
 // WMO weather codes → emoji + short label.
 const WMO = {

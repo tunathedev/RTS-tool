@@ -37,7 +37,7 @@ It also pulls **product images from HEB.com** for the selected item.
 - 🔄 **Export / Import** — *Export* downloads the full catalog as `products.json`
   (commit it to share corrections across everyone's devices); *Import* loads a
   catalog file.
-- 🌤️ **Weather** — San Antonio 78252, three 3-hour blocks + a demand "sell tip".
+- 🌤️ **Weather** — San Antonio 78253, hourly forecast + a demand "sell tip".
 - 🖼️ **Product images** — a direct image URL per product (from the data), with an
   HEB.com lookup / "View on HEB.com" fallback (see *Images* below).
 - ⚠️ Prominent reminder: *date all RTE items immediately when pulled from the
