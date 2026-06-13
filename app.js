@@ -11,6 +11,7 @@ const LS_KEY = 'rts.pullList.v1';
 const LS_SHELF = 'rts.shelfOverrides.v1';   // legacy (migrated into LS_CUST)
 const LS_CUST = 'rts.catalog.v2';           // user edits: { patches, added, deleted }
 const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
+const LS_WX = 'rts.wxCollapsed';
 
 const state = {
   data: null,
@@ -51,6 +52,7 @@ async function init() {
   renderList();
   renderPullList();
   wireEvents();
+  applyWxCollapsed();
   loadWeather();
 }
 
@@ -636,6 +638,16 @@ const WMO = {
 };
 const wmo = (code) => WMO[code] || ['🌡️', '—'];
 
+function toggleWeather() {
+  const collapsed = $('weather').classList.toggle('collapsed');
+  $('wxToggle').setAttribute('aria-expanded', String(!collapsed));
+  try { localStorage.setItem(LS_WX, collapsed ? '1' : '0'); } catch {}
+}
+function applyWxCollapsed() {
+  let c = false; try { c = localStorage.getItem(LS_WX) === '1'; } catch {}
+  if (c) { $('weather').classList.add('collapsed'); $('wxToggle').setAttribute('aria-expanded', 'false'); }
+}
+
 async function loadWeather() {
   const box = $('wxBullets');
   box.innerHTML = `<div class="wx-msg">Loading weather…</div>`;
@@ -677,6 +689,7 @@ function renderWeather(h) {
     });
   }
 
+  if (hours[0]) { const [e] = wmo(hours[0].code); $('wxNow').textContent = `${hours[0].temp}° ${e}`; }
   $('wxBullets').innerHTML = hours.map((b, k) => {
     const [emoji, label] = wmo(b.code);
     const when = k === 0 ? 'Now' : hourLabel(b.sec);
@@ -871,6 +884,7 @@ function wireEvents() {
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
   $('wxRefresh').addEventListener('click', loadWeather);
+  $('wxToggle').addEventListener('click', toggleWeather);
   $('scanFab').addEventListener('click', openScanner);
   $('scanClose').addEventListener('click', closeScanner);
   // item editor

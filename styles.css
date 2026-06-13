@@ -151,8 +151,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 .weather {
   max-width: var(--maxw); margin: 0 auto 4px; padding: 10px 12px 12px;
 }
-.wx-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.wx-title { font-size: .8rem; font-weight: 700; color: var(--muted); }
+.wx-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.wx-toggle {
+  display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0;
+  background: none; border: none; padding: 4px 0; cursor: pointer; text-align: left;
+}
+.wx-chevron { font-size: .7rem; color: var(--muted); transition: transform .18s; }
+.weather.collapsed .wx-chevron { transform: rotate(-90deg); }
+.wx-title { font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wx-now { font-size: .8rem; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.weather.collapsed .wx-body { display: none; }
 .wx-refresh {
   border: 1px solid var(--line); background: #fff; color: var(--muted);
   width: 28px; height: 28px; border-radius: 8px; font-size: 1rem; line-height: 1; cursor: pointer;

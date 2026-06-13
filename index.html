@@ -39,11 +39,17 @@
   <!-- Weather: next three 3-hour blocks for San Antonio 78252 -->
   <section class="weather" id="weather" aria-label="Local weather forecast">
     <div class="wx-head">
-      <span class="wx-title">⛅ San Antonio · 78252 — hourly</span>
+      <button type="button" class="wx-toggle" id="wxToggle" aria-expanded="true">
+        <span class="wx-chevron" aria-hidden="true">▾</span>
+        <span class="wx-title">⛅ San Antonio · 78252 — hourly</span>
+        <span class="wx-now" id="wxNow"></span>
+      </button>
       <button type="button" class="wx-refresh" id="wxRefresh" aria-label="Refresh weather" title="Refresh">↻</button>
     </div>
-    <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
-    <div class="wx-tip" id="wxTip"></div>
+    <div class="wx-body" id="wxBody">
+      <div class="wx-bullets" id="wxBullets"><div class="wx-msg">Loading weather…</div></div>
+      <div class="wx-tip" id="wxTip"></div>
+    </div>
   </section>
 
   <!-- Tabs -->
