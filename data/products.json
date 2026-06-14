@@ -925,14 +925,18 @@
           "days": 180,
           "pkgDate": false,
           "upc": "7723217307",
-          "image": "https://images.heb.com/is/image/HEBGrocery/003036539"
+          "image": "https://images.heb.com/is/image/HEBGrocery/003036539",
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "Palmer Valentine Snack Mix",
           "days": 180,
           "pkgDate": false,
           "upc": "7723217308",
-          "image": "https://images.heb.com/is/image/HEBGrocery/003036541"
+          "image": "https://images.heb.com/is/image/HEBGrocery/003036541",
+          "holiday": true,
+          "seasonTable": 1
         }
       ]
     },
@@ -1170,7 +1174,9 @@
             "tall": 3,
             "wide": 5,
             "deep": 3
-          }
+          },
+          "holiday": true,
+          "seasonTable": 5
         },
         {
           "name": "Cookie, Christmas Red Bells",
@@ -1182,14 +1188,18 @@
             "tall": 3,
             "wide": 5,
             "deep": 3
-          }
+          },
+          "holiday": true,
+          "seasonTable": 5
         },
         {
           "name": "Cookie, Easter Pink Bunny",
           "days": 28,
           "pkgDate": false,
           "upc": "4122098274",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000620049"
+          "image": "https://images.heb.com/is/image/HEBGrocery/000620049",
+          "holiday": true,
+          "seasonTable": 2
         },
         {
           "name": "Cookie, Halloween Orange Pumpk",
@@ -1201,28 +1211,36 @@
             "tall": 5,
             "wide": 9,
             "deep": 3
-          }
+          },
+          "holiday": true,
+          "seasonTable": 3
         },
         {
           "name": "Cookie, Pink Hearts",
           "days": 28,
           "pkgDate": false,
           "upc": "4122094588",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000617153"
+          "image": "https://images.heb.com/is/image/HEBGrocery/000617153",
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "Cookies Valentine Ps Hearts",
           "days": 28,
           "pkgDate": false,
           "upc": "7366403051",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000324782"
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324782",
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "Cookies-Valentine Hearts 5doz.",
           "days": 28,
           "pkgDate": false,
           "upc": "7366400424",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000324789"
+          "image": "https://images.heb.com/is/image/HEBGrocery/000324789",
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "Crown Bk Round Brookie 4ct",
@@ -1404,7 +1422,9 @@
           "days": 28,
           "pkgDate": false,
           "upc": "3769521230",
-          "image": "https://images.heb.com/is/image/HEBGrocery/002094675"
+          "image": "https://images.heb.com/is/image/HEBGrocery/002094675",
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "White Frosted Sugar Cookie",
@@ -1601,7 +1621,9 @@
             "tall": 3,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "holiday": true,
+          "seasonTable": 6
         },
         {
           "name": "Lb Hal Mini Cupcakes Platter",
@@ -1620,7 +1642,9 @@
           "days": 7,
           "pkgDate": false,
           "upc": "4122085371",
-          "image": "https://images.heb.com/is/image/HEBGrocery/003191541"
+          "image": "https://images.heb.com/is/image/HEBGrocery/003191541",
+          "holiday": true,
+          "seasonTable": 5
         },
         {
           "name": "Mini Gold Love Cupcakes 12ct",
@@ -1632,7 +1656,9 @@
             "tall": 6,
             "wide": 3,
             "deep": 3
-          }
+          },
+          "holiday": true,
+          "seasonTable": 1
         },
         {
           "name": "Mini Harvest Gold Cupcakes 12ct",
@@ -1644,14 +1670,18 @@
             "tall": 5,
             "wide": 1,
             "deep": 4
-          }
+          },
+          "holiday": true,
+          "seasonTable": 4
         },
         {
           "name": "Vday Mini Cupcakes Platter",
           "days": 7,
           "pkgDate": false,
           "upc": "4122090620",
-          "image": "https://images.heb.com/is/image/HEBGrocery/003193016"
+          "image": "https://images.heb.com/is/image/HEBGrocery/003193016",
+          "holiday": true,
+          "seasonTable": 1
         }
       ]
     },
@@ -1764,7 +1794,9 @@
             "tall": 6,
             "wide": 2,
             "deep": 1
-          }
+          },
+          "holiday": true,
+          "seasonTable": 6
         }
       ]
     },
@@ -2029,7 +2061,9 @@
             "tall": 2,
             "wide": 1,
             "deep": 1
-          }
+          },
+          "holiday": true,
+          "seasonTable": 6
         },
         {
           "name": "Oreo Premium Ice Cream Cake Cf Foods",
@@ -2334,7 +2368,9 @@
           "days": null,
           "pkgDate": true,
           "upc": "7222005151",
-          "image": "https://images.heb.com/is/image/HEBGrocery/001508419"
+          "image": "https://images.heb.com/is/image/HEBGrocery/001508419",
+          "holiday": true,
+          "seasonTable": 6
         }
       ]
     }

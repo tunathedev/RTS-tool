@@ -150,9 +150,17 @@ function tableFor(it) {
   return CATEGORY_TABLE[it.category] || 2;
 }
 
-/* Holiday items live on a parallel set of 6 "Season Tables". */
-const SEASON_TABLES = [1, 2, 3, 4, 5, 6].map((n) => ({ n, name: 'Season Table ' + n }));
+/* Holiday items live on a parallel set of Season Tables (by holiday). */
+const SEASON_TABLES = [
+  { n: 1, name: "Valentine's Day", emoji: '💝' },
+  { n: 2, name: 'Easter', emoji: '🐰' },
+  { n: 3, name: 'Halloween', emoji: '🎃' },
+  { n: 4, name: 'Fall / Harvest', emoji: '🍂' },
+  { n: 5, name: 'Christmas', emoji: '🎄' },
+  { n: 6, name: 'Patriotic & Other', emoji: '🎉' },
+];
 const SEASON_NAME = Object.fromEntries(SEASON_TABLES.map((t) => [t.n, t.name]));
+const SEASON_EMOJI = Object.fromEntries(SEASON_TABLES.map((t) => [t.n, t.emoji]));
 function seasonFor(it) { return it.holiday ? (it.seasonTable || 1) : 0; }
 
 function rebuildItems() {
@@ -253,7 +261,7 @@ function buildCategoryFilter() {
   for (const t of SEASON_TABLES) {
     if (!seasonPresent.has(t.n)) continue;
     const o = document.createElement('option');
-    o.value = 's' + t.n; o.textContent = `🎄 ${t.name}`;
+    o.value = 's' + t.n; o.textContent = `${t.emoji} ${t.name}`;
     sel.appendChild(o);
   }
   if ([...sel.options].some((o) => o.value === cur)) sel.value = cur;
@@ -294,7 +302,7 @@ function renderList() {
       const th = document.createElement('div');
       if (it.holiday) {
         th.className = 'table-header season';
-        th.innerHTML = `<span class="table-num">🎄</span> ${escapeHtml(SEASON_NAME[it._season] || 'Seasonal')}`;
+        th.innerHTML = `<span class="table-num">${SEASON_EMOJI[it._season] || '🎉'}</span> ${escapeHtml(SEASON_NAME[it._season] || 'Seasonal')}`;
       } else {
         th.className = 'table-header';
         th.innerHTML = `<span class="table-num">${it._table}</span> ${escapeHtml(TABLE_NAME[it._table] || 'Other')}`;
@@ -318,7 +326,7 @@ function renderList() {
     tap.innerHTML =
       `<div class="product-thumb${it.image ? '' : ' empty'}">${thumb}</div>
        <div class="tap-text">
-         <div class="name">${it.holiday ? '🎄 ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
+         <div class="name">${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
          <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
        </div>`;
     tap.addEventListener('click', () => isDesktop() ? openItemEditor(it) : openSheet(it));
