@@ -336,6 +336,7 @@ function renderList() {
   const filterNum = seasonFilter ? parseInt(tableFilter.slice(1), 10) : parseInt(tableFilter, 10);
   const list = $('productList');
   list.innerHTML = '';
+  const frag = document.createDocumentFragment();   // build off-DOM, append once
   let shown = 0, lastCat = null, lastGroup = null;
 
   for (const it of state.items) {
@@ -361,12 +362,12 @@ function renderList() {
         th.className = 'table-header';
         th.innerHTML = `<span class="table-num">${it._table}</span> ${escapeHtml(TABLE_NAME[it._table] || 'Other')}`;
       }
-      list.appendChild(th); lastGroup = groupKey; lastCat = null;
+      frag.appendChild(th); lastGroup = groupKey; lastCat = null;
     }
     if (it.category !== lastCat) {
       const h = document.createElement('div');
       h.className = 'cat-header'; h.textContent = it.category;
-      list.appendChild(h); lastCat = it.category;
+      frag.appendChild(h); lastCat = it.category;
     }
 
     const row = document.createElement('div');
@@ -396,9 +397,10 @@ function renderList() {
     add.addEventListener('click', (e) => { e.stopPropagation(); toggleList(it.name); });
 
     row.append(tap, badge, add);
-    list.appendChild(row);
+    frag.appendChild(row);
     shown++;
   }
+  list.appendChild(frag);
 
   if (shown === 0) list.innerHTML = `<div class="no-results">No products match “${escapeHtml(term)}”.</div>`;
   let filterLabel = '';
@@ -1467,7 +1469,7 @@ function setupLock() {
  * Off by default. Add your Firebase config in sync-config.js to enable live
  * sync of the catalog, pull list, production plan and case-pack sizes across
  * all devices. Until then everything stays device-only (localStorage). */
-const sync = { on: false, applying: false, mod: null, db: null, seen: new Set() };
+const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {} };
 const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox'];
 
 function setSyncStatus(t, level) {
@@ -1484,6 +1486,7 @@ function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? 
 
 function pushSync(path, value, force) {
   if (!sync.on || (sync.applying && !force)) return;
+  sync.last[path] = JSON.stringify(value == null ? null : value);
   try { sync.mod.set(sync.mod.ref(sync.db, 'rts/' + path), { data: value == null ? null : value, ts: Date.now() }); } catch {}
 }
 
@@ -1492,6 +1495,9 @@ function onRemote(path, wrapper) {
   if (wrapper == null) { if (first) pushSync(path, localOf(path), true); return; } // seed cloud from this device
   const data = wrapper.data;
   if (data == null) return;
+  // skip our own echo / no-op updates to avoid redundant re-renders
+  const incoming = JSON.stringify(data);
+  if (incoming === sync.last[path] || incoming === JSON.stringify(localOf(path))) return;
   sync.applying = true;
   try {
     if (path === 'cust') {
@@ -1527,6 +1533,11 @@ async function initSync() {
       : '⚠︎ sync unavailable — check Firebase Auth/rules';
     setSyncStatus(msg, 'error');
   }
+}
+
+// fast repeat loads + offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
 setupLock();
