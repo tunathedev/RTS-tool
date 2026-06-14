@@ -176,9 +176,19 @@ const TYPE_GROUPS = [
   'Crescent', 'Tart', 'Pie', 'Pudding', 'Strudel', 'Bowl', 'Loaf', 'Brownie', 'Bites', 'Bar', 'Cake',
 ];
 const TYPE_GROUPS_LC = TYPE_GROUPS.map((t) => t.toLowerCase());
-function typeIndexOf(name) {
-  const u = ' ' + name.toLowerCase() + ' ';
+// fallback: an item named without a type word sorts with its category's type
+const CATEGORY_TYPE = {
+  'Cookies': 'Cookie', 'Cakes': 'Cake', 'Decorated Cakes': 'Cake', 'Cheesecakes': 'Cheesecake',
+  'Cupcakes': 'Cupcake', 'Muffins': 'Muffin', 'Mini Muffins': 'Mini Muffin', 'Macarons': 'Macaron',
+  'Pies': 'Pie', 'Two Bite Items': 'Bites', 'Danish/Donuts/Eclairs': 'Danish', 'Scones': 'Scone',
+  'Loafs': 'Loaf', 'Bread/Buns': 'Bread', 'Babka': 'Babka', 'Biscotti': 'Biscotti', 'Bunuelo': 'Bunuelo',
+  'Granola': 'Granola', 'Stollen/Panettone': 'Stollen',
+};
+function typeIndexOf(it) {
+  const u = ' ' + it.name.toLowerCase() + ' ';
   for (let i = 0; i < TYPE_GROUPS_LC.length; i++) if (u.includes(TYPE_GROUPS_LC[i])) return i;
+  const fb = CATEGORY_TYPE[it.category];               // fall back to the category's type
+  if (fb) { const j = TYPE_GROUPS_LC.indexOf(fb.toLowerCase()); if (j >= 0) return j; }
   return TYPE_GROUPS_LC.length;
 }
 
@@ -193,7 +203,7 @@ function rebuildItems() {
     list.push(effective(a, {}, a._key, true));
   }
   const order = (cat) => { if (!state.catOrder.has(cat)) state.catOrder.set(cat, state.catOrder.size); return state.catOrder.get(cat); };
-  for (const it of list) { it._table = tableFor(it); it._season = seasonFor(it); it._typeIdx = typeIndexOf(it.name); }
+  for (const it of list) { it._table = tableFor(it); it._season = seasonFor(it); it._typeIdx = typeIndexOf(it); }
   // everyday tables first (by table), then seasonal; within a category group
   // like products together (by product type), then by name
   list.sort((x, y) => {
