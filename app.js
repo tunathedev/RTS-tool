@@ -163,6 +163,25 @@ const SEASON_NAME = Object.fromEntries(SEASON_TABLES.map((t) => [t.n, t.name]));
 const SEASON_EMOJI = Object.fromEntries(SEASON_TABLES.map((t) => [t.n, t.emoji]));
 function seasonFor(it) { return it.holiday ? (it.seasonTable || 1) : 0; }
 
+/* Group like products together when sorting: detect each item's product type
+ * (specific phrases first) so cheesecakes, crème cakes, cookies, breads, etc.
+ * cluster within their category regardless of word order in the name. */
+const TYPE_GROUPS = [
+  'Donut Holes', 'Ice Cream Cake', 'Pound Cake', 'Ring Cake', 'Bundt Cake', 'Coffee Cake', 'Sheet Cake',
+  'Crème Cake', 'Creme Cake', 'Cream Cake', 'Cake Pops', 'Cheesecake', 'Sliced Loaf', 'Pan de Polvo',
+  'Brownie Bites', 'Pretzel Bites', 'Mini Cupcake', 'Mini Muffin', 'Cupcake', 'Muffin', 'Cookie',
+  'Macaroon', 'Macaron', 'Danish', 'Eclair', 'Scone', 'Brioche', 'Ciabatta', 'Focaccia', 'Batard',
+  'Sourdough', 'Bagel', 'Babka', 'Biscotti', 'Bunuelo', 'Mantecada', 'Granola', 'Stollen', 'Panettone',
+  'Pretzel', 'Bun', 'Roll', 'Bread', 'Tiramisu', 'Shortcake', 'Blondie', 'Brookie', 'Madeleine',
+  'Crescent', 'Tart', 'Pie', 'Pudding', 'Strudel', 'Bowl', 'Loaf', 'Brownie', 'Bites', 'Bar', 'Cake',
+];
+const TYPE_GROUPS_LC = TYPE_GROUPS.map((t) => t.toLowerCase());
+function typeIndexOf(name) {
+  const u = ' ' + name.toLowerCase() + ' ';
+  for (let i = 0; i < TYPE_GROUPS_LC.length; i++) if (u.includes(TYPE_GROUPS_LC[i])) return i;
+  return TYPE_GROUPS_LC.length;
+}
+
 function rebuildItems() {
   const list = [];
   for (const b of state.base) {
@@ -174,13 +193,15 @@ function rebuildItems() {
     list.push(effective(a, {}, a._key, true));
   }
   const order = (cat) => { if (!state.catOrder.has(cat)) state.catOrder.set(cat, state.catOrder.size); return state.catOrder.get(cat); };
-  for (const it of list) { it._table = tableFor(it); it._season = seasonFor(it); }
-  // everyday tables first (by table), then seasonal items (by season table)
+  for (const it of list) { it._table = tableFor(it); it._season = seasonFor(it); it._typeIdx = typeIndexOf(it.name); }
+  // everyday tables first (by table), then seasonal; within a category group
+  // like products together (by product type), then by name
   list.sort((x, y) => {
     const hx = x.holiday ? 1 : 0, hy = y.holiday ? 1 : 0;
     if (hx !== hy) return hx - hy;
     const gx = x.holiday ? x._season : x._table, gy = y.holiday ? y._season : y._table;
-    return gx - gy || order(x.category) - order(y.category) || x.name.localeCompare(y.name);
+    return gx - gy || order(x.category) - order(y.category)
+      || x._typeIdx - y._typeIdx || x.name.localeCompare(y.name);
   });
   state.items = list;
   state.byName = new Map(); state.byUpc = new Map();
