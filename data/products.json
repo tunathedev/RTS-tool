@@ -8,7 +8,7 @@
       "category": "Bread/Buns",
       "items": [
         {
-          "name": "12ct H-E-B Sweet Aloha Rolls",
+          "name": "Rolls Sweet Aloha 12 ct",
           "days": 14,
           "pkgDate": false,
           "upc": "4122071383",
@@ -20,7 +20,7 @@
           }
         },
         {
-          "name": "24ct H-E-B Sweet Aloha Rolls",
+          "name": "Rolls Sweet Aloha 24 ct",
           "days": 14,
           "pkgDate": false,
           "upc": "4122029439",
@@ -32,7 +32,7 @@
           }
         },
         {
-          "name": "Avocado Brioche Buns",
+          "name": "Brioche Avocado Buns",
           "days": 14,
           "pkgDate": false,
           "upc": "81004433050",
@@ -44,7 +44,7 @@
           }
         },
         {
-          "name": "Baked Challah Bread 12",
+          "name": "Bread Baked Challah 12",
           "days": 5,
           "pkgDate": false,
           "upc": "65784646874",
@@ -56,7 +56,7 @@
           }
         },
         {
-          "name": "Blueberry Sliced Brioche",
+          "name": "Brioche Blueberry Sliced",
           "days": 14,
           "pkgDate": false,
           "upc": "81004433034",
@@ -92,7 +92,7 @@
           }
         },
         {
-          "name": "Cinnamon Raisin Sliced Brioche",
+          "name": "Brioche Cinnamon Raisin Sliced",
           "days": 14,
           "pkgDate": false,
           "upc": "81004433035",
@@ -104,7 +104,7 @@
           }
         },
         {
-          "name": "Cristal Artisan Slice Bread5ct",
+          "name": "Bread Artisan Slice 5 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "81004433022",
@@ -116,7 +116,7 @@
           }
         },
         {
-          "name": "Cristal Bagel Bun 4ct",
+          "name": "Bagel Bun 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "85088500877",
@@ -128,7 +128,7 @@
           }
         },
         {
-          "name": "H-E-B Aloha Swt Hamburger Buns",
+          "name": "Buns Aloha Sweet Hamburger",
           "days": 14,
           "pkgDate": false,
           "upc": "4122092537",
@@ -140,7 +140,7 @@
           }
         },
         {
-          "name": "H-E-B Aloha Swt Hot Dog Buns 8ct",
+          "name": "Buns Aloha Sweet Hot Dog 8 ct",
           "days": 14,
           "pkgDate": false,
           "upc": "4122092542",
@@ -152,7 +152,7 @@
           }
         },
         {
-          "name": "H-E-B Butter Brioche Slice Bread",
+          "name": "Brioche Butter Slice Bread",
           "days": 7,
           "pkgDate": false,
           "upc": "4122048610",
@@ -164,7 +164,7 @@
           }
         },
         {
-          "name": "H-E-B Sweet Aloha Rolls 4ct",
+          "name": "Rolls Sweet Aloha 4 ct",
           "days": 14,
           "pkgDate": false,
           "upc": "4122042257",
@@ -176,7 +176,7 @@
           }
         },
         {
-          "name": "Izzio Ciabatta Take & Bake",
+          "name": "Ciabatta Take & Bake",
           "days": 10,
           "pkgDate": false,
           "upc": "65708202702",
@@ -188,7 +188,7 @@
           }
         },
         {
-          "name": "Jalapeno Cheddar Brioche Bun",
+          "name": "Brioche Jalapeno Cheddar Bun",
           "days": 14,
           "pkgDate": false,
           "upc": "81004433052",
@@ -200,7 +200,7 @@
           }
         },
         {
-          "name": "Lemon Sliced Brioche",
+          "name": "Brioche Lemon Sliced",
           "days": 14,
           "pkgDate": false,
           "upc": "81004433036",
@@ -212,7 +212,7 @@
           }
         },
         {
-          "name": "Organic Bah Cntry Itln Batard",
+          "name": "Batard Organic Bah Cntry Itln",
           "days": 10,
           "pkgDate": false,
           "upc": "4122097801",
@@ -224,7 +224,7 @@
           }
         },
         {
-          "name": "Organic Bah Rstd Grlc Batard",
+          "name": "Batard Organic Bah Rstd Grlc",
           "days": 10,
           "pkgDate": false,
           "upc": "4122097802",
@@ -236,7 +236,7 @@
           }
         },
         {
-          "name": "Pretzilla Soft Pretzel Bites",
+          "name": "Pretzel Bites Soft",
           "days": 10,
           "pkgDate": false,
           "upc": "67331603651",
@@ -260,7 +260,7 @@
           }
         },
         {
-          "name": "Rosemary Garlic Focaccia",
+          "name": "Focaccia Rosemary Garlic",
           "days": 10,
           "pkgDate": false,
           "upc": "65708202930",
@@ -272,14 +272,14 @@
           }
         },
         {
-          "name": "Rts Hot Cross Buns",
+          "name": "Buns Hot Cross",
           "days": 7,
           "pkgDate": false,
           "upc": "5178531850",
           "image": "https://images.heb.com/is/image/HEBGrocery/011411011"
         },
         {
-          "name": "Sf Style Sourdough Take & Bake",
+          "name": "Sourdough Sf Style Take & Bake",
           "days": 10,
           "pkgDate": false,
           "upc": "65708202704",
@@ -296,7 +296,7 @@
       "category": "Babka",
       "items": [
         {
-          "name": "Sliced Chocolate Babka",
+          "name": "Babka Sliced Chocolate",
           "days": 21,
           "pkgDate": false,
           "upc": "73661376046",
@@ -308,7 +308,7 @@
           }
         },
         {
-          "name": "Sliced Cinnamon Babka",
+          "name": "Babka Sliced Cinnamon",
           "days": 21,
           "pkgDate": false,
           "upc": "73661376047",
@@ -325,7 +325,7 @@
       "category": "Biscotti",
       "items": [
         {
-          "name": "H-E-B Vanilla Almond Biscottini",
+          "name": "Biscottini Vanilla Almond",
           "days": null,
           "pkgDate": true,
           "upc": "4122055603",
@@ -342,7 +342,7 @@
       "category": "Bunuelo",
       "items": [
         {
-          "name": "My Nanas Bunuelo Chip 9oz",
+          "name": "Bunuelo Chip 9 oz",
           "days": 30,
           "pkgDate": false,
           "upc": "3439210310",
@@ -354,7 +354,7 @@
           }
         },
         {
-          "name": "Pan De Polvo",
+          "name": "Pan de Polvo",
           "days": 30,
           "pkgDate": false,
           "upc": "22783200000",
@@ -366,7 +366,7 @@
           }
         },
         {
-          "name": "Powdered Pan De Polvo",
+          "name": "Pan de Polvo Powdered",
           "days": 30,
           "pkgDate": false,
           "upc": "23280900000",
@@ -383,7 +383,7 @@
       "category": "Cakes",
       "items": [
         {
-          "name": "10 Inch Angel Food Cake",
+          "name": "Cake Angel Food 10 in",
           "days": 14,
           "pkgDate": false,
           "upc": "22762800000",
@@ -395,7 +395,7 @@
           }
         },
         {
-          "name": "4 In Tiramisu Bowl",
+          "name": "Tiramisu Bowl 4 in",
           "days": 7,
           "pkgDate": false,
           "upc": "9585601966",
@@ -407,7 +407,7 @@
           }
         },
         {
-          "name": "4 Inch Lemoncello Bowl",
+          "name": "Bowl Limoncello 4 in",
           "days": 7,
           "pkgDate": false,
           "upc": "9585601791",
@@ -419,7 +419,7 @@
           }
         },
         {
-          "name": "7 Up Ring Cake 26 oz",
+          "name": "Ring Cake 7 Up 26 oz",
           "days": 10,
           "pkgDate": false,
           "upc": "4069768001",
@@ -431,7 +431,7 @@
           }
         },
         {
-          "name": "Angel Food Cake Bar",
+          "name": "Bar Angel Food Cake",
           "days": 14,
           "pkgDate": false,
           "upc": "7121404008",
@@ -443,7 +443,7 @@
           }
         },
         {
-          "name": "Cafe Valley Big Red Cream Cake",
+          "name": "Cream Cake Big Red",
           "days": 6,
           "pkgDate": false,
           "upc": "4069768014",
@@ -455,7 +455,7 @@
           }
         },
         {
-          "name": "Cafe Valley Honey Bun Cake",
+          "name": "Honey Bun Cake",
           "days": 14,
           "pkgDate": false,
           "upc": "4069763021",
@@ -467,7 +467,7 @@
           }
         },
         {
-          "name": "Cake, 36oz, Strawberry Creme",
+          "name": "Cake Strawberry Creme 36 oz",
           "days": 6,
           "pkgDate": false,
           "upc": "4122025616",
@@ -479,7 +479,7 @@
           }
         },
         {
-          "name": "Chocolate Cream Cake1/2 Cake",
+          "name": "Cream Cake Chocolate 1 2 Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "23233600000",
@@ -491,7 +491,7 @@
           }
         },
         {
-          "name": "Cofecke Strawberry Chs",
+          "name": "Coffee Cake Strawberry Cheese",
           "days": 7,
           "pkgDate": false,
           "upc": "4122064955",
@@ -503,7 +503,7 @@
           }
         },
         {
-          "name": "Coffeecake Apple",
+          "name": "Coffee Cake Apple",
           "days": 7,
           "pkgDate": false,
           "upc": "4122064858",
@@ -515,7 +515,7 @@
           }
         },
         {
-          "name": "Coffeecake Cheese",
+          "name": "Coffee Cake Cheese",
           "days": 7,
           "pkgDate": false,
           "upc": "4122065629",
@@ -539,7 +539,7 @@
           }
         },
         {
-          "name": "Drmn Strawberries White Chocolate Shortcake",
+          "name": "Shortcake Drmn Strawberries White Chocolate",
           "days": null,
           "pkgDate": true,
           "upc": "77011830009",
@@ -551,7 +551,7 @@
           }
         },
         {
-          "name": "Gc Poundcake Pecan Praline",
+          "name": "Pound Cake Pecan Praline",
           "days": 14,
           "pkgDate": false,
           "upc": "85003145015",
@@ -564,7 +564,7 @@
           "cakeSide": true
         },
         {
-          "name": "Gc Pudding Strawberry Key Lime",
+          "name": "Pudding Strawberry Key Lime",
           "days": 14,
           "pkgDate": false,
           "upc": "85003145018",
@@ -577,7 +577,7 @@
           "cakeSide": true
         },
         {
-          "name": "Guzel Cakes Banana Pudding",
+          "name": "Pudding Banana",
           "days": 14,
           "pkgDate": false,
           "upc": "85003145010",
@@ -590,7 +590,7 @@
           "cakeSide": true
         },
         {
-          "name": "Guzel Cakes Lot Cookie Butter",
+          "name": "Cookie Butter",
           "days": 14,
           "pkgDate": false,
           "upc": "85003145011",
@@ -603,7 +603,7 @@
           "cakeSide": true
         },
         {
-          "name": "Guzel Cakes Pl Strawberry",
+          "name": "Strawberry",
           "days": 14,
           "pkgDate": false,
           "upc": "85003145009",
@@ -616,7 +616,7 @@
           "cakeSide": true
         },
         {
-          "name": "H-E-B Banana Nut Creme Cake",
+          "name": "Creme Cake Banana Nut",
           "days": 6,
           "pkgDate": false,
           "upc": "4122047072",
@@ -628,7 +628,7 @@
           }
         },
         {
-          "name": "H-E-B Si Banana Nut Half Crme Ck",
+          "name": "CrÈMe Cake Sock It Banana Nut Half",
           "days": 6,
           "pkgDate": false,
           "upc": "22713200000",
@@ -640,7 +640,7 @@
           }
         },
         {
-          "name": "H-E-B Sock It To Me Creme Cake",
+          "name": "Creme Cake Sock It To Me",
           "days": 6,
           "pkgDate": false,
           "upc": "4122064117",
@@ -652,7 +652,7 @@
           }
         },
         {
-          "name": "H-E-B Triple Chocolate Creme Cake",
+          "name": "Creme Cake Triple Chocolate",
           "days": 6,
           "pkgDate": false,
           "upc": "4122022961",
@@ -664,7 +664,7 @@
           }
         },
         {
-          "name": "Lr 8in Mango Cake",
+          "name": "Cake Mango 8 in",
           "days": null,
           "pkgDate": true,
           "upc": "23240500000",
@@ -676,7 +676,7 @@
           }
         },
         {
-          "name": "Lr 8in Tiramisu Cake",
+          "name": "Tiramisu Cake 8 in",
           "days": null,
           "pkgDate": true,
           "upc": "23254100000",
@@ -688,7 +688,7 @@
           }
         },
         {
-          "name": "Lr 8in Truffle Royale Cake",
+          "name": "Cake Truffle Royale 8 in",
           "days": null,
           "pkgDate": true,
           "upc": "23319400000",
@@ -700,7 +700,7 @@
           }
         },
         {
-          "name": "Lr Chocolate Truffle Cake",
+          "name": "Cake Chocolate Truffle",
           "days": null,
           "pkgDate": true,
           "upc": "22622900000",
@@ -712,7 +712,7 @@
           }
         },
         {
-          "name": "Lr Strawberry Lemon Velvet Cake",
+          "name": "Cake Strawberry Lemon Velvet",
           "days": null,
           "pkgDate": true,
           "upc": "22619300000",
@@ -724,7 +724,7 @@
           }
         },
         {
-          "name": "Sab Cream Cake Marble Half",
+          "name": "Cream Cake Marble Half",
           "days": 6,
           "pkgDate": false,
           "upc": "22838000000",
@@ -736,7 +736,7 @@
           }
         },
         {
-          "name": "Sab Lemon Cream Cake Half",
+          "name": "Cream Cake Lemon Half",
           "days": 6,
           "pkgDate": false,
           "upc": "22838100000",
@@ -748,7 +748,7 @@
           }
         },
         {
-          "name": "Sab Sock It To Me Cream Cake 1/2",
+          "name": "Cream Cake Sock It To Me 1/2",
           "days": 6,
           "pkgDate": false,
           "upc": "22837900000",
@@ -760,7 +760,7 @@
           }
         },
         {
-          "name": "Sab Strawberry Cream Cake Half",
+          "name": "Cream Cake Strawberry Half",
           "days": 6,
           "pkgDate": false,
           "upc": "22837800000",
@@ -777,7 +777,7 @@
       "category": "Decorated Cakes",
       "items": [
         {
-          "name": "1/4 Buttercream Chocolate Birthday",
+          "name": "Buttercream Chocolate Birthday 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "22660100000",
@@ -790,7 +790,7 @@
           "cakeSide": true
         },
         {
-          "name": "1/4 Sheet White Birthday Cake",
+          "name": "Cake Sheet White Birthday 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "22634800000",
@@ -803,7 +803,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream 1/4 Chocolate Flower Power",
+          "name": "Buttercream Chocolate Flower Power 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23226000000",
@@ -816,7 +816,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream 1/4 Vanilla Candles & Confetti",
+          "name": "Buttercream Vanilla Candles & Confetti 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23225400000",
@@ -829,7 +829,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream 1/4 Vanilla Flower Power",
+          "name": "Buttercream Vanilla Flower Power 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23225100000",
@@ -842,7 +842,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream 1/4 Vanilla Vintage Bows",
+          "name": "Buttercream Vanilla Vintage Bows 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23225300000",
@@ -855,7 +855,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream Chocolate 1/4 Candles & Confetti",
+          "name": "Buttercream Chocolate Candles & Confetti 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23231100000",
@@ -868,7 +868,7 @@
           "cakeSide": true
         },
         {
-          "name": "Buttercream Chocolate 1/4 Vintage Bows",
+          "name": "Buttercream Chocolate Vintage Bows 1/4",
           "days": null,
           "pkgDate": true,
           "upc": "23229300000",
@@ -881,7 +881,7 @@
           "cakeSide": true
         },
         {
-          "name": "Everyday Reception Cakes",
+          "name": "Cakes Everyday Reception",
           "days": null,
           "pkgDate": true,
           "upc": "2320435560",
@@ -899,7 +899,7 @@
       "category": "Candy",
       "items": [
         {
-          "name": "Palmer Valentine Munchy Medley",
+          "name": "Valentine Munchy Medley",
           "days": 180,
           "pkgDate": false,
           "upc": "7723217307",
@@ -908,7 +908,7 @@
           "seasonTable": 1
         },
         {
-          "name": "Palmer Valentine Snack Mix",
+          "name": "Valentine Snack Mix",
           "days": 180,
           "pkgDate": false,
           "upc": "7723217308",
@@ -922,7 +922,7 @@
       "category": "Cheesecakes",
       "items": [
         {
-          "name": "16 oz Strawberry Swirl Cheesecake",
+          "name": "Cheesecake Strawberry Swirl 16 oz",
           "days": 7,
           "pkgDate": false,
           "upc": "1037416201",
@@ -934,7 +934,7 @@
           }
         },
         {
-          "name": "16 oz Variety Sampler Cheesecake",
+          "name": "Cheesecake Variety Sampler 16 oz",
           "days": 7,
           "pkgDate": false,
           "upc": "1037416205",
@@ -946,7 +946,7 @@
           }
         },
         {
-          "name": "40oz Texas Variety Cheesecake",
+          "name": "Cheesecake Texas Variety 40 oz",
           "days": 7,
           "pkgDate": false,
           "upc": "1037440089",
@@ -958,7 +958,7 @@
           }
         },
         {
-          "name": "8\" Caramel Turtle Cheesecake",
+          "name": "Cheesecake Caramel Turtle 8\"",
           "days": 7,
           "pkgDate": false,
           "upc": "4122048957",
@@ -970,7 +970,7 @@
           }
         },
         {
-          "name": "8\" New York Style Cheesecake",
+          "name": "Cheesecake New York Style 8\"",
           "days": 7,
           "pkgDate": false,
           "upc": "4122048960",
@@ -982,7 +982,7 @@
           }
         },
         {
-          "name": "8in Pumpkin Swirl Cheesecake",
+          "name": "Cheesecake Pumpkin Swirl 8 in",
           "days": 7,
           "pkgDate": false,
           "upc": "73025661073",
@@ -994,7 +994,7 @@
           }
         },
         {
-          "name": "9in Strawberry Swirl Cheesecake",
+          "name": "Cheesecake Strawberry Swirl 9 in",
           "days": 7,
           "pkgDate": false,
           "upc": "1037442061",
@@ -1006,7 +1006,7 @@
           }
         },
         {
-          "name": "9in Variety Cheesecake",
+          "name": "Cheesecake Variety 9 in",
           "days": 7,
           "pkgDate": false,
           "upc": "1037442065",
@@ -1018,7 +1018,7 @@
           }
         },
         {
-          "name": "9in40oz New York Cheesecake",
+          "name": "Cheesecake New York 40 oz 9 in",
           "days": 7,
           "pkgDate": false,
           "upc": "1037442060",
@@ -1030,7 +1030,7 @@
           }
         },
         {
-          "name": "Cbc Blueberry Cheesecake Slice",
+          "name": "Cheesecake Slice Blueberry",
           "days": 3,
           "pkgDate": false,
           "upc": "86320400048",
@@ -1042,7 +1042,7 @@
           }
         },
         {
-          "name": "Cbc Original Cheesecake Slice",
+          "name": "Cheesecake Slice Original",
           "days": 3,
           "pkgDate": false,
           "upc": "86320400045",
@@ -1054,7 +1054,7 @@
           }
         },
         {
-          "name": "Cbc Sea Salt Caramel Cheesecake Slc",
+          "name": "Cheesecake Slice Sea Salt Caramel",
           "days": 3,
           "pkgDate": false,
           "upc": "86320400046",
@@ -1066,7 +1066,7 @@
           }
         },
         {
-          "name": "Cbc Strawberry Cheesecake Slc",
+          "name": "Cheesecake Slice Strawberry",
           "days": 3,
           "pkgDate": false,
           "upc": "86320400047",
@@ -1078,7 +1078,7 @@
           }
         },
         {
-          "name": "Ny 2sl Cheesecake",
+          "name": "Cheesecake New York 2 Slice",
           "days": 7,
           "pkgDate": false,
           "upc": "1037422610",
@@ -1090,7 +1090,7 @@
           }
         },
         {
-          "name": "Straw 2sl Cheesecake",
+          "name": "Cheesecake Strawberry 2 Slice",
           "days": 7,
           "pkgDate": false,
           "upc": "1037422611",
@@ -1107,7 +1107,7 @@
       "category": "Cookies",
       "items": [
         {
-          "name": "Alyssas Healthy Chocobites",
+          "name": "Bites Healthy Choco",
           "days": null,
           "pkgDate": true,
           "upc": "86716900014",
@@ -1119,7 +1119,7 @@
           }
         },
         {
-          "name": "Alyssas Oatmeal Bites",
+          "name": "Bites Oatmeal",
           "days": null,
           "pkgDate": true,
           "upc": "86716900010",
@@ -1131,7 +1131,7 @@
           }
         },
         {
-          "name": "Alyssas Vegan Bites",
+          "name": "Bites Vegan",
           "days": null,
           "pkgDate": true,
           "upc": "86716900011",
@@ -1143,7 +1143,7 @@
           }
         },
         {
-          "name": "Cookie, Christmas Green Trees",
+          "name": "Cookie Christmas Green Trees",
           "days": 28,
           "pkgDate": false,
           "upc": "4122090697",
@@ -1157,7 +1157,7 @@
           "seasonTable": 5
         },
         {
-          "name": "Cookie, Christmas Red Bells",
+          "name": "Cookie Christmas Red Bells",
           "days": 28,
           "pkgDate": false,
           "upc": "4122090699",
@@ -1171,7 +1171,7 @@
           "seasonTable": 5
         },
         {
-          "name": "Cookie, Easter Pink Bunny",
+          "name": "Cookie Easter Pink Bunny",
           "days": 28,
           "pkgDate": false,
           "upc": "4122098274",
@@ -1180,7 +1180,7 @@
           "seasonTable": 2
         },
         {
-          "name": "Cookie, Halloween Orange Pumpk",
+          "name": "Cookie Halloween Orange Pumpkin",
           "days": 28,
           "pkgDate": false,
           "upc": "4122084850",
@@ -1194,7 +1194,7 @@
           "seasonTable": 3
         },
         {
-          "name": "Cookie, Pink Hearts",
+          "name": "Cookie Pink Hearts",
           "days": 28,
           "pkgDate": false,
           "upc": "4122094588",
@@ -1212,7 +1212,7 @@
           "seasonTable": 1
         },
         {
-          "name": "Cookies-Valentine Hearts 5doz.",
+          "name": "Cookies -Valentine Hearts 5 dozen",
           "days": 28,
           "pkgDate": false,
           "upc": "7366400424",
@@ -1221,7 +1221,7 @@
           "seasonTable": 1
         },
         {
-          "name": "Crown Bk Round Brookie 4ct",
+          "name": "Brookie Round 4 ct",
           "days": 12,
           "pkgDate": false,
           "upc": "8271872114",
@@ -1233,7 +1233,7 @@
           }
         },
         {
-          "name": "Gluten-Free Cravin For Cookies & Cream",
+          "name": "Cookies Gluten-Free Cravin For & Cream",
           "days": 21,
           "pkgDate": false,
           "upc": "77011830016",
@@ -1245,7 +1245,7 @@
           }
         },
         {
-          "name": "H-E-B Candy Cookie",
+          "name": "Cookie Candy",
           "days": 21,
           "pkgDate": false,
           "upc": "23205700000",
@@ -1257,7 +1257,7 @@
           }
         },
         {
-          "name": "H-E-B Chocolate Chewies 6ct",
+          "name": "Chocolate Chewies 6 ct",
           "days": 10,
           "pkgDate": false,
           "upc": "23200800000",
@@ -1269,7 +1269,7 @@
           }
         },
         {
-          "name": "H-E-B Chocolate Chp Soft Baked Snack Pack",
+          "name": "Chocolate Chip Soft Baked Snack Pack",
           "days": 7,
           "pkgDate": false,
           "upc": "4122071871",
@@ -1281,7 +1281,7 @@
           }
         },
         {
-          "name": "H-E-B Dble Chocolate Chip Cookies 18ct",
+          "name": "Cookies Double Chocolate Chip 18 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "23217300000",
@@ -1293,7 +1293,7 @@
           }
         },
         {
-          "name": "H-E-B Oatmeal Raisin Cookies 18ct",
+          "name": "Cookies Oatmeal Raisin 18 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "23216200000",
@@ -1305,7 +1305,7 @@
           }
         },
         {
-          "name": "H-E-B Original Madeleines",
+          "name": "Madeleines Original",
           "days": 30,
           "pkgDate": false,
           "upc": "4122086629",
@@ -1317,7 +1317,7 @@
           }
         },
         {
-          "name": "H-E-B Pumpkin Madeleines",
+          "name": "Madeleines Pumpkin",
           "days": 30,
           "pkgDate": false,
           "upc": "4122085437",
@@ -1329,7 +1329,7 @@
           }
         },
         {
-          "name": "H-E-B Snickerdoodle Cookies 18ct",
+          "name": "Cookies Snickerdoodle 18 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "23219200000",
@@ -1341,7 +1341,7 @@
           }
         },
         {
-          "name": "H-E-B Sugar Cookies 18ct",
+          "name": "Cookies Sugar 18 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "23212400000",
@@ -1353,14 +1353,14 @@
           }
         },
         {
-          "name": "Red Frosted Cookies",
+          "name": "Cookies Red Frosted",
           "days": 28,
           "pkgDate": false,
           "upc": "4980014644",
           "image": "https://images.heb.com/is/image/HEBGrocery/001847668"
         },
         {
-          "name": "Richs Red Velvet Frostd Cookie",
+          "name": "Cookie Richs Red Velvet Frostd",
           "days": 28,
           "pkgDate": false,
           "upc": "4980014134",
@@ -1372,7 +1372,7 @@
           }
         },
         {
-          "name": "Rts Chocolate Chunk 18ct",
+          "name": "Chocolate Chunk 18 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "23209400000",
@@ -1384,7 +1384,7 @@
           }
         },
         {
-          "name": "Twc Snickerdoodle Cookies",
+          "name": "Cookies Snickerdoodle",
           "days": 10,
           "pkgDate": false,
           "upc": "77098190603",
@@ -1405,7 +1405,7 @@
           "seasonTable": 1
         },
         {
-          "name": "White Frosted Sugar Cookie",
+          "name": "Cookie White Frosted Sugar",
           "days": 28,
           "pkgDate": false,
           "upc": "4980026510",
@@ -1417,7 +1417,7 @@
           }
         },
         {
-          "name": "Yellow Frosted Cookie",
+          "name": "Cookie Yellow Frosted",
           "days": 28,
           "pkgDate": false,
           "upc": "4980014646",
@@ -1429,7 +1429,7 @@
       "category": "Macarons",
       "items": [
         {
-          "name": "Almond Macaron",
+          "name": "Macaron Almond",
           "days": null,
           "pkgDate": true,
           "upc": "88869202759",
@@ -1442,7 +1442,7 @@
           "cakeSide": true
         },
         {
-          "name": "Blueberry Macaron",
+          "name": "Macaron Blueberry",
           "days": null,
           "pkgDate": true,
           "upc": "88869202762",
@@ -1455,7 +1455,7 @@
           "cakeSide": true
         },
         {
-          "name": "Blueberry Macarons 6ct",
+          "name": "Macarons Blueberry 6 ct",
           "days": null,
           "pkgDate": true,
           "upc": "23310000000",
@@ -1468,7 +1468,7 @@
           "cakeSide": true
         },
         {
-          "name": "Dark Chocolate Macaron",
+          "name": "Macaron Dark Chocolate",
           "days": null,
           "pkgDate": true,
           "upc": "88869202764",
@@ -1481,7 +1481,7 @@
           "cakeSide": true
         },
         {
-          "name": "Dark Chocolate Orange Macaron 6ct",
+          "name": "Macaron Dark Chocolate Orange 6 ct",
           "days": null,
           "pkgDate": true,
           "upc": "22604700000",
@@ -1494,7 +1494,7 @@
           "cakeSide": true
         },
         {
-          "name": "Pistachio Macaron",
+          "name": "Macaron Pistachio",
           "days": null,
           "pkgDate": true,
           "upc": "88869202760",
@@ -1507,7 +1507,7 @@
           "cakeSide": true
         },
         {
-          "name": "Raspberry Chocolate Macaron 6ct",
+          "name": "Macaron Raspberry Chocolate 6 ct",
           "days": null,
           "pkgDate": true,
           "upc": "22657100000",
@@ -1520,7 +1520,7 @@
           "cakeSide": true
         },
         {
-          "name": "Raspberry Macaron",
+          "name": "Macaron Raspberry",
           "days": null,
           "pkgDate": true,
           "upc": "88869202763",
@@ -1533,7 +1533,7 @@
           "cakeSide": true
         },
         {
-          "name": "Salted Butter Caramel Macaron",
+          "name": "Macaron Salted Butter Caramel",
           "days": null,
           "pkgDate": true,
           "upc": "88869210287",
@@ -1546,7 +1546,7 @@
           "cakeSide": true
         },
         {
-          "name": "Variety Macaron 6ct",
+          "name": "Macaron Variety 6 ct",
           "days": null,
           "pkgDate": true,
           "upc": "22662700000",
@@ -1564,7 +1564,7 @@
       "category": "Cupcakes",
       "items": [
         {
-          "name": "H-E-B Mini Chocolate Cupcakes 12pk",
+          "name": "Cakes Mini Chocolate Cup 12 pk",
           "days": 7,
           "pkgDate": false,
           "upc": "4122087465",
@@ -1576,7 +1576,7 @@
           }
         },
         {
-          "name": "H-E-B Mini Gold Cupcakes 12ct",
+          "name": "Cakes Mini Gold Cup 12 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4122054190",
@@ -1588,7 +1588,7 @@
           }
         },
         {
-          "name": "Hh Gluten-Free Mini Cupcakes",
+          "name": "Cakes Gluten-Free Mini Cup",
           "days": 7,
           "pkgDate": false,
           "upc": "4122046771",
@@ -1600,7 +1600,7 @@
           }
         },
         {
-          "name": "Kb 12ct Patriot Vanilla Chocolate Cupcakes",
+          "name": "Cakes Patriot Vanilla Chocolate Cup 12 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "77098130648",
@@ -1614,7 +1614,7 @@
           "seasonTable": 6
         },
         {
-          "name": "Lb Hal Mini Cupcakes Platter",
+          "name": "Cakes Half Mini Cup Platter",
           "days": 7,
           "pkgDate": false,
           "upc": "4122099285",
@@ -1626,7 +1626,7 @@
           }
         },
         {
-          "name": "Mini Chocolate Christmas Cupcakes 12ct",
+          "name": "Cakes Mini Chocolate Christmas Cup 12 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4122085371",
@@ -1635,7 +1635,7 @@
           "seasonTable": 5
         },
         {
-          "name": "Mini Gold Love Cupcakes 12ct",
+          "name": "Cakes Mini Gold Love Cup 12 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4122087219",
@@ -1649,7 +1649,7 @@
           "seasonTable": 1
         },
         {
-          "name": "Mini Harvest Gold Cupcakes 12ct",
+          "name": "Cakes Mini Harvest Gold Cup 12 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4122090490",
@@ -1663,7 +1663,7 @@
           "seasonTable": 4
         },
         {
-          "name": "Vday Mini Cupcakes Platter",
+          "name": "Cakes Vday Mini Cup Platter",
           "days": 7,
           "pkgDate": false,
           "upc": "4122090620",
@@ -1677,7 +1677,7 @@
       "category": "Danish/Donuts/Eclairs",
       "items": [
         {
-          "name": "Assorted Mini Danishes",
+          "name": "Danishes Assorted Mini",
           "days": 7,
           "pkgDate": false,
           "upc": "70173005010",
@@ -1689,7 +1689,7 @@
           }
         },
         {
-          "name": "Cheese Mini Danishes",
+          "name": "Danishes Cheese Mini",
           "days": 7,
           "pkgDate": false,
           "upc": "70173005020",
@@ -1701,7 +1701,7 @@
           }
         },
         {
-          "name": "Chocolate Eclairs 4 Pk",
+          "name": "Eclairs Chocolate 4 pk",
           "days": null,
           "pkgDate": true,
           "upc": "4980014779",
@@ -1713,7 +1713,7 @@
           }
         },
         {
-          "name": "H-E-B Devil Food Donut Holes",
+          "name": "Donut Holes Devil Food",
           "days": 5,
           "pkgDate": false,
           "upc": "4122089838",
@@ -1725,7 +1725,7 @@
           }
         },
         {
-          "name": "H-E-B Glazed Donut Holes",
+          "name": "Donut Holes Glazed",
           "days": 2,
           "pkgDate": false,
           "upc": "4122091076",
@@ -1737,7 +1737,7 @@
           }
         },
         {
-          "name": "H-E-B Powdered Donut Holes",
+          "name": "Donut Holes Powdered",
           "days": 5,
           "pkgDate": false,
           "upc": "4122083396",
@@ -1749,7 +1749,7 @@
           }
         },
         {
-          "name": "H-E-B Sour Cream Donut Holes",
+          "name": "Donut Holes Sour Cream",
           "days": 5,
           "pkgDate": false,
           "upc": "4122090507",
@@ -1780,7 +1780,7 @@
       "category": "Muffins",
       "items": [
         {
-          "name": "Banana Nut Muffin 4ct",
+          "name": "Muffin Banana Nut 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "22637100000",
@@ -1792,7 +1792,7 @@
           }
         },
         {
-          "name": "Blueberry Muffin 4ct",
+          "name": "Muffin Blueberry 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "22653300000",
@@ -1804,7 +1804,7 @@
           }
         },
         {
-          "name": "Chocolate Chunk Muffin 4ct",
+          "name": "Muffin Chocolate Chunk 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "22632600000",
@@ -1816,7 +1816,7 @@
           }
         },
         {
-          "name": "Double Chocolate Chip Muffin 4ct",
+          "name": "Muffin Double Chocolate Chip 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "23222100000",
@@ -1828,7 +1828,7 @@
           }
         },
         {
-          "name": "Gsb Pistachio Muffin 4ct",
+          "name": "Muffin Pistachio 4 ct",
           "days": 5,
           "pkgDate": false,
           "upc": "8770990198",
@@ -1845,7 +1845,7 @@
       "category": "Mini Muffins",
       "items": [
         {
-          "name": "H-E-B Apl Cinn & Lmn Mini Muffins",
+          "name": "Mini Muffins Apple Cinnamon & Lemon",
           "days": 5,
           "pkgDate": false,
           "upc": "4122085312",
@@ -1857,7 +1857,7 @@
           }
         },
         {
-          "name": "H-E-B Banana Nut Mini Muffins",
+          "name": "Mini Muffins Banana Nut",
           "days": 5,
           "pkgDate": false,
           "upc": "4122086990",
@@ -1869,7 +1869,7 @@
           }
         },
         {
-          "name": "H-E-B Blueberry Streusel Mini Muffin",
+          "name": "Mini Muffin Blueberry Streusel",
           "days": 5,
           "pkgDate": false,
           "upc": "4122087150",
@@ -1881,7 +1881,7 @@
           }
         },
         {
-          "name": "H-E-B Chocolate Chip Mini Muffins",
+          "name": "Mini Muffins Chocolate Chip",
           "days": 5,
           "pkgDate": false,
           "upc": "4122091021",
@@ -1898,7 +1898,7 @@
       "category": "Gluten Free Items",
       "items": [
         {
-          "name": "Abe'S Blueberry Muffins 4ct",
+          "name": "Muffins Blueberry 4 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4426172047",
@@ -1910,7 +1910,7 @@
           }
         },
         {
-          "name": "Abe'S Chocolate Chip Muffins 4ct",
+          "name": "Muffins Chocolate Chip 4 ct",
           "days": 7,
           "pkgDate": false,
           "upc": "4426172057",
@@ -1922,7 +1922,7 @@
           }
         },
         {
-          "name": "Abes Chocolate Chip Muffin 12 Pk",
+          "name": "Muffin Chocolate Chip 12 pk",
           "days": 7,
           "pkgDate": false,
           "upc": "4426149054",
@@ -1934,7 +1934,7 @@
           }
         },
         {
-          "name": "Abes Wild Blueberry Muffin 12 Pk",
+          "name": "Muffin Wild Blueberry 12 pk",
           "days": 7,
           "pkgDate": false,
           "upc": "4426149044",
@@ -1946,7 +1946,7 @@
           }
         },
         {
-          "name": "Genius Gluten-Free Brown Bread",
+          "name": "Bread Gluten-Free Brown",
           "days": 10,
           "pkgDate": false,
           "upc": "81221702038",
@@ -1958,7 +1958,7 @@
           }
         },
         {
-          "name": "Genius Gluten-Free Four Seeded Bread",
+          "name": "Bread Gluten-Free Four Seeded",
           "days": 10,
           "pkgDate": false,
           "upc": "81221702002",
@@ -1970,7 +1970,7 @@
           }
         },
         {
-          "name": "Genius Gluten-Free Soft White",
+          "name": "Gluten-Free Soft White",
           "days": 10,
           "pkgDate": false,
           "upc": "81221702034",
@@ -1982,7 +1982,7 @@
           }
         },
         {
-          "name": "Hh Gluten-Free Brownie Bites",
+          "name": "Brownie Bites Gluten-Free",
           "days": 14,
           "pkgDate": false,
           "upc": "4122046765",
@@ -1999,7 +1999,7 @@
       "category": "Granola",
       "items": [
         {
-          "name": "H-E-B Berry Crunch Granola",
+          "name": "Granola Berry Crunch",
           "days": 30,
           "pkgDate": false,
           "upc": "4122050213",
@@ -2011,7 +2011,7 @@
           }
         },
         {
-          "name": "Non Gmo Spr Sd & Fruit Granola",
+          "name": "Granola Non Gmo Spr Sd & Fruit",
           "days": 30,
           "pkgDate": false,
           "upc": "4122037584",
@@ -2028,7 +2028,7 @@
       "category": "Ice Cream Cakes/Cupcakes",
       "items": [
         {
-          "name": "Carvel Patriotic Ice Cream Cake",
+          "name": "Ice Cream Cake Patriotic",
           "days": null,
           "pkgDate": true,
           "upc": "1626425201",
@@ -2042,7 +2042,7 @@
           "seasonTable": 6
         },
         {
-          "name": "Oreo Premium Ice Cream Cake Cf Foods",
+          "name": "Ice Cream Cake Oreo Premium",
           "days": null,
           "pkgDate": true,
           "upc": "1626401105",
@@ -2054,7 +2054,7 @@
           }
         },
         {
-          "name": "Reeses Peanut Butter Ice Cream Cake",
+          "name": "Ice Cream Cake Reeses Peanut Butter",
           "days": null,
           "pkgDate": true,
           "upc": "1626415295",
@@ -2071,21 +2071,21 @@
       "category": "Pies",
       "items": [
         {
-          "name": "10\" Pumpkin Cream Cheese",
+          "name": "Pumpkin Cream Cheese 10\"",
           "days": 3,
           "pkgDate": false,
           "upc": "23200700000",
           "image": "https://images.heb.com/is/image/HEBGrocery/014386556"
         },
         {
-          "name": "10\" Pumpkin Pie",
+          "name": "Pie Pumpkin 10\"",
           "days": 3,
           "pkgDate": false,
           "upc": "22600100000",
           "image": "https://images.heb.com/is/image/HEBGrocery/010533516"
         },
         {
-          "name": "8\" Pecan Pie",
+          "name": "Pie Pecan 8\"",
           "days": 4,
           "pkgDate": false,
           "upc": "4122031239",
@@ -2097,7 +2097,7 @@
           }
         },
         {
-          "name": "8\" Pumpkin Pie",
+          "name": "Pie Pumpkin 8\"",
           "days": 3,
           "pkgDate": false,
           "upc": "4122043508",
@@ -2109,7 +2109,7 @@
           }
         },
         {
-          "name": "8in Lemon Meringue Pie",
+          "name": "Pie Lemon Meringue 8 in",
           "days": 4,
           "pkgDate": false,
           "upc": "4122084232",
@@ -2121,7 +2121,7 @@
           }
         },
         {
-          "name": "Apple Caramel Crumb Pie",
+          "name": "Pie Apple Caramel Crumb",
           "days": 5,
           "pkgDate": false,
           "upc": "81536001184",
@@ -2133,7 +2133,7 @@
           }
         },
         {
-          "name": "Kennys Mini Key Lime Pie",
+          "name": "Pie Mini Key Lime",
           "days": 10,
           "pkgDate": false,
           "upc": "71127610285",
@@ -2145,7 +2145,7 @@
           }
         },
         {
-          "name": "Kennys Mini Peanut Butter Pie",
+          "name": "Pie Mini Peanut Butter",
           "days": 10,
           "pkgDate": false,
           "upc": "71127650286",
@@ -2157,7 +2157,7 @@
           }
         },
         {
-          "name": "Lr Key Lime Pie Cake",
+          "name": "Pie Key Lime Cake",
           "days": null,
           "pkgDate": true,
           "upc": "22620700000",
@@ -2174,7 +2174,7 @@
       "category": "Two Bite Items",
       "items": [
         {
-          "name": "H-E-B Brownies Snack Pack",
+          "name": "Brownie S Snack Pack",
           "days": 30,
           "pkgDate": false,
           "upc": "4122071872",
@@ -2186,7 +2186,7 @@
           }
         },
         {
-          "name": "H-E-B Two-Bite Brownie Bites",
+          "name": "Brownie Bites Two-Bite",
           "days": 21,
           "pkgDate": false,
           "upc": "4122010951",
@@ -2198,7 +2198,7 @@
           }
         },
         {
-          "name": "Two-Bite Blueberry Scones",
+          "name": "Scones Two-Bite Blueberry",
           "days": 10,
           "pkgDate": false,
           "upc": "77098106345",
@@ -2210,7 +2210,7 @@
           }
         },
         {
-          "name": "Two-Bite Cinnamon Rolls",
+          "name": "Rolls Two-Bite Cinnamon",
           "days": 14,
           "pkgDate": false,
           "upc": "4122085275",
@@ -2222,7 +2222,7 @@
           }
         },
         {
-          "name": "Two-Bite Macaroons Chocolate Dippd",
+          "name": "Macaroons Two-Bite Chocolate Dippd",
           "days": 21,
           "pkgDate": false,
           "upc": "4122085277",
@@ -2234,7 +2234,7 @@
           }
         },
         {
-          "name": "Two-Bite Orange Cranberry Scones",
+          "name": "Scones Two-Bite Orange Cranberry",
           "days": 10,
           "pkgDate": false,
           "upc": "77098106346",
@@ -2246,7 +2246,7 @@
           }
         },
         {
-          "name": "Two-Bite Pumpkin Spice Scones",
+          "name": "Scones Two-Bite Pumpkin Spice",
           "days": 10,
           "pkgDate": false,
           "upc": "77098106341",
@@ -2263,7 +2263,7 @@
       "category": "Sugar Free",
       "items": [
         {
-          "name": "Cookies-Sugar-Free Soft Chocolate Chip",
+          "name": "Cookies -Sugar-Free Soft Chocolate Chip",
           "days": null,
           "pkgDate": true,
           "upc": "3874982857",
@@ -2316,7 +2316,7 @@
       "category": "Other",
       "items": [
         {
-          "name": "Crown Bk Lemon Blondie",
+          "name": "Blondie Lemon",
           "days": null,
           "pkgDate": true,
           "upc": "8271872025",
@@ -2328,7 +2328,7 @@
           }
         },
         {
-          "name": "Moyers Chocolate Caramel Apple",
+          "name": "Chocolate Caramel Apple",
           "days": null,
           "pkgDate": true,
           "upc": "62805501200",
@@ -2354,7 +2354,7 @@
       "category": "Loafs",
       "items": [
         {
-          "name": "Loaf, Sliced, Banana Nut",
+          "name": "Sliced Loaf Banana Nut",
           "days": 6,
           "pkgDate": false,
           "upc": "4122018342",
@@ -2366,7 +2366,7 @@
           }
         },
         {
-          "name": "Loaf, Sliced, Lemon Creme",
+          "name": "Sliced Loaf Lemon Creme",
           "days": 6,
           "pkgDate": false,
           "upc": "4122018341",
@@ -2378,7 +2378,7 @@
           }
         },
         {
-          "name": "Loaf, Sliced, Marble",
+          "name": "Sliced Loaf Marble",
           "days": 6,
           "pkgDate": false,
           "upc": "4122018338",
@@ -2390,7 +2390,7 @@
           }
         },
         {
-          "name": "Loaf, Sliced, Danish Butter",
+          "name": "Sliced Loaf Danish Butter",
           "days": 7,
           "pkgDate": false,
           "upc": "4122018340",
