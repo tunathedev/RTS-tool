@@ -355,6 +355,8 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
 }
 .product-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .product-thumb.empty { display: none; }
+.product-item.discontinued .name { text-decoration: line-through; color: var(--muted); }
+.product-item.discontinued .product-thumb { opacity: .5; }
 .product-item .name { font-size: .95rem; }
 .product-item .meta { font-size: .74rem; color: var(--muted); margin-top: 2px; }
 .badge {

@@ -14,6 +14,7 @@ const LS_BASE = 'rts.baseCatalog.v1';       // optional imported base catalog
 const LS_WX = 'rts.wxCollapsed';
 const LS_HOLIDAY = 'rts.hideHoliday';
 const LS_CAKE = 'rts.hideCake';
+const LS_DISC = 'rts.hideDiscontinued';
 const LS_PROD = 'rts.production.v1';
 const LS_COMPBOX = 'rts.componentBox.v1';
 
@@ -30,6 +31,7 @@ const state = {
   cust: { patches: {}, added: [], deleted: [] },  // user customizations
   hideHoliday: false,
   hideCake: false,
+  hideDisc: false,
   prod: {},           // production plan: id -> { make, done }
   compBox: {},        // component name -> items per box (for box-pull math)
   imgCache: new Map(),
@@ -53,6 +55,7 @@ async function init() {
   loadCustomizations();
   loadHolidayPref();
   loadCakePref();
+  loadDiscPref();
   rebuildItems();
   loadPullList();
   loadProduction();
@@ -67,6 +70,7 @@ async function init() {
   applyWxCollapsed();
   syncHolidayBtn();
   syncCakeBtn();
+  syncDiscBtn();
   loadWeather();
   initSync();
 }
@@ -118,6 +122,7 @@ function effective(src, patch, key, isAdded) {
     holiday: ('holiday' in patch ? patch.holiday : src.holiday) || false,
     seasonTable: ('seasonTable' in patch ? patch.seasonTable : src.seasonTable) || undefined,
     cakeSide: ('cakeSide' in patch ? patch.cakeSide : src.cakeSide) || false,
+    discontinued: ('discontinued' in patch ? patch.discontinued : src.discontinued) || false,
     _key: key, _added: !!isAdded,
     _defDays: src.days, _defPkg: src.pkgDate,
   };
@@ -252,6 +257,22 @@ function syncCakeBtn() {
   btn.textContent = state.hideCake ? '🎂 Cake side: hidden' : '🎂 Cake side: shown';
 }
 
+function loadDiscPref() {
+  let v = null; try { v = localStorage.getItem(LS_DISC); } catch {}
+  state.hideDisc = v === null ? true : v === '1';   // default: discontinued hidden
+}
+function toggleDisc() {
+  state.hideDisc = !state.hideDisc;
+  try { localStorage.setItem(LS_DISC, state.hideDisc ? '1' : '0'); } catch {}
+  syncDiscBtn();
+  renderList();
+}
+function syncDiscBtn() {
+  const btn = $('discToggle');
+  btn.classList.toggle('active', state.hideDisc);
+  btn.textContent = state.hideDisc ? '⛔ Discontinued: hidden' : '⛔ Discontinued: shown';
+}
+
 function refreshCatalog() {
   rebuildItems();
   buildCategoryFilter();
@@ -322,6 +343,8 @@ function renderList() {
     if (state.hideHoliday && it.holiday && !seasonFilter) continue;
     // cake-side items are hidden from the shelves when the toggle is on
     if (state.hideCake && it.cakeSide) continue;
+    // discontinued items are hidden when the toggle is on
+    if (state.hideDisc && it.discontinued) continue;
     if (tableFilter) {
       if (seasonFilter) { if (!(it.holiday && it._season === filterNum)) continue; }
       else { if (it.holiday || it._table !== filterNum) continue; }
@@ -347,7 +370,7 @@ function renderList() {
     }
 
     const row = document.createElement('div');
-    row.className = 'product-item';
+    row.className = 'product-item' + (it.discontinued ? ' discontinued' : '');
 
     const tap = document.createElement('div');
     tap.className = 'tap';
@@ -357,7 +380,7 @@ function renderList() {
     tap.innerHTML =
       `<div class="product-thumb${it.image ? '' : ' empty'}">${thumb}</div>
        <div class="tap-text">
-         <div class="name">${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
+         <div class="name">${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
          <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
        </div>`;
     tap.addEventListener('click', () => isDesktop() ? openItemEditor(it) : openSheet(it));
@@ -438,6 +461,7 @@ function openItemEditor(it, fromSheet) {
   $('edSeason').value = it && it.seasonTable ? String(it.seasonTable) : '1';
   $('edSeasonField').hidden = !$('edHoliday').checked;
   $('edCake').checked = it ? !!it.cakeSide : false;
+  $('edDisc').checked = it ? !!it.discontinued : false;
   const pkg = it ? it.pkgDate : false;
   $('edPkg').checked = pkg;
   $('edDays').value = it && !pkg ? it.days : '';
@@ -474,6 +498,7 @@ function readEditor() {
     holiday: $('edHoliday').checked,
     seasonTable: $('edHoliday').checked ? (parseInt($('edSeason').value, 10) || 1) : null,
     cakeSide: $('edCake').checked,
+    discontinued: $('edDisc').checked,
     days: pkg ? null : days,
   };
 }
@@ -1379,6 +1404,7 @@ function wireEvents() {
   $('addItemBtn').addEventListener('click', () => openItemEditor(null));
   $('holidayToggle').addEventListener('click', toggleHoliday);
   $('cakeToggle').addEventListener('click', toggleCake);
+  $('discToggle').addEventListener('click', toggleDisc);
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);
@@ -1390,7 +1416,7 @@ function wireEvents() {
   // auto-save edits as you type / change
   ['edName', 'edCategory', 'edUpc', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays']
     .forEach((id) => $(id).addEventListener('input', scheduleAutoSave));
-  ['edTable', 'edSeason', 'edCake'].forEach((id) => $(id).addEventListener('change', commitEditor));
+  ['edTable', 'edSeason', 'edCake', 'edDisc'].forEach((id) => $(id).addEventListener('change', commitEditor));
   // export / import
   $('exportBtn').addEventListener('click', exportCatalog);
   $('importBtn').addEventListener('click', () => $('importFile').click());
