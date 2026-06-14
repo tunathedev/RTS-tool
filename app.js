@@ -698,6 +698,7 @@ function toggleList(name) {
   savePullList();
   updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
   renderPullList();
+  syncCremeProduction();
   updateSheetAddBtn();
 }
 
@@ -721,12 +722,41 @@ function boxesFor(it, qty) {
 function isHalfItem(it) { return /^half\b/i.test(it.name); }
 function wholesForHalf(qty) { return Math.ceil(qty / 2); }
 
+/* Pulling half crème cakes triggers the matching "Sliced Half Crème Cakes"
+ * production (you slice whole cakes to make the halves). Pull qty drives the
+ * production make-count for that flavor. */
+const HALF_PROD_MAP = [
+  [/banana nut/i, 'cake-banananut'],
+  [/marble/i, 'cake-marble'],
+  [/lemon/i, 'cake-lemon'],
+  [/strawberry/i, 'cake-strawberry'],
+  [/triple chocolate|chocolate/i, 'cake-triplechoc'],
+  [/sock it/i, 'cake-sockit'],
+];
+function prodIdForHalf(name) { for (const [re, id] of HALF_PROD_MAP) if (re.test(name)) return id; return null; }
+function syncCremeProduction() {
+  const sums = {};
+  for (const p of state.pull) {
+    const it = state.byName.get(p.name);
+    if (it && isHalfItem(it)) { const id = prodIdForHalf(it.name); if (id) sums[id] = (sums[id] || 0) + p.qty; }
+  }
+  let changed = false;
+  for (const cake of PRODUCTION) {
+    if (!cake.cake) continue;
+    const want = sums[cake.id] || 0;
+    const rec = state.prod[cake.id] || { make: 0, done: false };
+    if (rec.make !== want) { rec.make = want; if (!want) rec.done = false; state.prod[cake.id] = rec; changed = true; }
+  }
+  if (changed) { saveProduction(); renderProduction(); }
+}
+
 function setQty(name, delta) {
   const p = state.pull.find((x) => x.name === name);
   if (!p) return;
   p.qty = Math.max(1, p.qty + delta);
   savePullList();
   renderPullList();
+  syncCremeProduction();
 }
 
 function toggleDone(name) {
@@ -752,6 +782,7 @@ function clearList() {
   savePullList();
   renderList();
   renderPullList();
+  syncCremeProduction();
 }
 
 function renderPullList() {
