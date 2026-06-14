@@ -1440,12 +1440,20 @@ async function initSync() {
   setSyncStatus('☁︎ connecting…');
   try {
     const appMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const authMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     const dbMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
     const app = appMod.initializeApp(cfg);
+    await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
     setSyncStatus('☁︎ Global sync on');
-  } catch (e) { sync.on = false; setSyncStatus('⚠︎ sync unavailable (offline?)'); }
+  } catch (e) {
+    sync.on = false;
+    const msg = e && /admin-restricted|operation-not-allowed|configuration-not-found/i.test(e.code || e.message || '')
+      ? '⚠︎ sync off — enable Anonymous sign-in in Firebase'
+      : '⚠︎ sync unavailable — check Firebase Auth/rules';
+    setSyncStatus(msg);
+  }
 }
 
 setupLock();
