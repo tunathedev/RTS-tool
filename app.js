@@ -392,6 +392,7 @@ function renderList() {
 
     const add = document.createElement('button');
     add.className = 'add-btn' + (inList(it.name) ? ' in' : '');
+    add.dataset.name = it.name;
     add.textContent = inList(it.name) ? '✓' : '＋';
     add.setAttribute('aria-label', inList(it.name) ? 'Remove from pull list' : 'Add to pull list');
     add.addEventListener('click', (e) => { e.stopPropagation(); toggleList(it.name); });
@@ -677,9 +678,21 @@ function toggleList(name) {
   if (i >= 0) state.pull.splice(i, 1);
   else state.pull.push({ name, qty: 1, done: false, labels: false });
   savePullList();
-  renderList();
+  updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
   renderPullList();
   updateSheetAddBtn();
+}
+
+// update the +/✓ state of a Browse row's add button without re-rendering the list
+function updateAddButton(name) {
+  const inIt = inList(name);
+  for (const b of document.querySelectorAll('#productList .add-btn')) {
+    if (b.dataset.name === name) {
+      b.className = 'add-btn' + (inIt ? ' in' : '');
+      b.textContent = inIt ? '✓' : '＋';
+      b.setAttribute('aria-label', inIt ? 'Remove from pull list' : 'Add to pull list');
+    }
+  }
 }
 
 // boxes needed for a quantity given items-per-box
