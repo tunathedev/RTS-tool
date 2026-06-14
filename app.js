@@ -1405,7 +1405,15 @@ function setupLock() {
 const sync = { on: false, applying: false, mod: null, db: null, seen: new Set() };
 const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox'];
 
-function setSyncStatus(t) { const el = $('syncStatus'); if (el) el.textContent = t; }
+function setSyncStatus(t, level) {
+  const el = $('syncStatus'); if (el) el.textContent = t;
+  const pill = $('syncPill'); if (!pill) return;
+  const map = { connecting: ['Connecting…', 'amber'], on: ['Synced', 'on'], error: ['Sync error', 'error'] };
+  const [label, cls] = map[level] || ['', ''];
+  pill.textContent = label;
+  pill.className = 'sync-pill' + (cls ? ' ' + cls : '');
+  pill.hidden = !label;
+}
 function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : state.compBox; }
 function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
 
@@ -1436,8 +1444,8 @@ function onRemote(path, wrapper) {
 
 async function initSync() {
   const cfg = window.SYNC_CONFIG;
-  if (!cfg || !cfg.databaseURL) { setSyncStatus(''); return; }
-  setSyncStatus('☁︎ connecting…');
+  if (!cfg || !cfg.databaseURL) { setSyncStatus('', 'off'); return; }
+  setSyncStatus('☁︎ connecting…', 'connecting');
   try {
     const appMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const authMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
@@ -1446,13 +1454,13 @@ async function initSync() {
     await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
-    setSyncStatus('☁︎ Global sync on');
+    setSyncStatus('☁︎ Global sync on', 'on');
   } catch (e) {
     sync.on = false;
     const msg = e && /admin-restricted|operation-not-allowed|configuration-not-found/i.test(e.code || e.message || '')
       ? '⚠︎ sync off — enable Anonymous sign-in in Firebase'
       : '⚠︎ sync unavailable — check Firebase Auth/rules';
-    setSyncStatus(msg);
+    setSyncStatus(msg, 'error');
   }
 }
 

@@ -85,6 +85,16 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
   background: #fff; color: var(--heb); border-radius: 6px;
   padding: 0 6px; margin: 0 1px; box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
+.sync-pill {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 4px;
+  font-size: .64rem; font-weight: 800; letter-spacing: .3px;
+  padding: 2px 9px; border-radius: 999px; background: rgba(255,255,255,.2); color: #fff;
+}
+.sync-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #cbd5e1; }
+.sync-pill.on::before { background: #34d399; }
+.sync-pill.amber::before { background: #fbbf24; }
+.sync-pill.error { background: rgba(0,0,0,.28); }
+.sync-pill.error::before { background: #fff; }
 /* live weather chip in the header */
 .wx-chip {
   flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
