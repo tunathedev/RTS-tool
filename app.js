@@ -1407,6 +1407,9 @@ function wireEvents() {
   $('holidayToggle').addEventListener('click', toggleHoliday);
   $('cakeToggle').addEventListener('click', toggleCake);
   $('discToggle').addEventListener('click', toggleDisc);
+  // flush any pending (coalesced) sync writes before the app is backgrounded/closed
+  window.addEventListener('pagehide', flushAllPush);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAllPush(); });
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);
@@ -1469,7 +1472,7 @@ function setupLock() {
  * Off by default. Add your Firebase config in sync-config.js to enable live
  * sync of the catalog, pull list, production plan and case-pack sizes across
  * all devices. Until then everything stays device-only (localStorage). */
-const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {} };
+const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {}, timers: {}, pending: {} };
 const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox'];
 
 function setSyncStatus(t, level) {
@@ -1484,11 +1487,23 @@ function setSyncStatus(t, level) {
 function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : state.compBox; }
 function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
 
+// coalesce rapid writes per path (e.g. +/- qty bursts) into one network write
 function pushSync(path, value, force) {
   if (!sync.on || (sync.applying && !force)) return;
-  sync.last[path] = JSON.stringify(value == null ? null : value);
-  try { sync.mod.set(sync.mod.ref(sync.db, 'rts/' + path), { data: value == null ? null : value, ts: Date.now() }); } catch {}
+  const v = value == null ? null : value;
+  sync.pending[path] = v;
+  sync.last[path] = JSON.stringify(v);
+  if (force) { flushPush(path); return; }
+  clearTimeout(sync.timers[path]);
+  sync.timers[path] = setTimeout(() => flushPush(path), 300);
 }
+function flushPush(path) {
+  if (!sync.on || !(path in sync.pending)) return;
+  clearTimeout(sync.timers[path]); delete sync.timers[path];
+  const v = sync.pending[path]; delete sync.pending[path];
+  try { sync.mod.set(sync.mod.ref(sync.db, 'rts/' + path), { data: v, ts: Date.now() }); } catch {}
+}
+function flushAllPush() { for (const p of Object.keys(sync.pending)) flushPush(p); }
 
 function onRemote(path, wrapper) {
   const first = !sync.seen.has(path); sync.seen.add(path);
