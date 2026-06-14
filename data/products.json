@@ -560,7 +560,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 8
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Gc Pudding Strawberry Key Lime",
@@ -572,7 +573,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Guzel Cakes Banana Pudding",
@@ -584,7 +586,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Guzel Cakes Lot Cookie Butter",
@@ -596,7 +599,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Guzel Cakes Pl Strawberry",
@@ -608,7 +612,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "H-E-B Banana Nut Creme Cake",
