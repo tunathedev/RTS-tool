@@ -664,42 +664,6 @@
           }
         },
         {
-          "name": "Loaf, Sliced, Banana Nut",
-          "days": 6,
-          "pkgDate": false,
-          "upc": "4122018342",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000878279",
-          "par": {
-            "tall": 2,
-            "wide": 4,
-            "deep": 2
-          }
-        },
-        {
-          "name": "Loaf, Sliced, Lemon Creme",
-          "days": 6,
-          "pkgDate": false,
-          "upc": "4122018341",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000878277",
-          "par": {
-            "tall": 3,
-            "wide": 2,
-            "deep": 2
-          }
-        },
-        {
-          "name": "Loaf, Sliced, Marble",
-          "days": 6,
-          "pkgDate": false,
-          "upc": "4122018338",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000878276",
-          "par": {
-            "tall": 4,
-            "wide": 2,
-            "deep": 1
-          }
-        },
-        {
           "name": "Lr 8in Mango Cake",
           "days": null,
           "pkgDate": true,
@@ -1797,18 +1761,6 @@
           }
         },
         {
-          "name": "Loaf, Sliced, Danish Butter",
-          "days": 7,
-          "pkgDate": false,
-          "upc": "4122018340",
-          "image": "https://images.heb.com/is/image/HEBGrocery/000878278",
-          "par": {
-            "tall": 3,
-            "wide": 1,
-            "deep": 1
-          }
-        },
-        {
           "name": "Two Bite Patriotic Mini Donuts",
           "days": null,
           "pkgDate": true,
@@ -2395,6 +2347,59 @@
           "image": "https://images.heb.com/is/image/HEBGrocery/001508419",
           "holiday": true,
           "seasonTable": 6
+        }
+      ]
+    },
+    {
+      "category": "Loafs",
+      "items": [
+        {
+          "name": "Loaf, Sliced, Banana Nut",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018342",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878279",
+          "par": {
+            "tall": 2,
+            "wide": 4,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Lemon Creme",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018341",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878277",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 2
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Marble",
+          "days": 6,
+          "pkgDate": false,
+          "upc": "4122018338",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878276",
+          "par": {
+            "tall": 4,
+            "wide": 2,
+            "deep": 1
+          }
+        },
+        {
+          "name": "Loaf, Sliced, Danish Butter",
+          "days": 7,
+          "pkgDate": false,
+          "upc": "4122018340",
+          "image": "https://images.heb.com/is/image/HEBGrocery/000878278",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 1
+          }
         }
       ]
     }

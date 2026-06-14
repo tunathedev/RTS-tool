@@ -136,7 +136,7 @@ const TABLES = [
 ];
 const TABLE_NAME = Object.fromEntries(TABLES.map((t) => [t.n, t.name]));
 const CATEGORY_TABLE = {
-  'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Scones': 1,
+  'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Scones': 1, 'Loafs': 1,
   'Cakes': 2, 'Decorated Cakes': 2, 'Candy': 2, 'Cookies': 2,
   'Macarons': 2, 'Pies': 2, 'Two Bite Items': 2, 'Fruit Cakes': 2,
   'Babka': 4, 'Bunuelo': 4, 'Rosca de Reyes': 4,
