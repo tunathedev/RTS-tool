@@ -822,7 +822,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "1/4 Sheet White Birthday Cake",
@@ -834,7 +835,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream 1/4 Chocolate Flower Power",
@@ -846,7 +848,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream 1/4 Vanilla Candles & Confetti",
@@ -858,7 +861,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream 1/4 Vanilla Flower Power",
@@ -870,7 +874,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream 1/4 Vanilla Vintage Bows",
@@ -882,7 +887,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream Chocolate 1/4 Candles & Confetti",
@@ -894,7 +900,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Buttercream Chocolate 1/4 Vintage Bows",
@@ -906,7 +913,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         },
         {
           "name": "Everyday Reception Cakes",
@@ -918,7 +926,8 @@
             "tall": 4,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "cakeSide": true
         }
       ]
     },
