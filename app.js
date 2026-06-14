@@ -142,6 +142,7 @@ const TABLES = [
 const TABLE_NAME = Object.fromEntries(TABLES.map((t) => [t.n, t.name]));
 const CATEGORY_TABLE = {
   'Biscotti': 1, 'Danish/Donuts/Eclairs': 1, 'Muffins': 1, 'Mini Muffins': 1, 'Scones': 1, 'Loafs': 1,
+  'Doughnut Holes': 3,
   'Cakes': 2, 'Decorated Cakes': 2, 'Candy': 2, 'Cookies': 2,
   'Macarons': 2, 'Pies': 2, 'Two Bite Items': 2, 'Fruit Cakes': 2,
   'Babka': 4, 'Bunuelo': 4, 'Rosca de Reyes': 4,
@@ -1005,7 +1006,7 @@ function renderProduction() {
       <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} ${p.make ? '' : 'disabled'} aria-label="Mark produced" />
       <div class="pull-main">
         <div class="pull-name">${escapeHtml(it.name)}</div>
-        <div class="pull-sub">${escapeHtml(sub)}</div>
+        <div class="pull-sub">${escapeHtml(sub)}${it.cake && p.make > 0 ? ' <span class="from-pull">↳ from pull list</span>' : ''}</div>
       </div>
       <div class="qty">
         <button type="button" data-act="dec" aria-label="Decrease">−</button>

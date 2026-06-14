@@ -409,6 +409,7 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
 }
 .pull-check:disabled { opacity: .4; }
 .prod-prep:empty { display: none; }
+.from-pull { display: inline-block; font-size: .66rem; font-weight: 800; color: var(--heb); background: #fff0ef; border-radius: 999px; padding: 1px 7px; margin-left: 2px; }
 .prod-prep { margin: 10px 14px 0; border: 1px solid #bfe6c8; background: #effaf1; border-radius: 12px; padding: 10px 12px; }
 .prep-head { font-family: var(--font-head); font-weight: 800; color: var(--ok); font-size: .82rem; margin-bottom: 6px; }
 .prep-row { display: flex; align-items: center; gap: 10px; font-size: .85rem; padding: 5px 0; border-bottom: 1px dashed #cdeed5; }

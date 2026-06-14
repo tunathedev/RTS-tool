@@ -1711,68 +1711,6 @@
             "wide": 1,
             "deep": 6
           }
-        },
-        {
-          "name": "Donut Holes Devil Food",
-          "days": 5,
-          "pkgDate": false,
-          "upc": "4122089838",
-          "image": "https://images.heb.com/is/image/HEBGrocery/002039864",
-          "par": {
-            "tall": 3,
-            "wide": 1,
-            "deep": 6
-          }
-        },
-        {
-          "name": "Donut Holes Glazed",
-          "days": 2,
-          "pkgDate": false,
-          "upc": "4122091076",
-          "image": "https://images.heb.com/is/image/HEBGrocery/001853222",
-          "par": {
-            "tall": 3,
-            "wide": 2,
-            "deep": 3
-          }
-        },
-        {
-          "name": "Donut Holes Powdered",
-          "days": 5,
-          "pkgDate": false,
-          "upc": "4122083396",
-          "image": "https://images.heb.com/is/image/HEBGrocery/001852945",
-          "par": {
-            "tall": 3,
-            "wide": 2,
-            "deep": 3
-          }
-        },
-        {
-          "name": "Donut Holes Sour Cream",
-          "days": 5,
-          "pkgDate": false,
-          "upc": "4122090507",
-          "image": "https://images.heb.com/is/image/HEBGrocery/002093646",
-          "par": {
-            "tall": 3,
-            "wide": 1,
-            "deep": 6
-          }
-        },
-        {
-          "name": "Two Bite Patriotic Mini Donuts",
-          "days": null,
-          "pkgDate": true,
-          "upc": "77098132303",
-          "image": "https://images.heb.com/is/image/HEBGrocery/016362539",
-          "par": {
-            "tall": 6,
-            "wide": 2,
-            "deep": 1
-          },
-          "holiday": true,
-          "seasonTable": 6
         }
       ]
     },
@@ -2400,6 +2338,73 @@
             "wide": 1,
             "deep": 1
           }
+        }
+      ]
+    },
+    {
+      "category": "Doughnut Holes",
+      "items": [
+        {
+          "name": "Donut Holes Devil Food",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122089838",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002039864",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Donut Holes Glazed",
+          "days": 2,
+          "pkgDate": false,
+          "upc": "4122091076",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001853222",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Donut Holes Powdered",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122083396",
+          "image": "https://images.heb.com/is/image/HEBGrocery/001852945",
+          "par": {
+            "tall": 3,
+            "wide": 2,
+            "deep": 3
+          }
+        },
+        {
+          "name": "Donut Holes Sour Cream",
+          "days": 5,
+          "pkgDate": false,
+          "upc": "4122090507",
+          "image": "https://images.heb.com/is/image/HEBGrocery/002093646",
+          "par": {
+            "tall": 3,
+            "wide": 1,
+            "deep": 6
+          }
+        },
+        {
+          "name": "Two Bite Patriotic Mini Donuts",
+          "days": null,
+          "pkgDate": true,
+          "upc": "77098132303",
+          "image": "https://images.heb.com/is/image/HEBGrocery/016362539",
+          "par": {
+            "tall": 6,
+            "wide": 2,
+            "deep": 1
+          },
+          "holiday": true,
+          "seasonTable": 6
         }
       ]
     }
