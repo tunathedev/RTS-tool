@@ -328,6 +328,27 @@ function buildCatDatalist() {
   }
 }
 
+/* Sticky thumbnails: reuse already-loaded <img> nodes across re-renders so
+ * images never reload (or get dropped on a flaky HEB request). A node that has
+ * loaded once is cached and moved into the new row instead of recreated. */
+const thumbCache = new Map();
+function thumbEl(url, cls) {
+  const wrap = document.createElement('div');
+  wrap.className = cls + (url ? '' : ' empty');
+  if (url) {
+    let img = thumbCache.get(url);
+    if (!img) {
+      img = new Image();
+      img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
+      img.addEventListener('load', () => thumbCache.set(url, img));
+      img.addEventListener('error', () => { if (!thumbCache.has(url)) { wrap.classList.add('empty'); img.remove(); } });
+      img.src = url;
+    }
+    wrap.appendChild(img);   // moving a cached (loaded) node does not reload it
+  }
+  return wrap;
+}
+
 /* ---------------- Browse list ---------------- */
 function renderList() {
   const term = $('search').value.trim().toLowerCase();
@@ -375,15 +396,12 @@ function renderList() {
 
     const tap = document.createElement('div');
     tap.className = 'tap';
-    const thumb = it.image
-      ? `<img src="${escapeHtml(it.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('empty');this.remove();" />`
-      : '';
     tap.innerHTML =
-      `<div class="product-thumb${it.image ? '' : ' empty'}">${thumb}</div>
-       <div class="tap-text">
+      `<div class="tap-text">
          <div class="name">${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
          <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
        </div>`;
+    tap.insertBefore(thumbEl(it.image, 'product-thumb'), tap.firstChild);
     tap.addEventListener('click', () => isDesktop() ? openItemEditor(it) : openSheet(it));
 
     const badge = document.createElement('span');
@@ -771,12 +789,8 @@ function renderPullList() {
       ? `<span class="pull-boxes">${boxes} box${boxes === 1 ? '' : 'es'}</span>`
       : `<span class="pull-boxes unknown">box qty —</span>`;
 
-    const thumb = it.image
-      ? `<img src="${escapeHtml(it.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('empty');this.remove();" />`
-      : '';
     row.innerHTML = `
       <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} aria-label="Mark pulled" />
-      <div class="pull-thumb${it.image ? '' : ' empty'}">${thumb}</div>
       <div class="pull-main">
         <div class="pull-name">${escapeHtml(it.name)}</div>
         <div class="pull-sub">${escapeHtml(it.category)} · sell by ${sell}</div>
@@ -791,6 +805,7 @@ function renderPullList() {
         ${boxHtml}
       </div>
       <button type="button" class="remove-btn" aria-label="Remove">🗑️</button>`;
+    row.insertBefore(thumbEl(it.image, 'pull-thumb'), row.children[1]);   // after the checkbox
 
     row.querySelector('.pull-check').addEventListener('change', () => toggleDone(it.name));
     row.querySelector('.label-toggle input').addEventListener('change', () => toggleLabels(it.name));
