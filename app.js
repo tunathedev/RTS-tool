@@ -717,6 +717,9 @@ function updateAddButton(name) {
 function boxesFor(it, qty) {
   return it && it.boxQty ? Math.ceil(qty / it.boxQty) : null;
 }
+// a "Half ___" item is a whole cake cut in half — 2 halves per whole to pull
+function isHalfItem(it) { return /^half\b/i.test(it.name); }
+function wholesForHalf(qty) { return Math.ceil(qty / 2); }
 
 function setQty(name, delta) {
   const p = state.pull.find((x) => x.name === name);
@@ -762,15 +765,17 @@ function renderPullList() {
   const totalQty = state.pull.reduce((s, p) => s + p.qty, 0);
   const doneCount = state.pull.filter((p) => p.done).length;
   const labeledCount = state.pull.filter((p) => p.labels).length;
-  let totalBoxes = 0, boxKnown = false;
+  let totalBoxes = 0, boxKnown = false, totalWholes = 0;
   for (const it of ordered) {
     const p = state.pull.find((x) => x.name === it.name);
+    if (isHalfItem(it)) { totalWholes += wholesForHalf(p.qty); continue; }
     const b = boxesFor(it, p.qty);
     if (b != null) { totalBoxes += b; boxKnown = true; }
   }
   $('pullSummary').innerHTML =
     `${n} item${n === 1 ? '' : 's'} · ${totalQty} to pull` +
     (boxKnown ? ` · <strong>${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}</strong>` : '') +
+    (totalWholes ? ` · <strong>${totalWholes} whole${totalWholes === 1 ? '' : 's'} to cut</strong>` : '') +
     ` · ${doneCount}/${n} pulled · ${labeledCount}/${n} labeled · pulled ${fmtDate(getPullDate())}`;
 
   const wrap = $('pullItems');
@@ -785,7 +790,9 @@ function renderPullList() {
       : (() => { const sb = sellByFor(it); const { cls } = freshness(sb);
                  return `<span class="pull-sellby ${cls}">${fmtDate(sb)}</span>`; })();
     const boxes = boxesFor(it, p.qty);
-    const boxHtml = boxes != null
+    const boxHtml = isHalfItem(it)
+      ? `<span class="pull-boxes">🍰 ${wholesForHalf(p.qty)} whole${wholesForHalf(p.qty) === 1 ? '' : 's'}</span>`
+      : boxes != null
       ? `<span class="pull-boxes">${boxes} box${boxes === 1 ? '' : 'es'}</span>`
       : `<span class="pull-boxes unknown">box qty —</span>`;
 
@@ -819,16 +826,17 @@ function renderPullList() {
 function pullListText() {
   const lines = [`Pull List — pulled ${fmtDate(getPullDate())}`];
   const ordered = state.items.filter((it) => inList(it.name));
-  let totalBoxes = 0, boxKnown = false;
+  let totalBoxes = 0, boxKnown = false, totalWholes = 0;
   for (const it of ordered) {
     const p = state.pull.find((x) => x.name === it.name);
     const sb = it.pkgDate ? 'pkg date' : 'sell by ' + fmtDate(sellByFor(it));
-    const b = boxesFor(it, p.qty);
-    if (b != null) { totalBoxes += b; boxKnown = true; }
-    const boxStr = b != null ? ` (${b} box${b === 1 ? '' : 'es'})` : '';
-    lines.push(`[${p.done ? 'x' : ' '}] ${p.qty}x ${it.name} — ${sb}${boxStr}`);
+    let extra = '';
+    if (isHalfItem(it)) { const w = wholesForHalf(p.qty); totalWholes += w; extra = ` (cut ${w} whole${w === 1 ? '' : 's'})`; }
+    else { const b = boxesFor(it, p.qty); if (b != null) { totalBoxes += b; boxKnown = true; extra = ` (${b} box${b === 1 ? '' : 'es'})`; } }
+    lines.push(`[${p.done ? 'x' : ' '}] ${p.qty}x ${it.name} — ${sb}${extra}`);
   }
   if (boxKnown) lines.push(`Total: ${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}`);
+  if (totalWholes) lines.push(`Whole cakes to cut: ${totalWholes}`);
   return lines.join('\n');
 }
 
