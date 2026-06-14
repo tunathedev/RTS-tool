@@ -1,22 +1,13 @@
 /* Global sync configuration.
  *
- * Leave SYNC_CONFIG = null to keep the app device-only (everything saved per
- * device, no sync). To turn on live sync across ALL devices, create a free
- * Firebase project, enable Realtime Database, and paste its config here.
- *
- * Steps (see README "Global sync"):
- *   1. https://console.firebase.google.com → Add project (free "Spark" plan)
- *   2. Build → Realtime Database → Create database → Start in test mode
- *   3. Project settings → General → "Your apps" → Web app → copy the config
- *   4. Paste it below (must include databaseURL) and commit this file.
- *
- * Example:
- * window.SYNC_CONFIG = {
- *   apiKey: "AIza…",
- *   authDomain: "your-app.firebaseapp.com",
- *   databaseURL: "https://your-app-default-rtdb.firebaseio.com",
- *   projectId: "your-app",
- *   appId: "1:…:web:…"
- * };
+ * Live sync is ON — this app's Firebase Realtime Database. The catalog edits,
+ * pull list, production plan, and case-pack sizes sync across all devices.
+ * To go back to device-only, set window.SYNC_CONFIG = null.
  */
-window.SYNC_CONFIG = null;
+window.SYNC_CONFIG = {
+  apiKey: "AIzaSyDiPIHiu06bx2xAxVMOuwt_d0p2VEZvluM",
+  authDomain: "rts-ready.firebaseapp.com",
+  databaseURL: "https://rts-ready-default-rtdb.firebaseio.com",
+  projectId: "rts-ready",
+  appId: "1:388726629784:web:f7d5dcb9e2ca7e5d6df7ed"
+};
