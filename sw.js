@@ -3,12 +3,16 @@
  * so Firebase sync, weather, and HEB images are never touched. Shell assets use
  * stale-while-revalidate (fast load, refresh in background → applied next load);
  * product data is network-first (fresh) with a cache fallback when offline. */
-const CACHE = 'rts-ready-v1';
+const CACHE = 'rts-ready-v2';
 const SHELL = ['./', './index.html', './app.js', './styles.css', './sync-config.js'];
 
 self.addEventListener('install', (e) => {
-  self.skipWaiting();
+  // don't auto-activate — wait for the page to confirm via the "Reload" prompt
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL).catch(() => {})));
+});
+
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {

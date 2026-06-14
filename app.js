@@ -1550,9 +1550,32 @@ async function initSync() {
   }
 }
 
-// fast repeat loads + offline support
+// fast repeat loads + offline support, with an "update ready → reload" prompt
+function showUpdateToast(reg) {
+  const t = document.getElementById('updateToast'); if (!t) return;
+  t.hidden = false;
+  document.getElementById('updateReload').onclick = () => {
+    if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    else location.reload();
+  };
+}
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      if (reg.waiting && navigator.serviceWorker.controller) showUpdateToast(reg);
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing; if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateToast(reg);
+        });
+      });
+    } catch {}
+  });
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return; refreshing = true; location.reload();
+  });
 }
 
 setupLock();
