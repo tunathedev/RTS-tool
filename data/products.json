@@ -443,7 +443,7 @@
           }
         },
         {
-          "name": "Cream Cake Big Red",
+          "name": "Big Red Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "4069768014",
@@ -467,7 +467,7 @@
           }
         },
         {
-          "name": "Cake Strawberry Creme 36 oz",
+          "name": "Strawberry Crème Cake 36 oz",
           "days": 6,
           "pkgDate": false,
           "upc": "4122025616",
@@ -479,7 +479,7 @@
           }
         },
         {
-          "name": "Cream Cake Chocolate 1 2 Cake",
+          "name": "Half Chocolate Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "23233600000",
@@ -616,7 +616,7 @@
           "cakeSide": true
         },
         {
-          "name": "Creme Cake Banana Nut",
+          "name": "Banana Nut Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "4122047072",
@@ -628,7 +628,7 @@
           }
         },
         {
-          "name": "CrÈMe Cake Sock It Banana Nut Half",
+          "name": "Half Sock It Banana Nut Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "22713200000",
@@ -640,7 +640,7 @@
           }
         },
         {
-          "name": "Creme Cake Sock It To Me",
+          "name": "Sock It To Me Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "4122064117",
@@ -652,7 +652,7 @@
           }
         },
         {
-          "name": "Creme Cake Triple Chocolate",
+          "name": "Triple Chocolate Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "4122022961",
@@ -724,7 +724,7 @@
           }
         },
         {
-          "name": "Cream Cake Marble Half",
+          "name": "Half Marble Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "22838000000",
@@ -736,7 +736,7 @@
           }
         },
         {
-          "name": "Cream Cake Lemon Half",
+          "name": "Half Lemon Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "22838100000",
@@ -748,7 +748,7 @@
           }
         },
         {
-          "name": "Cream Cake Sock It To Me 1/2",
+          "name": "Half Sock It To Me Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "22837900000",
@@ -760,7 +760,7 @@
           }
         },
         {
-          "name": "Cream Cake Strawberry Half",
+          "name": "Half Strawberry Crème Cake",
           "days": 6,
           "pkgDate": false,
           "upc": "22837800000",
