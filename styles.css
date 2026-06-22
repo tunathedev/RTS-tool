@@ -69,8 +69,12 @@ html, body {
   font-size: 16px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+  /* keep the page locked to the viewport width — no sideways pan / off-center drift */
+  width: 100%; max-width: 100%; overflow-x: hidden;
 }
-main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
+/* nothing should be able to push the layout wider than the screen */
+img, video, canvas, svg, table { max-width: 100%; }
+main { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 
 /* ---------- Header ---------- */
 .topbar {
@@ -201,6 +205,12 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 }
 .fab:active { transform: scale(.97); }
 .fab-icon { font-size: 1.2rem; line-height: 1; }
+/* second FAB: Flip Book, hovering just above the Scan button */
+.fab-flip {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
+  background: var(--fresh); box-shadow: 0 6px 18px rgba(0,133,124,.4);
+}
+body.flip-open .fab { display: none; }   /* hide both FABs while the overlay is open */
 
 /* ---------- Scanner modal ---------- */
 .scan-modal {
@@ -309,8 +319,8 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 }
 .tab {
   flex: 1; min-width: 0; border: none; background: #e9ebee; color: #374151;
-  font-size: .82rem; font-weight: 700; padding: 11px 6px; border-radius: 11px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: .9rem; font-weight: 700; padding: 12px 8px; border-radius: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
   white-space: nowrap;
 }
 .tab.active { background: var(--heb); color: #fff; }
@@ -611,8 +621,30 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .pull-boxes { font-size: .7rem; color: var(--fresh); font-weight: 800; white-space: nowrap; }
 .pull-boxes.unknown { color: var(--muted); font-weight: 600; }
 
-/* ---------- Flip Book ---------- */
-#flipView { background: transparent; box-shadow: none; }
+/* ---------- Flip Book (floating overlay) ---------- */
+.flip-overlay {
+  position: fixed; inset: 0; z-index: 80; background: var(--bg);
+  display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  animation: slideUp .2s ease;
+}
+.flip-head {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; color: #fff;
+  background: linear-gradient(135deg, var(--heb) 0%, var(--heb-dark) 100%);
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.flip-title { font-family: var(--font-head); font-weight: 800; font-size: 1rem; }
+.flip-close {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 1.1rem; cursor: pointer;
+}
+.flip-close:active { transform: scale(.95); }
+.flip-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  width: 100%; max-width: var(--maxw); margin: 0 auto;
+  padding: 12px 12px calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
 .flip-strip {
   display: flex; gap: 7px; overflow-x: auto; padding: 4px 2px 10px;
   -webkit-overflow-scrolling: touch;

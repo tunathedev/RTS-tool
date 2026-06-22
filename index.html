@@ -106,7 +106,6 @@
     <button class="tab" id="tabProd" role="tab" aria-selected="false">
       Production <span class="tab-count" id="prodCount">0</span>
     </button>
-    <button class="tab" id="tabFlip" role="tab" aria-selected="false">Flip Book</button>
   </nav>
 
   <main>
@@ -161,9 +160,15 @@
       </div>
       <div class="prod-note">📦 Component counts &amp; container/box math — coming next.</div>
     </section>
+  </main>
 
-    <!-- FLIP BOOK VIEW -->
-    <section id="flipView" class="view" role="tabpanel" hidden>
+  <!-- FLIP BOOK overlay (opened by the floating book button) -->
+  <div class="flip-overlay" id="flipView" role="dialog" aria-modal="true" aria-label="Flip book" hidden>
+    <div class="flip-head">
+      <span class="flip-title">📖 Flip Book · shelf-life dates</span>
+      <button type="button" class="flip-close" id="flipClose" aria-label="Close flip book">✕</button>
+    </div>
+    <div class="flip-body">
       <div class="flip-strip" id="flipStrip"></div>
       <div class="flip-wrap">
         <button type="button" class="flip-nav" id="flipPrev" aria-label="Previous">‹</button>
@@ -171,10 +176,13 @@
         <button type="button" class="flip-nav" id="flipNext" aria-label="Next">›</button>
       </div>
       <div class="flip-pulled" id="flipPulled"></div>
-    </section>
-  </main>
+    </div>
+  </div>
 
-  <!-- Floating "scan UPC" button -->
+  <!-- Floating buttons (Flip Book stacked above Scan) -->
+  <button type="button" class="fab fab-flip" id="flipFab" aria-label="Open flip book">
+    <span class="fab-icon">📖</span><span class="fab-text">Flip</span>
+  </button>
   <button type="button" class="fab" id="scanFab" aria-label="Scan a barcode">
     <span class="fab-icon">📷</span><span class="fab-text">Scan</span>
   </button>

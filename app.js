@@ -1117,6 +1117,7 @@ function flipPages() {
 }
 
 function renderFlip() {
+  if ($('flipView').hidden) return;   // overlay closed — it re-renders on open
   const { groups, keys } = flipPages();
   if (!keys.length) {
     $('flipCard').innerHTML = '<div class="flip-empty">No products to show.</div>';
@@ -1504,15 +1505,18 @@ function escapeHtml(s) {
 }
 
 function switchTab(which) {
-  const tabs = [['browse', 'tabBrowse', 'browseView'], ['list', 'tabList', 'listView'], ['prod', 'tabProd', 'prodView'], ['flip', 'tabFlip', 'flipView']];
+  const tabs = [['browse', 'tabBrowse', 'browseView'], ['list', 'tabList', 'listView'], ['prod', 'tabProd', 'prodView']];
   for (const [name, tabId, viewId] of tabs) {
     const on = which === name;
     $(tabId).classList.toggle('active', on);
     $(tabId).setAttribute('aria-selected', String(on));
     $(viewId).hidden = !on;
   }
-  if (which === 'flip') renderFlip();
 }
+
+/* Flip Book lives in a floating overlay (button stacked above Scan) */
+function openFlip() { $('flipView').hidden = false; document.body.classList.add('flip-open'); renderFlip(); }
+function closeFlip() { $('flipView').hidden = true; document.body.classList.remove('flip-open'); }
 
 function wireEvents() {
   $('search').addEventListener('input', renderList);
@@ -1522,9 +1526,11 @@ function wireEvents() {
   $('tabBrowse').addEventListener('click', () => switchTab('browse'));
   $('tabList').addEventListener('click', () => switchTab('list'));
   $('tabProd').addEventListener('click', () => switchTab('prod'));
-  $('tabFlip').addEventListener('click', () => switchTab('flip'));
   $('prodCopyBtn').addEventListener('click', copyProduction);
   $('prodClearBtn').addEventListener('click', clearProduction);
+  // flip book overlay: open from floating button, close from header
+  $('flipFab').addEventListener('click', openFlip);
+  $('flipClose').addEventListener('click', closeFlip);
   // flip book navigation
   $('flipPrev').addEventListener('click', () => flipBy(-1));
   $('flipNext').addEventListener('click', () => flipBy(1));
@@ -1581,6 +1587,7 @@ function wireEvents() {
     if (!$('scanModal').hidden) closeScanner();
     else if (!$('itemEditor').hidden) cancelItemEditor();
     else if (!$('sheet').hidden) closeSheet();
+    else if (!$('flipView').hidden) closeFlip();
   });
 }
 
