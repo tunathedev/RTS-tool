@@ -211,6 +211,13 @@ main { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px
   background: var(--fresh); box-shadow: 0 6px 18px rgba(0,133,124,.4);
 }
 body.flip-open .fab { display: none; }   /* hide both FABs while the overlay is open */
+/* the .fab's position:fixed is the anchor for this count badge */
+.fab-badge {
+  position: absolute; top: -6px; right: -4px; min-width: 20px; height: 20px;
+  padding: 0 5px; border-radius: 999px; background: #fff; color: var(--fresh);
+  border: 2px solid var(--fresh); font-family: var(--font-head); font-weight: 900;
+  font-size: .72rem; line-height: 16px; text-align: center;
+}
 
 /* ---------- Scanner modal ---------- */
 .scan-modal {

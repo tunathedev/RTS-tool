@@ -1116,7 +1116,15 @@ function flipPages() {
   return { groups, keys };
 }
 
+function updateFlipBadge() {
+  const n = flipPages().keys.length;
+  const b = $('flipBadge');
+  b.textContent = n;
+  b.hidden = n === 0;
+}
+
 function renderFlip() {
+  updateFlipBadge();                  // keep the floating-button count fresh even when closed
   if ($('flipView').hidden) return;   // overlay closed — it re-renders on open
   const { groups, keys } = flipPages();
   if (!keys.length) {
