@@ -71,6 +71,8 @@ html, body {
   -webkit-font-smoothing: antialiased;
   /* keep the page locked to the viewport width — no sideways pan / off-center drift */
   width: 100%; max-width: 100%; overflow-x: hidden;
+  /* no pinch / double-tap zoom, no auto text resizing on rotate */
+  touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
 }
 /* nothing should be able to push the layout wider than the screen */
 img, video, canvas, svg, table { max-width: 100%; }
