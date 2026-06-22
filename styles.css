@@ -304,13 +304,14 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px; }
 .tabs {
   position: sticky; top: 0; z-index: 20;
   max-width: var(--maxw); margin: 0 auto; padding: 0 12px;
-  display: flex; gap: 8px; background: var(--bg);
+  display: flex; gap: 6px; background: var(--bg);
   padding-top: 4px; padding-bottom: 8px;
 }
 .tab {
-  flex: 1; border: none; background: #e9ebee; color: #374151;
-  font-size: .95rem; font-weight: 700; padding: 12px; border-radius: 11px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+  flex: 1; min-width: 0; border: none; background: #e9ebee; color: #374151;
+  font-size: .82rem; font-weight: 700; padding: 11px 6px; border-radius: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+  white-space: nowrap;
 }
 .tab.active { background: var(--heb); color: #fff; }
 .tab-count {
@@ -609,3 +610,43 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .pull-item.labeled .label-toggle { color: var(--heb-dark); }
 .pull-boxes { font-size: .7rem; color: var(--fresh); font-weight: 800; white-space: nowrap; }
 .pull-boxes.unknown { color: var(--muted); font-weight: 600; }
+
+/* ---------- Flip Book ---------- */
+#flipView { background: transparent; box-shadow: none; }
+.flip-strip {
+  display: flex; gap: 7px; overflow-x: auto; padding: 4px 2px 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.flip-day {
+  flex: 0 0 auto; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  border-radius: 999px; padding: 8px 14px; font-family: var(--font-head); font-weight: 800;
+  font-size: .9rem; cursor: pointer;
+}
+.flip-day.active { background: var(--heb); color: #fff; border-color: var(--heb); }
+.flip-wrap { display: flex; align-items: stretch; gap: 8px; }
+.flip-nav {
+  flex: 0 0 auto; width: 44px; border: 1px solid var(--line); background: #fff; color: var(--heb);
+  border-radius: 14px; font-size: 2rem; font-weight: 800; line-height: 1; cursor: pointer;
+}
+.flip-nav:active { background: #fff0ef; }
+.flip-card {
+  flex: 1; min-width: 0; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); padding: 20px 16px; text-align: center;
+}
+.flip-daynum {
+  font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--heb-dark);
+}
+.flip-sub { font-size: .8rem; color: var(--muted); margin-top: 14px; }
+.flip-weekday { font-family: var(--font-head); font-weight: 700; font-size: 1.1rem; color: var(--ink); }
+.flip-date {
+  font-family: var(--font-head); font-weight: 900; font-size: 3.4rem; line-height: 1; color: var(--heb);
+  letter-spacing: -1px; margin: 2px 0 4px;
+}
+.flip-date.pkg { font-size: 1.6rem; color: #6b21a8; line-height: 1.15; }
+.flip-count { font-size: .78rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.flip-list { list-style: none; margin: 8px 0 0; padding: 0; text-align: left; }
+.flip-list li { font-size: .9rem; padding: 5px 4px; border-bottom: 1px solid #f1f2f4; }
+.flip-list li:last-child { border-bottom: none; }
+.flip-pulled { text-align: center; font-size: .76rem; color: var(--muted); margin-top: 10px; }
+.flip-empty { color: var(--muted); padding: 30px; }

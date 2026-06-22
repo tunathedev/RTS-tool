@@ -235,6 +235,7 @@ function toggleHoliday() {
   try { localStorage.setItem(LS_HOLIDAY, state.hideHoliday ? '1' : '0'); } catch {}
   syncHolidayBtn();
   renderList();
+  renderFlip();
 }
 function syncHolidayBtn() {
   const btn = $('holidayToggle');
@@ -251,6 +252,7 @@ function toggleCake() {
   try { localStorage.setItem(LS_CAKE, state.hideCake ? '1' : '0'); } catch {}
   syncCakeBtn();
   renderList();
+  renderFlip();
 }
 function syncCakeBtn() {
   const btn = $('cakeToggle');
@@ -267,6 +269,7 @@ function toggleDisc() {
   try { localStorage.setItem(LS_DISC, state.hideDisc ? '1' : '0'); } catch {}
   syncDiscBtn();
   renderList();
+  renderFlip();
 }
 function syncDiscBtn() {
   const btn = $('discToggle');
@@ -281,6 +284,7 @@ function refreshCatalog() {
   renderHeader();
   renderList();
   renderPullList();
+  renderFlip();
 }
 
 function renderHeader() {
@@ -1094,6 +1098,65 @@ async function copyProduction() {
   catch { prompt('Copy your production plan:', text); }
 }
 
+/* ---------------- Flip Book (by shelf-life days) ---------------- */
+let flipKey = null;   // current page: a day count (number) or 'pkg'
+
+function flipPages() {
+  const groups = new Map();
+  for (const it of state.items) {
+    if (state.hideHoliday && it.holiday) continue;
+    if (state.hideCake && it.cakeSide) continue;
+    if (state.hideDisc && it.discontinued) continue;
+    const key = it.pkgDate ? 'pkg' : it.days;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(it);
+  }
+  const keys = [...groups.keys()].filter((k) => k !== 'pkg').sort((a, b) => a - b);
+  if (groups.has('pkg')) keys.push('pkg');
+  return { groups, keys };
+}
+
+function renderFlip() {
+  const { groups, keys } = flipPages();
+  if (!keys.length) {
+    $('flipCard').innerHTML = '<div class="flip-empty">No products to show.</div>';
+    $('flipStrip').innerHTML = ''; $('flipPulled').textContent = '';
+    return;
+  }
+  if (flipKey === null || !groups.has(flipKey)) flipKey = keys[0];
+
+  $('flipStrip').innerHTML = keys.map((k) =>
+    `<button type="button" class="flip-day${k === flipKey ? ' active' : ''}" data-k="${k}">${k === 'pkg' ? 'Pkg' : k + 'd'}</button>`
+  ).join('');
+
+  const items = groups.get(flipKey).slice().sort((a, b) => a.name.localeCompare(b.name));
+  let head;
+  if (flipKey === 'pkg') {
+    head = `<div class="flip-daynum">Pkg date</div><div class="flip-date pkg">Follow printed<br>package date</div>`;
+  } else {
+    const sb = addDays(getPullDate(), flipKey);
+    head = `<div class="flip-daynum">${flipKey}-day shelf life</div>
+            <div class="flip-sub">Sell by</div>
+            <div class="flip-weekday">${weekdayShort(sb)}</div>
+            <div class="flip-date">${monthDay(sb)}</div>`;
+  }
+  $('flipCard').innerHTML =
+    `${head}
+     <div class="flip-count">${items.length} item${items.length === 1 ? '' : 's'}</div>
+     <ul class="flip-list">${items.map((it) => `<li>${escapeHtml(it.name)}</li>`).join('')}</ul>`;
+  $('flipPulled').textContent = 'Pulled ' + monthDay(getPullDate());
+}
+
+function flipBy(delta) {
+  const { keys } = flipPages();
+  if (!keys.length) return;
+  let i = keys.indexOf(flipKey);
+  if (i < 0) i = 0;
+  i = (i + delta + keys.length) % keys.length;   // wrap around
+  flipKey = keys[i];
+  renderFlip();
+}
+
 /* ---------------- date + freshness ---------------- */
 function getPullDate() { return parseISO($('pullDate').value) || stripTime(new Date()); }
 function sellByFor(it) { return it.pkgDate ? null : addDays(getPullDate(), it.days); }
@@ -1111,6 +1174,7 @@ function onPullDateChange() {
   updateDateLabel();
   renderList();
   renderPullList();
+  renderFlip();
   if (state.current) renderSheetResult(state.current);
 }
 
@@ -1431,6 +1495,8 @@ function parseISO(s) { if (!s) return null; const [y, m, d] = s.split('-').map(N
 function stripTime(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function fmtDate(d) { const z = (n) => String(n).padStart(2, '0'); return `${z(d.getMonth() + 1)}/${z(d.getDate())}/${d.getFullYear()}`; }
+function monthDay(d) { return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+function weekdayShort(d) { return d.toLocaleDateString(undefined, { weekday: 'short' }); }
 
 /* ---------------- misc ---------------- */
 function escapeHtml(s) {
@@ -1438,13 +1504,14 @@ function escapeHtml(s) {
 }
 
 function switchTab(which) {
-  const tabs = [['browse', 'tabBrowse', 'browseView'], ['list', 'tabList', 'listView'], ['prod', 'tabProd', 'prodView']];
+  const tabs = [['browse', 'tabBrowse', 'browseView'], ['list', 'tabList', 'listView'], ['prod', 'tabProd', 'prodView'], ['flip', 'tabFlip', 'flipView']];
   for (const [name, tabId, viewId] of tabs) {
     const on = which === name;
     $(tabId).classList.toggle('active', on);
     $(tabId).setAttribute('aria-selected', String(on));
     $(viewId).hidden = !on;
   }
+  if (which === 'flip') renderFlip();
 }
 
 function wireEvents() {
@@ -1455,8 +1522,23 @@ function wireEvents() {
   $('tabBrowse').addEventListener('click', () => switchTab('browse'));
   $('tabList').addEventListener('click', () => switchTab('list'));
   $('tabProd').addEventListener('click', () => switchTab('prod'));
+  $('tabFlip').addEventListener('click', () => switchTab('flip'));
   $('prodCopyBtn').addEventListener('click', copyProduction);
   $('prodClearBtn').addEventListener('click', clearProduction);
+  // flip book navigation
+  $('flipPrev').addEventListener('click', () => flipBy(-1));
+  $('flipNext').addEventListener('click', () => flipBy(1));
+  $('flipStrip').addEventListener('click', (e) => {
+    const b = e.target.closest('.flip-day'); if (!b) return;
+    flipKey = b.dataset.k === 'pkg' ? 'pkg' : parseInt(b.dataset.k, 10);
+    renderFlip();
+  });
+  let fx = 0;
+  $('flipCard').addEventListener('touchstart', (e) => { fx = e.changedTouches[0].clientX; }, { passive: true });
+  $('flipCard').addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - fx;
+    if (Math.abs(dx) > 50) flipBy(dx < 0 ? 1 : -1);
+  }, { passive: true });
   $('sheetClose').addEventListener('click', closeSheet);
   $('sheetBackdrop').addEventListener('click', closeSheet);
   $('sheetAddBtn').addEventListener('click', () => { if (state.current) toggleList(state.current.name); });
