@@ -139,6 +139,7 @@
       </div>
 
       <div id="pullListWrap" hidden>
+        <button type="button" class="btn btn-block freezer-enter" id="freezerBtn">🧊 Freezer Mode — start pulling</button>
         <div class="pull-summary" id="pullSummary"></div>
         <div id="pullItems" class="pull-items"></div>
         <div class="pull-actions">
@@ -219,6 +220,17 @@
     <button type="button" class="photo-close" id="photoClose" aria-label="Close photo">✕</button>
     <img id="photoImg" alt="Floor photo" />
     <button type="button" class="photo-share" id="photoShare">⬆️ Share / Save</button>
+  </div>
+
+  <!-- FREEZER MODE overlay (big, glove-friendly pull checklist) -->
+  <div class="freezer-overlay" id="freezerView" role="dialog" aria-modal="true" aria-label="Freezer pull mode" hidden>
+    <div class="freezer-head">
+      <button type="button" class="freezer-exit" id="freezerExit" aria-label="Exit freezer mode">✕ Exit</button>
+      <span class="freezer-title">🧊 Freezer Pull</span>
+      <span class="freezer-count" id="freezerCount">0/0</span>
+    </div>
+    <div class="freezer-bar"><span id="freezerBar"></span></div>
+    <div class="freezer-list" id="freezerList"></div>
   </div>
 
   <!-- SCANNER modal -->

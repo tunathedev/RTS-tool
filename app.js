@@ -806,6 +806,7 @@ function renderPullList() {
   $('listCount').textContent = n;
   $('pullListEmpty').hidden = n > 0;
   $('pullListWrap').hidden = n === 0;
+  if (!$('freezerView').hidden) renderFreezer();   // keep freezer mode in sync
   if (n === 0) return;
 
   const ordered = state.items.filter((it) => inList(it.name));
@@ -875,6 +876,59 @@ function renderPullList() {
     row.querySelector('.remove-btn').addEventListener('click', () => toggleList(it.name));
     wrap.appendChild(row);
   }
+}
+
+/* ---------------- Freezer Mode ----------------
+ * Full-screen, glove-friendly pull checklist for standing at the freezer:
+ * giant item names, a big check target per row, nothing easy to miss-tap.
+ * Remaining items sit on top; pulled ones sink to the bottom, dimmed. */
+function openFreezer() {
+  if (!state.pull.length) return;
+  $('freezerView').hidden = false;
+  document.body.classList.add('freezer-open');
+  renderFreezer();
+}
+function closeFreezer() { $('freezerView').hidden = true; document.body.classList.remove('freezer-open'); }
+
+function renderFreezer() {
+  const ordered = state.items.filter((it) => inList(it.name));
+  const pullOf = (it) => state.pull.find((x) => x.name === it.name) || { qty: 1, done: false };
+  const n = ordered.length;
+  const done = ordered.filter((it) => pullOf(it).done).length;
+  const pct = n ? Math.round((done / n) * 100) : 0;
+  $('freezerCount').textContent = `${done}/${n}`;
+  $('freezerBar').style.width = pct + '%';
+
+  const list = $('freezerList');
+  if (!n) { list.innerHTML = '<div class="fz-empty">Pull list is empty.</div>'; return; }
+  if (done === n) {
+    list.innerHTML = '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
+    return;
+  }
+  // remaining first (in table order), then pulled, dimmed at the bottom
+  const remaining = ordered.filter((it) => !pullOf(it).done);
+  const pulled = ordered.filter((it) => pullOf(it).done);
+  const frag = document.createDocumentFragment();
+  for (const it of [...remaining, ...pulled]) {
+    const p = pullOf(it);
+    const card = document.createElement('div');
+    card.className = 'fz-card' + (p.done ? ' done' : '');
+    const sub = it.pkgDate ? 'Pkg date' : 'Sell by ' + fmtDate(sellByFor(it));
+    card.innerHTML =
+      `<div class="fz-qty">×${p.qty}</div>
+       <div class="fz-info">
+         <div class="fz-name">${escapeHtml(it.name)}</div>
+         <div class="fz-sub">${sub}${it.plu ? ` · PLU ${escapeHtml(String(it.plu))}` : ''}</div>
+       </div>
+       <button type="button" class="fz-check${p.done ? ' on' : ''}" aria-label="${p.done ? 'Mark not pulled' : 'Mark pulled'}">${p.done ? '✓' : ''}</button>`;
+    card.querySelector('.fz-check').addEventListener('click', () => {
+      try { if (navigator.vibrate) navigator.vibrate(25); } catch {}
+      toggleDone(it.name);   // re-renders the freezer via renderPullList
+    });
+    frag.appendChild(card);
+  }
+  list.innerHTML = '';
+  list.appendChild(frag);
 }
 
 function pullListText() {
@@ -1821,6 +1875,8 @@ function wireEvents() {
   $('sheetAddBtn').addEventListener('click', () => { if (state.current) toggleList(state.current.name); });
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
+  $('freezerBtn').addEventListener('click', openFreezer);
+  $('freezerExit').addEventListener('click', closeFreezer);
   $('wxRefresh').addEventListener('click', loadWeather);
   $('wxToggle').addEventListener('click', toggleWeather);
   $('wxChip').addEventListener('click', toggleWeather);
@@ -1856,6 +1912,7 @@ function wireEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('photoViewer').hidden) closePhoto();
+    else if (!$('freezerView').hidden) closeFreezer();
     else if (!$('scanModal').hidden) closeScanner();
     else if (!$('itemEditor').hidden) cancelItemEditor();
     else if (!$('sheet').hidden) closeSheet();

@@ -3,7 +3,7 @@
  * so Firebase sync, weather, and HEB images are never touched. Shell assets use
  * stale-while-revalidate (fast load, refresh in background → applied next load);
  * product data is network-first (fresh) with a cache fallback when offline. */
-const CACHE = 'rts-ready-v5';
+const CACHE = 'rts-ready-v6';
 const SHELL = ['./', './index.html', './app.js', './styles.css', './sync-config.js'];
 
 self.addEventListener('install', (e) => {
