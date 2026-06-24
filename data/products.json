@@ -931,7 +931,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 9
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Variety Sampler 16 oz",
@@ -943,7 +944,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 9
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Texas Variety 40 oz",
@@ -955,7 +957,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 8
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Caramel Turtle 8\"",
@@ -967,7 +970,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 6
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake New York Style 8\"",
@@ -979,7 +983,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 6
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Pumpkin Swirl 8 in",
@@ -991,7 +996,8 @@
             "tall": 2,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Strawberry Swirl 9 in",
@@ -1003,7 +1009,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 8
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Variety 9 in",
@@ -1015,7 +1022,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 8
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake New York 40 oz 9 in",
@@ -1027,7 +1035,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 8
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Slice Blueberry",
@@ -1039,7 +1048,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 7
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Slice Original",
@@ -1051,7 +1061,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 7
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Slice Sea Salt Caramel",
@@ -1063,7 +1074,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 7
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Slice Strawberry",
@@ -1075,7 +1087,8 @@
             "tall": 1,
             "wide": 1,
             "deep": 7
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake New York 2 Slice",
@@ -1087,7 +1100,8 @@
             "tall": 2,
             "wide": 2,
             "deep": 3
-          }
+          },
+          "freezerDays": 30
         },
         {
           "name": "Cheesecake Strawberry 2 Slice",
@@ -1099,7 +1113,8 @@
             "tall": 2,
             "wide": 2,
             "deep": 3
-          }
+          },
+          "freezerDays": 30
         }
       ]
     },
@@ -1573,7 +1588,8 @@
             "tall": 4,
             "wide": 3,
             "deep": 2
-          }
+          },
+          "freezerDays": 10
         },
         {
           "name": "Cakes Mini Gold Cup 12 ct",
@@ -1585,7 +1601,8 @@
             "tall": 4,
             "wide": 3,
             "deep": 2
-          }
+          },
+          "freezerDays": 10
         },
         {
           "name": "Cakes Gluten-Free Mini Cup",
@@ -1597,7 +1614,8 @@
             "tall": 4,
             "wide": 2,
             "deep": 1
-          }
+          },
+          "freezerDays": 10
         },
         {
           "name": "Cakes Patriot Vanilla Chocolate Cup 12 ct",
@@ -1623,7 +1641,8 @@
             "tall": 6,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "freezerDays": 10
         },
         {
           "name": "Cakes Mini Chocolate Christmas Cup 12 ct",
@@ -1632,7 +1651,8 @@
           "upc": "4122085371",
           "image": "https://images.heb.com/is/image/HEBGrocery/003191541",
           "holiday": true,
-          "seasonTable": 5
+          "seasonTable": 5,
+          "freezerDays": 10
         },
         {
           "name": "Cakes Mini Gold Love Cup 12 ct",
@@ -1646,7 +1666,8 @@
             "deep": 3
           },
           "holiday": true,
-          "seasonTable": 1
+          "seasonTable": 1,
+          "freezerDays": 10
         },
         {
           "name": "Cakes Mini Harvest Gold Cup 12 ct",
@@ -1660,7 +1681,8 @@
             "deep": 4
           },
           "holiday": true,
-          "seasonTable": 4
+          "seasonTable": 4,
+          "freezerDays": 10
         },
         {
           "name": "Cakes Vday Mini Cup Platter",
@@ -1669,7 +1691,8 @@
           "upc": "4122090620",
           "image": "https://images.heb.com/is/image/HEBGrocery/003193016",
           "holiday": true,
-          "seasonTable": 1
+          "seasonTable": 1,
+          "freezerDays": 10
         }
       ]
     },

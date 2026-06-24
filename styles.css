@@ -574,6 +574,12 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--heb);
 .detail-head-text h2 { margin: 3px 0 7px; font-size: 1.15rem; line-height: 1.2; }
 .shelf { font-size: .85rem; color: var(--muted); }
 .shelf strong { color: var(--ink); }
+.freezer-life {
+  margin-top: 6px; font-size: .8rem; color: #1d4ed8;
+  background: #eef4ff; border: 1px solid #d4e1fb; border-radius: 9px; padding: 6px 9px;
+}
+.freezer-life:empty { display: none; }
+.freezer-life strong { color: #1e3a8a; }
 
 .sheet-result { margin: 16px 0; border-radius: 12px; padding: 14px; background: #f8fafc; border: 1px solid var(--line); }
 .sheet-result .sellby-label { font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
@@ -873,3 +879,21 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .fz-alldone-emoji { font-size: 4rem; margin-bottom: 10px; }
 .fz-alldone span { font-size: .9rem; color: var(--muted); font-weight: 600; }
 .fz-empty { text-align: center; color: var(--muted); padding: 60px 24px; }
+
+/* ---------- Holes (fill-first) ---------- */
+.btn-hole { background: #fff; color: #7a5b00; border: 1.5px solid #e6c64d; }
+.btn-hole.on { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+.pull-divider {
+  font-family: var(--font-head); font-weight: 800; font-size: .76rem; letter-spacing: .4px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 10px 14px 6px; background: #fafbfc; border-bottom: 1px solid var(--line);
+}
+.pull-item.hole { background: #fffdf3; box-shadow: inset 4px 0 0 #f59e0b; }
+.pull-item.hole .pull-check-btn { border-color: #f59e0b; }
+.pull-hole-chip {
+  border: 1px solid var(--line); background: #fff; color: var(--muted);
+  border-radius: 999px; padding: 6px 11px; font-size: .72rem; font-weight: 800; cursor: pointer; white-space: nowrap;
+}
+.pull-hole-chip.on { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+.fz-section.fill { color: #b45309; border-bottom-color: #f59e0b; }
+.fz-card.hole { box-shadow: inset 5px 0 0 #f59e0b, 0 2px 6px rgba(0,0,0,.07); }

@@ -117,6 +117,7 @@ function effective(src, patch, key, isAdded) {
     name: patch.name ?? src.name,
     category: patch.category ?? src.category,
     days, pkgDate: days == null,
+    freezerDays: ('freezerDays' in patch ? patch.freezerDays : src.freezerDays) || undefined,
     upc: ('upc' in patch ? patch.upc : src.upc) || '',
     plu: ('plu' in patch ? patch.plu : src.plu) || '',
     image: ('image' in patch ? patch.image : src.image) || undefined,
@@ -407,8 +408,8 @@ function renderList() {
     tap.className = 'tap';
     tap.innerHTML =
       `<div class="tap-text">
-         <div class="name">${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
-         <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}</div>
+         <div class="name">${isHole(it.name) ? '🕳️ ' : ''}${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
+         <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}${it.freezerDays ? ` · ❄️ ${it.freezerDays}d frozen` : ''}</div>
        </div>`;
     tap.insertBefore(thumbEl(it.image, 'product-thumb'), tap.firstChild);
     tap.addEventListener('click', () => isDesktop() ? openItemEditor(it) : openSheet(it));
@@ -453,6 +454,7 @@ function openSheet(it) {
   $('hebLink').href = HEB_SEARCH(hebQuery(it.name));
 
   renderShelf(it);
+  renderFreezerLife(it);
   renderUpc(it);
   renderPar(it);
   renderSheetResult(it);
@@ -461,6 +463,13 @@ function openSheet(it) {
 
   $('sheetBackdrop').hidden = false;
   $('sheet').hidden = false;
+}
+
+function renderFreezerLife(it) {
+  const el = $('detailFreezer');
+  if (!it.freezerDays) { el.innerHTML = ''; return; }
+  const useBy = addDays(getPullDate(), it.freezerDays);
+  el.innerHTML = `❄️ Freezer life: <strong>${it.freezerDays} days</strong> · if frozen on this date, use by <strong>${fmtDate(useBy)}</strong>`;
 }
 
 function renderShelf(it) {
@@ -498,6 +507,7 @@ function openItemEditor(it, fromSheet) {
   $('edPkg').checked = pkg;
   $('edDays').value = it && !pkg ? it.days : '';
   $('edDays').disabled = pkg;
+  $('edFreezer').value = it && it.freezerDays ? it.freezerDays : '';
   $('edDelete').style.display = it ? '' : 'none';
   $('edReset').style.display = it && !it._added ? '' : 'none';
   $('itemEditor').scrollTop = 0;
@@ -533,6 +543,7 @@ function readEditor() {
     cakeSide: $('edCake').checked,
     discontinued: $('edDisc').checked,
     days: pkg ? null : days,
+    freezerDays: pos('edFreezer') || null,
   };
 }
 
@@ -593,6 +604,7 @@ function exportCatalog() {
   for (const c of categoryNames()) {
     const items = state.items.filter((i) => i.category === c).map((i) => {
       const o = { name: i.name, days: i.days, pkgDate: i.pkgDate };
+      if (i.freezerDays) o.freezerDays = i.freezerDays;
       if (i.upc) o.upc = i.upc;
       if (i.plu) o.plu = i.plu;
       if (i.image) o.image = i.image;
@@ -690,6 +702,10 @@ function updateSheetAddBtn() {
   const inIt = inList(it.name);
   btn.textContent = inIt ? '✓ In pull list — remove' : '＋ Add to pull list';
   btn.classList.toggle('in', inIt);
+  const hole = isHole(it.name);
+  const hb = $('sheetHoleBtn');
+  hb.textContent = hole ? '🕳️ Hole flagged — tap to clear' : '🕳️ Flag as hole (fill first)';
+  hb.classList.toggle('on', hole);
 }
 
 /* ---------------- Pull list ---------------- */
@@ -698,7 +714,7 @@ function loadPullList() {
     const saved = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
     // keep only items that still exist in the dataset
     state.pull = saved.filter((p) => state.byName.has(p.name))
-      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done, labels: !!p.labels }));
+      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done, labels: !!p.labels, hole: !!p.hole }));
   } catch { state.pull = []; }
 }
 function savePullList() {
@@ -713,6 +729,22 @@ function toggleList(name) {
   else state.pull.push({ name, qty: 1, done: false, labels: false });
   savePullList();
   updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
+  renderPullList();
+  syncCremeProduction();
+  updateSheetAddBtn();
+}
+
+function isHole(name) { const p = state.pull.find((x) => x.name === name); return !!(p && p.hole); }
+
+// Flag/unflag a product as a "hole" (empty floor spot). Flagging adds it to the
+// pull list so holes get filled first; unflagging leaves it in the list.
+function toggleHole(name) {
+  let p = state.pull.find((x) => x.name === name);
+  if (p) { p.hole = !p.hole; }
+  else { p = { name, qty: 1, done: false, labels: false, hole: true }; state.pull.push(p); }
+  savePullList();
+  updateAddButton(name);
+  renderList();
   renderPullList();
   syncCremeProduction();
   updateSheetAddBtn();
@@ -801,6 +833,13 @@ function clearList() {
   syncCremeProduction();
 }
 
+function pullDivider(text) {
+  const d = document.createElement('div');
+  d.className = 'pull-divider';
+  d.textContent = text;
+  return d;
+}
+
 function renderPullList() {
   const n = state.pull.length;
   $('listCount').textContent = n;
@@ -834,10 +873,19 @@ function renderPullList() {
 
   const wrap = $('pullItems');
   wrap.innerHTML = '';
-  for (const it of ordered) {
+  const isHolePend = (it) => { const p = state.pull.find((x) => x.name === it.name); return !!(p && p.hole && !p.done); };
+  const holes = ordered.filter(isHolePend);
+  const rest = ordered.filter((it) => !isHolePend(it));
+  let didHoleHdr = false, didRestHdr = false;
+  for (const it of [...holes, ...rest]) {
     const p = state.pull.find((x) => x.name === it.name);
+    const hole = isHolePend(it);
+    if (holes.length) {
+      if (hole && !didHoleHdr) { didHoleHdr = true; wrap.appendChild(pullDivider('🕳️ Fill first — empty spots')); }
+      if (!hole && !didRestHdr) { didRestHdr = true; wrap.appendChild(pullDivider('Then pull')); }
+    }
     const row = document.createElement('div');
-    row.className = 'pull-item' + (p.done ? ' done' : '') + (p.labels ? ' labeled' : '');
+    row.className = 'pull-item' + (p.done ? ' done' : '') + (p.labels ? ' labeled' : '') + (hole ? ' hole' : '');
 
     const sell = it.pkgDate
       ? `<span class="pull-date pkg">Pkg date</span>`
@@ -854,7 +902,7 @@ function renderPullList() {
       <button type="button" class="pull-check-btn" aria-label="Mark pulled" aria-pressed="${p.done}">${p.done ? '✓' : ''}</button>
       <div class="pull-body">
         <div class="pull-row-top">
-          <span class="pull-name">${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</span>
+          <span class="pull-name">${hole ? '🕳️ ' : ''}${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</span>
           <span class="pull-date-wrap">sell by ${sell}</span>
         </div>
         <div class="pull-row-ctl">
@@ -864,12 +912,14 @@ function renderPullList() {
             <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
           </span>
           ${meta ? `<span class="pull-meta">${meta}</span>` : ''}
+          <button type="button" class="pull-hole-chip${hole ? ' on' : ''}" aria-pressed="${hole}">🕳️ Hole</button>
           <button type="button" class="pull-label-chip${p.labels ? ' on' : ''}" aria-pressed="${p.labels}">🏷 ${p.labels ? 'Labeled' : 'Label'}</button>
           <button type="button" class="remove-btn" aria-label="Remove from list">🗑️</button>
         </div>
       </div>`;
 
     row.querySelector('.pull-check-btn').addEventListener('click', () => toggleDone(it.name));
+    row.querySelector('.pull-hole-chip').addEventListener('click', () => toggleHole(it.name));
     row.querySelector('.pull-label-chip').addEventListener('click', () => toggleLabels(it.name));
     row.querySelector('[data-act="dec"]').addEventListener('click', () => setQty(it.name, -1));
     row.querySelector('[data-act="inc"]').addEventListener('click', () => setQty(it.name, +1));
@@ -905,16 +955,45 @@ function renderFreezer() {
     list.innerHTML = '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
     return;
   }
-  // walk-the-freezer order: keep items in table/section order with light
-  // dividers; pulled items dim in place so you go straight down each section
+  const holeOf = (it) => { const p = state.pull.find((x) => x.name === it.name); return !!(p && p.hole && !p.done); };
+  const fzCard = (it) => {
+    const p = pullOf(it);
+    const card = document.createElement('div');
+    card.className = 'fz-card' + (p.done ? ' done' : '') + (holeOf(it) ? ' hole' : '');
+    const sub = it.pkgDate ? 'Pkg date' : 'Sell by ' + fmtDate(sellByFor(it));
+    card.innerHTML =
+      `<div class="fz-qty">×${p.qty}</div>
+       <div class="fz-info">
+         <div class="fz-name">${holeOf(it) ? '🕳️ ' : ''}${escapeHtml(it.name)}</div>
+         <div class="fz-sub">${sub}${it.plu ? ` · PLU ${escapeHtml(String(it.plu))}` : ''}</div>
+       </div>
+       <button type="button" class="fz-check${p.done ? ' on' : ''}" aria-label="${p.done ? 'Mark not pulled' : 'Mark pulled'}">${p.done ? '✓' : ''}</button>`;
+    card.querySelector('.fz-check').addEventListener('click', () => {
+      try { if (navigator.vibrate) navigator.vibrate(25); } catch {}
+      toggleDone(it.name);   // re-renders the freezer via renderPullList
+    });
+    return card;
+  };
+
+  const frag = document.createDocumentFragment();
+  // holes first — empty spots to fill before walking the freezer
+  const holes = ordered.filter(holeOf);
+  if (holes.length) {
+    const h = document.createElement('div');
+    h.className = 'fz-section fill';
+    h.innerHTML = `<span class="fz-section-name">🕳️ Fill first — empty spots</span><span class="fz-section-count">${holes.length}</span>`;
+    frag.appendChild(h);
+    for (const it of holes) frag.appendChild(fzCard(it));
+  }
+  // then walk the freezer in table/section order; pulled items dim in place
+  const walk = ordered.filter((it) => !holeOf(it));
   const counts = new Map();
-  for (const it of ordered) {
+  for (const it of walk) {
     const k = freezerGroupKey(it); const c = counts.get(k) || { t: 0, d: 0 };
     c.t++; if (pullOf(it).done) c.d++; counts.set(k, c);
   }
-  const frag = document.createDocumentFragment();
   let lastKey = null;
-  for (const it of ordered) {
+  for (const it of walk) {
     const k = freezerGroupKey(it);
     if (k !== lastKey) {
       lastKey = k;
@@ -924,22 +1003,7 @@ function renderFreezer() {
       h.innerHTML = `<span class="fz-section-name">🧊 ${escapeHtml(freezerGroupLabel(it))}</span><span class="fz-section-count">${c.d}/${c.t}</span>`;
       frag.appendChild(h);
     }
-    const p = pullOf(it);
-    const card = document.createElement('div');
-    card.className = 'fz-card' + (p.done ? ' done' : '');
-    const sub = it.pkgDate ? 'Pkg date' : 'Sell by ' + fmtDate(sellByFor(it));
-    card.innerHTML =
-      `<div class="fz-qty">×${p.qty}</div>
-       <div class="fz-info">
-         <div class="fz-name">${escapeHtml(it.name)}</div>
-         <div class="fz-sub">${sub}${it.plu ? ` · PLU ${escapeHtml(String(it.plu))}` : ''}</div>
-       </div>
-       <button type="button" class="fz-check${p.done ? ' on' : ''}" aria-label="${p.done ? 'Mark not pulled' : 'Mark pulled'}">${p.done ? '✓' : ''}</button>`;
-    card.querySelector('.fz-check').addEventListener('click', () => {
-      try { if (navigator.vibrate) navigator.vibrate(25); } catch {}
-      toggleDone(it.name);   // re-renders the freezer via renderPullList
-    });
-    frag.appendChild(card);
+    frag.appendChild(fzCard(it));
   }
   list.innerHTML = '';
   list.appendChild(frag);
@@ -1895,6 +1959,7 @@ function wireEvents() {
   $('sheetClose').addEventListener('click', closeSheet);
   $('sheetBackdrop').addEventListener('click', closeSheet);
   $('sheetAddBtn').addEventListener('click', () => { if (state.current) toggleList(state.current.name); });
+  $('sheetHoleBtn').addEventListener('click', () => { if (state.current) toggleHole(state.current.name); });
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
   $('freezerBtn').addEventListener('click', openFreezer);
@@ -1924,7 +1989,7 @@ function wireEvents() {
   $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; commitEditor(); });
   $('edHoliday').addEventListener('change', (e) => { $('edSeasonField').hidden = !e.target.checked; commitEditor(); });
   // auto-save edits as you type / change
-  ['edName', 'edCategory', 'edUpc', 'edPlu', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays']
+  ['edName', 'edCategory', 'edUpc', 'edPlu', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays', 'edFreezer']
     .forEach((id) => $(id).addEventListener('input', scheduleAutoSave));
   ['edTable', 'edSeason', 'edCake', 'edDisc'].forEach((id) => $(id).addEventListener('change', commitEditor));
   // export / import
