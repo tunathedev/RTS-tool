@@ -179,7 +179,10 @@
     </div>
   </div>
 
-  <!-- Floating buttons (Flip Book stacked above Scan) -->
+  <!-- Floating buttons (Log + Flip stacked above Scan) -->
+  <button type="button" class="fab fab-log" id="logFab" aria-label="Open floor log">
+    <span class="fab-icon">📸</span><span class="fab-text">Log</span>
+  </button>
   <button type="button" class="fab fab-flip" id="flipFab" aria-label="Open flip book">
     <span class="fab-icon">📖</span><span class="fab-text">Flip</span>
     <span class="fab-badge" id="flipBadge" hidden></span>
@@ -187,6 +190,36 @@
   <button type="button" class="fab" id="scanFab" aria-label="Scan a barcode">
     <span class="fab-icon">📷</span><span class="fab-text">Scan</span>
   </button>
+
+  <!-- FLOOR LOG overlay (arrive / leave proof photos) -->
+  <div class="log-overlay" id="logView" role="dialog" aria-modal="true" aria-label="RTS floor log" hidden>
+    <div class="log-head">
+      <span class="flip-title">📸 RTS Floor Log</span>
+      <button type="button" class="flip-close" id="logClose" aria-label="Close floor log">✕</button>
+    </div>
+    <div class="log-body">
+      <div class="log-capture">
+        <div class="log-id-row">
+          <input type="text" id="logInitials" maxlength="5" placeholder="Your initials" autocomplete="off" />
+          <input type="text" id="logNote" placeholder="Note (optional)" autocomplete="off" />
+        </div>
+        <div class="log-cap-btns">
+          <button type="button" class="log-cap arrive" data-tag="arrive">🌅 Arrive shot</button>
+          <button type="button" class="log-cap leave" data-tag="leave">🌇 Leave shot</button>
+        </div>
+        <div class="log-hint" id="logHint">Snap the floor when you walk in (what you inherited) and when you leave (how you set it). Optional — it's your proof.</div>
+        <input type="file" id="logFile" accept="image/*" capture="environment" hidden />
+      </div>
+      <div class="log-timeline" id="logTimeline"></div>
+    </div>
+  </div>
+
+  <!-- Fullscreen photo viewer -->
+  <div class="photo-viewer" id="photoViewer" hidden>
+    <button type="button" class="photo-close" id="photoClose" aria-label="Close photo">✕</button>
+    <img id="photoImg" alt="Floor photo" />
+    <button type="button" class="photo-share" id="photoShare">⬆️ Share / Save</button>
+  </div>
 
   <!-- SCANNER modal -->
   <div class="scan-modal" id="scanModal" role="dialog" aria-modal="true" aria-label="Barcode scanner" hidden>

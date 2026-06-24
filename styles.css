@@ -222,7 +222,12 @@ main { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px
   bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
   background: var(--fresh); box-shadow: 0 6px 18px rgba(0,133,124,.4);
 }
-body.flip-open .fab { display: none; }   /* hide both FABs while the overlay is open */
+.fab-log {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 138px);
+  background: #2563eb; box-shadow: 0 6px 18px rgba(37,99,235,.4);
+}
+/* hide all FABs while any overlay is open */
+body.flip-open .fab, body.log-open .fab { display: none; }
 /* the .fab's position:fixed is the anchor for this count badge */
 .fab-badge {
   position: absolute; top: -6px; right: -4px; min-width: 20px; height: 20px;
@@ -640,26 +645,27 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .pull-boxes { font-size: .7rem; color: var(--fresh); font-weight: 800; white-space: nowrap; }
 .pull-boxes.unknown { color: var(--muted); font-weight: 600; }
 
-/* ---------- Flip Book (floating overlay) ---------- */
-.flip-overlay {
+/* ---------- Flip Book + Floor Log (floating overlays) ---------- */
+.flip-overlay, .log-overlay {
   position: fixed; inset: 0; z-index: 80; background: var(--bg);
   display: flex; flex-direction: column;
   padding-top: env(safe-area-inset-top, 0px);
   animation: slideUp .2s ease;
 }
-.flip-head {
+.flip-head, .log-head {
   flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 12px 16px; color: #fff;
   background: linear-gradient(135deg, var(--heb) 0%, var(--heb-dark) 100%);
   box-shadow: 0 2px 8px rgba(0,0,0,.12);
 }
+.log-head { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
 .flip-title { font-family: var(--font-head); font-weight: 800; font-size: 1rem; }
 .flip-close {
   flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; border: none;
   background: rgba(255,255,255,.18); color: #fff; font-size: 1.1rem; cursor: pointer;
 }
 .flip-close:active { transform: scale(.95); }
-.flip-body {
+.flip-body, .log-body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   width: 100%; max-width: var(--maxw); margin: 0 auto;
   padding: 12px 12px calc(env(safe-area-inset-bottom, 0px) + 24px);
@@ -701,3 +707,73 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .flip-list li:last-child { border-bottom: none; }
 .flip-pulled { text-align: center; font-size: .76rem; color: var(--muted); margin-top: 10px; }
 .flip-empty { color: var(--muted); padding: 30px; }
+
+/* ---------- Floor Log ---------- */
+.log-capture {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.log-id-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.log-id-row input {
+  padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: #fff;
+}
+#logInitials { flex: 0 0 96px; text-transform: uppercase; font-weight: 700; }
+#logNote { flex: 1; min-width: 0; }
+.log-cap-btns { display: flex; gap: 10px; }
+.log-cap {
+  flex: 1; border: none; border-radius: 12px; padding: 14px 8px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 800; font-size: .95rem; color: #fff;
+}
+.log-cap:active { transform: scale(.98); }
+.log-cap.arrive { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.log-cap.leave { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.log-hint { font-size: .74rem; color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.4; }
+
+.log-day-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 6px 2px 8px; padding-bottom: 6px; border-bottom: 2px solid var(--line);
+}
+.log-day-date { font-family: var(--font-head); font-weight: 800; font-size: 1rem; color: var(--ink); }
+.log-day-flags { font-size: .72rem; font-weight: 800; }
+.log-complete { color: var(--ok); }
+.log-partial { color: var(--warn); }
+
+.log-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.log-col { min-width: 0; }
+.log-col-label {
+  font-family: var(--font-head); font-weight: 800; font-size: .76rem; text-transform: uppercase;
+  letter-spacing: .4px; padding: 4px 0 8px; color: var(--muted);
+}
+.log-col-label.arrive { color: #b45309; }
+.log-col-label.leave { color: #4338ca; }
+.log-col-empty { color: var(--line); font-size: 1.2rem; text-align: center; padding: 14px 0; }
+.log-shot {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.log-shot img { width: 100%; display: block; aspect-ratio: 4 / 3; object-fit: cover; cursor: zoom-in; background: #eee; }
+.log-shot-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 8px;
+}
+.log-shot-by { font-size: .72rem; font-weight: 700; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-del { flex: 0 0 auto; border: none; background: none; cursor: pointer; font-size: .9rem; padding: 2px; opacity: .6; }
+.log-del:active { opacity: 1; }
+.log-shot-note { font-size: .76rem; color: var(--ink); padding: 0 8px 8px; line-height: 1.35; }
+.log-empty { text-align: center; color: var(--muted); padding: 48px 24px; line-height: 1.6; font-size: .9rem; }
+
+/* fullscreen photo viewer */
+.photo-viewer {
+  position: fixed; inset: 0; z-index: 95; background: rgba(0,0,0,.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px);
+}
+.photo-viewer img { max-width: 100%; max-height: 80%; object-fit: contain; border-radius: 8px; }
+.photo-close {
+  position: absolute; top: calc(env(safe-area-inset-top,0px) + 12px); right: 14px;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 1.2rem; cursor: pointer;
+}
+.photo-share {
+  margin-top: 16px; border: none; border-radius: 999px; background: #2563eb; color: #fff;
+  font-family: var(--font-head); font-weight: 800; font-size: .9rem; padding: 12px 22px; cursor: pointer;
+}

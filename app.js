@@ -17,6 +17,7 @@ const LS_CAKE = 'rts.hideCake';
 const LS_DISC = 'rts.hideDiscontinued';
 const LS_PROD = 'rts.production.v1';
 const LS_COMPBOX = 'rts.componentBox.v1';
+const LS_LOGINIT = 'rts.logInitials';
 
 const state = {
   data: null,
@@ -34,6 +35,8 @@ const state = {
   hideDisc: false,
   prod: {},           // production plan: id -> { make, done }
   compBox: {},        // component name -> items per box (for box-pull math)
+  log: [],            // floor log entries: { id, ts, day, tag, by, note, img }
+
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
 };
@@ -1174,6 +1177,195 @@ function flipBy(delta) {
   renderFlip();
 }
 
+/* ---------------- Floor Log (arrive / leave proof photos) ----------------
+ * Flexible photo log: each shot is tagged Arrive (the floor we inherited) or
+ * Leave (how we set it), with initials + optional note + a burned-in date/time
+ * stamp. Photos are compressed to ~100KB and stored per-entry under rts/log in
+ * Firebase, loaded only when the log opens so the main app stays fast. */
+const TAG_META = { arrive: { emoji: '🌅', label: 'Arrive' }, leave: { emoji: '🌇', label: 'Leave' } };
+let logLoaded = false;        // fetched this session?
+let logPendingLoad = false;   // opened before sync was ready
+let captureTag = 'leave';     // which button launched the camera
+
+function openFloorLog() {
+  $('logView').hidden = false;
+  document.body.classList.add('log-open');
+  try { $('logInitials').value = localStorage.getItem(LS_LOGINIT) || ''; } catch {}
+  loadFloorLog();
+  renderFloorLog();
+}
+function closeFloorLog() { $('logView').hidden = true; document.body.classList.remove('log-open'); }
+
+function loadFloorLog() {
+  if (!sync.on) { logPendingLoad = true; return; }   // retried once sync connects
+  if (logLoaded) return;
+  logLoaded = true;
+  try {
+    sync.mod.get(sync.mod.ref(sync.db, 'rts/log')).then((snap) => {
+      mergeFloorLog(snap.val()); renderFloorLog();
+    }).catch(() => {});
+  } catch {}
+}
+function mergeFloorLog(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  const seen = new Set(state.log.map((e) => e.id));
+  for (const e of Object.values(obj)) {
+    if (e && e.id && !seen.has(e.id)) { state.log.push(e); seen.add(e.id); }
+  }
+  state.log.sort((a, b) => b.ts - a.ts);   // newest first
+}
+
+function logStamp(tag, d, by) {
+  const t = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${(TAG_META[tag] || {}).label || ''}`.toUpperCase() + ` · ${monthDay(d)} ${t}` + (by ? ` · ${by}` : '');
+}
+
+// Downscale to ~1080px wide, burn in the stamp, export as a small JPEG data URL.
+function processPhoto(file, text) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const ow = img.naturalWidth || 1080, oh = img.naturalHeight || 1080;
+      const scale = Math.min(1, 1080 / ow);
+      const w = Math.round(ow * scale), h = Math.round(oh * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const fs = Math.max(18, Math.round(w * 0.04));
+      const barH = Math.round(fs * 1.9);
+      ctx.fillStyle = 'rgba(0,0,0,.58)';
+      ctx.fillRect(0, h - barH, w, barH);
+      ctx.fillStyle = '#fff';
+      ctx.font = `700 ${fs}px Inter, Archivo, sans-serif`;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, Math.round(w * 0.03), h - barH / 2);
+      try { resolve(c.toDataURL('image/jpeg', 0.6)); } catch (e) { reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load failed')); };
+    img.src = url;
+  });
+}
+
+function startCapture(tag) {
+  captureTag = tag;
+  const by = ($('logInitials').value || '').trim().toUpperCase();
+  try { localStorage.setItem(LS_LOGINIT, by); } catch {}
+  $('logFile').value = '';
+  $('logFile').click();
+}
+
+async function onLogFile(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const d = new Date();
+  const by = ($('logInitials').value || '').trim().toUpperCase();
+  try { localStorage.setItem(LS_LOGINIT, by); } catch {}
+  const note = ($('logNote').value || '').trim();
+  $('logHint').textContent = 'Processing photo…';
+  let img;
+  try { img = await processPhoto(file, logStamp(captureTag, d, by)); }
+  catch { $('logHint').textContent = 'Could not read that photo — try again.'; return; }
+  const id = d.getTime().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+  const entry = { id, ts: d.getTime(), day: toISO(d), tag: captureTag, by, note, img };
+  state.log.unshift(entry);
+  $('logNote').value = '';
+  $('logHint').textContent = sync.on ? 'Saved ✓' : '⚠︎ Saved on this device — will upload when sync connects.';
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/log/' + id), entry); } catch {} }
+  renderFloorLog();
+}
+
+function deleteLogEntry(id) {
+  if (!confirm('Delete this photo from the log?')) return;
+  state.log = state.log.filter((e) => e.id !== id);
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/log/' + id), null); } catch {} }
+  renderFloorLog();
+}
+
+function renderFloorLog() {
+  const tl = $('logTimeline');
+  if (!sync.on && !state.log.length) {
+    tl.innerHTML = '<div class="log-empty">📷 No photos yet.<br>Connect to global sync, then tag your first Arrive / Leave shot.</div>';
+    return;
+  }
+  if (!state.log.length) {
+    tl.innerHTML = '<div class="log-empty">📷 No photos yet.<br>Tag the floor when you arrive and when you leave — your before/after proof builds up here.</div>';
+    return;
+  }
+  // group by day (already sorted newest-first)
+  const days = [];
+  const byDay = new Map();
+  for (const e of state.log) {
+    if (!byDay.has(e.day)) { byDay.set(e.day, []); days.push(e.day); }
+    byDay.get(e.day).push(e);
+  }
+  const frag = document.createDocumentFragment();
+  for (const day of days) {
+    const entries = byDay.get(day);
+    const hasA = entries.some((e) => e.tag === 'arrive');
+    const hasL = entries.some((e) => e.tag === 'leave');
+    const dd = parseISO(day) || new Date(entries[0].ts);
+    const head = document.createElement('div');
+    head.className = 'log-day-head';
+    head.innerHTML = `<span class="log-day-date">${weekdayShort(dd)} · ${monthDay(dd)}</span>` +
+      `<span class="log-day-flags">${hasA && hasL ? '<span class="log-complete">✅ before &amp; after</span>'
+        : hasA ? '<span class="log-partial">🌅 arrive only</span>'
+        : '<span class="log-partial">🌇 leave only</span>'}</span>`;
+    frag.appendChild(head);
+
+    const cols = document.createElement('div');
+    cols.className = 'log-cols';
+    for (const tag of ['arrive', 'leave']) {
+      const col = document.createElement('div');
+      col.className = 'log-col';
+      col.innerHTML = `<div class="log-col-label ${tag}">${TAG_META[tag].emoji} ${TAG_META[tag].label}</div>`;
+      const shots = entries.filter((e) => e.tag === tag);
+      if (!shots.length) col.insertAdjacentHTML('beforeend', '<div class="log-col-empty">—</div>');
+      for (const e of shots) {
+        const card = document.createElement('div');
+        card.className = 'log-shot';
+        const t = new Date(e.ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        card.innerHTML =
+          `<img loading="lazy" src="${e.img}" alt="${TAG_META[tag].label} ${escapeHtml(e.day)}" />
+           <div class="log-shot-meta">
+             <span class="log-shot-by">${e.by ? escapeHtml(e.by) + ' · ' : ''}${t}</span>
+             <button type="button" class="log-del" aria-label="Delete photo">🗑️</button>
+           </div>
+           ${e.note ? `<div class="log-shot-note">${escapeHtml(e.note)}</div>` : ''}`;
+        card.querySelector('img').addEventListener('click', () => openPhoto(e.img));
+        card.querySelector('.log-del').addEventListener('click', () => deleteLogEntry(e.id));
+        col.appendChild(card);
+      }
+      cols.appendChild(col);
+    }
+    frag.appendChild(cols);
+  }
+  tl.innerHTML = '';
+  tl.appendChild(frag);
+}
+
+/* fullscreen photo viewer with share/save */
+let viewerSrc = null;
+function openPhoto(src) { viewerSrc = src; $('photoImg').src = src; $('photoViewer').hidden = false; }
+function closePhoto() { $('photoViewer').hidden = true; $('photoImg').src = ''; viewerSrc = null; }
+async function sharePhoto() {
+  if (!viewerSrc) return;
+  try {
+    const blob = await (await fetch(viewerSrc)).blob();
+    const file = new File([blob], 'rts-floor.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'RTS floor' });
+      return;
+    }
+  } catch {}
+  // fallback: download
+  const a = document.createElement('a');
+  a.href = viewerSrc; a.download = 'rts-floor.jpg';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
 /* ---------------- date + freshness ---------------- */
 function getPullDate() { return parseISO($('pullDate').value) || stripTime(new Date()); }
 function sellByFor(it) { return it.pkgDate ? null : addDays(getPullDate(), it.days); }
@@ -1547,6 +1739,13 @@ function wireEvents() {
   // flip book overlay: open from floating button, close from header
   $('flipFab').addEventListener('click', openFlip);
   $('flipClose').addEventListener('click', closeFlip);
+  // floor log overlay
+  $('logFab').addEventListener('click', openFloorLog);
+  $('logClose').addEventListener('click', closeFloorLog);
+  $('logView').querySelectorAll('.log-cap').forEach((b) => b.addEventListener('click', () => startCapture(b.dataset.tag)));
+  $('logFile').addEventListener('change', onLogFile);
+  $('photoClose').addEventListener('click', closePhoto);
+  $('photoShare').addEventListener('click', sharePhoto);
   // flip book navigation
   $('flipPrev').addEventListener('click', () => flipBy(-1));
   $('flipNext').addEventListener('click', () => flipBy(1));
@@ -1600,10 +1799,12 @@ function wireEvents() {
   $('importFile').addEventListener('change', (e) => { if (e.target.files[0]) importCatalog(e.target.files[0]); e.target.value = ''; });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!$('scanModal').hidden) closeScanner();
+    if (!$('photoViewer').hidden) closePhoto();
+    else if (!$('scanModal').hidden) closeScanner();
     else if (!$('itemEditor').hidden) cancelItemEditor();
     else if (!$('sheet').hidden) closeSheet();
     else if (!$('flipView').hidden) closeFlip();
+    else if (!$('logView').hidden) closeFloorLog();
   });
 }
 
@@ -1713,6 +1914,7 @@ async function initSync() {
     await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
+    if (logPendingLoad && !$('logView').hidden) { logPendingLoad = false; loadFloorLog(); renderFloorLog(); }
     setSyncStatus('☁︎ Global sync on', 'on');
   } catch (e) {
     sync.on = false;
