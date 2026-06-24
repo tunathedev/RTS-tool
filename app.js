@@ -2161,21 +2161,28 @@ function showUpdateToast(reg) {
   };
 }
 if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return; refreshing = true; location.reload();   // new version active → refresh once
+  });
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('sw.js');
-      if (reg.waiting && navigator.serviceWorker.controller) showUpdateToast(reg);
+      // auto-apply: as soon as a new version finishes downloading, activate it
+      const applyNow = () => { if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' }); };
+      if (reg.waiting && navigator.serviceWorker.controller) applyNow();
       reg.addEventListener('updatefound', () => {
         const nw = reg.installing; if (!nw) return;
         nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateToast(reg);
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) applyNow();
         });
       });
+      // keep checking for new versions even while the app stays open
+      setInterval(() => reg.update().catch(() => {}), 60 * 1000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
+      });
     } catch {}
-  });
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (refreshing) return; refreshing = true; location.reload();
   });
 }
 
