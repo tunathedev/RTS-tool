@@ -819,11 +819,17 @@ function renderPullList() {
     const b = boxesFor(it, p.qty);
     if (b != null) { totalBoxes += b; boxKnown = true; }
   }
+  const pct = n ? Math.round((doneCount / n) * 100) : 0;
   $('pullSummary').innerHTML =
-    `${n} item${n === 1 ? '' : 's'} · ${totalQty} to pull` +
-    (boxKnown ? ` · <strong>${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}</strong>` : '') +
-    (totalWholes ? ` · <strong>${totalWholes} whole${totalWholes === 1 ? '' : 's'} to cut</strong>` : '') +
-    ` · ${doneCount}/${n} pulled · ${labeledCount}/${n} labeled · pulled ${fmtDate(getPullDate())}`;
+    `<div class="pull-progress-top">
+       <strong>${doneCount} of ${n} pulled</strong>
+       <span>${fmtDate(getPullDate())}</span>
+     </div>
+     <div class="pull-bar"><span style="width:${pct}%"></span></div>
+     <div class="pull-progress-sub">${totalQty} to pull` +
+    (boxKnown ? ` · ${totalBoxes} box${totalBoxes === 1 ? '' : 'es'}` : '') +
+    (totalWholes ? ` · ${totalWholes} whole${totalWholes === 1 ? '' : 's'} to cut` : '') +
+    `</div>`;
 
   const wrap = $('pullItems');
   wrap.innerHTML = '';
@@ -833,36 +839,37 @@ function renderPullList() {
     row.className = 'pull-item' + (p.done ? ' done' : '') + (p.labels ? ' labeled' : '');
 
     const sell = it.pkgDate
-      ? `<span class="pull-sellby pkg">Pkg date</span>`
+      ? `<span class="pull-date pkg">Pkg date</span>`
       : (() => { const sb = sellByFor(it); const { cls } = freshness(sb);
-                 return `<span class="pull-sellby ${cls}">${fmtDate(sb)}</span>`; })();
+                 return `<span class="pull-date ${cls}">${fmtDate(sb)}</span>`; })();
     const boxes = boxesFor(it, p.qty);
-    const boxHtml = isHalfItem(it)
-      ? `<span class="pull-boxes">🍰 ${wholesForHalf(p.qty)} whole${wholesForHalf(p.qty) === 1 ? '' : 's'}</span>`
+    const meta = isHalfItem(it)
+      ? `🍰 cut ${wholesForHalf(p.qty)} whole${wholesForHalf(p.qty) === 1 ? '' : 's'}`
       : boxes != null
-      ? `<span class="pull-boxes">${boxes} box${boxes === 1 ? '' : 'es'}</span>`
-      : `<span class="pull-boxes unknown">box qty —</span>`;
+      ? `${boxes} box${boxes === 1 ? '' : 'es'}`
+      : '';
 
     row.innerHTML = `
-      <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} aria-label="Mark pulled" />
-      <div class="pull-main">
-        <div class="pull-name">${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</div>
-        <div class="pull-sub">${escapeHtml(it.category)} · sell by ${sell}</div>
-      </div>
-      <div class="qty">
-        <button type="button" data-act="dec" aria-label="Decrease quantity">−</button>
-        <span>${p.qty}</span>
-        <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
-      </div>
-      <div class="pull-flags">
-        <label class="label-toggle"><input type="checkbox" ${p.labels ? 'checked' : ''} aria-label="Labels printed" /> labels</label>
-        ${boxHtml}
-      </div>
-      <button type="button" class="remove-btn" aria-label="Remove">🗑️</button>`;
-    row.insertBefore(thumbEl(it.image, 'pull-thumb'), row.children[1]);   // after the checkbox
+      <button type="button" class="pull-check-btn" aria-label="Mark pulled" aria-pressed="${p.done}">${p.done ? '✓' : ''}</button>
+      <div class="pull-body">
+        <div class="pull-row-top">
+          <span class="pull-name">${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</span>
+          <span class="pull-date-wrap">sell by ${sell}</span>
+        </div>
+        <div class="pull-row-ctl">
+          <span class="qty">
+            <button type="button" data-act="dec" aria-label="Decrease quantity">−</button>
+            <span class="qty-n">${p.qty}</span>
+            <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
+          </span>
+          ${meta ? `<span class="pull-meta">${meta}</span>` : ''}
+          <button type="button" class="pull-label-chip${p.labels ? ' on' : ''}" aria-pressed="${p.labels}">🏷 ${p.labels ? 'Labeled' : 'Label'}</button>
+          <button type="button" class="remove-btn" aria-label="Remove from list">🗑️</button>
+        </div>
+      </div>`;
 
-    row.querySelector('.pull-check').addEventListener('change', () => toggleDone(it.name));
-    row.querySelector('.label-toggle input').addEventListener('change', () => toggleLabels(it.name));
+    row.querySelector('.pull-check-btn').addEventListener('click', () => toggleDone(it.name));
+    row.querySelector('.pull-label-chip').addEventListener('click', () => toggleLabels(it.name));
     row.querySelector('[data-act="dec"]').addEventListener('click', () => setQty(it.name, -1));
     row.querySelector('[data-act="inc"]').addEventListener('click', () => setQty(it.name, +1));
     row.querySelector('.remove-btn').addEventListener('click', () => toggleList(it.name));
@@ -1310,9 +1317,13 @@ function renderFloorLog() {
     const head = document.createElement('div');
     head.className = 'log-day-head';
     head.innerHTML = `<span class="log-day-date">${weekdayShort(dd)} · ${monthDay(dd)}</span>` +
-      `<span class="log-day-flags">${hasA && hasL ? '<span class="log-complete">✅ before &amp; after</span>'
-        : hasA ? '<span class="log-partial">🌅 arrive only</span>'
-        : '<span class="log-partial">🌇 leave only</span>'}</span>`;
+      `<span class="log-day-right">
+         <span class="log-day-flags">${hasA && hasL ? '<span class="log-complete">✅ before &amp; after</span>'
+           : hasA ? '<span class="log-partial">🌅 arrive only</span>'
+           : '<span class="log-partial">🌇 leave only</span>'}</span>
+         <button type="button" class="log-share-day" aria-label="Share before/after">📤 Share</button>
+       </span>`;
+    head.querySelector('.log-share-day').addEventListener('click', () => shareDay(day));
     frag.appendChild(head);
 
     const cols = document.createElement('div');
@@ -1344,6 +1355,51 @@ function renderFloorLog() {
   }
   tl.innerHTML = '';
   tl.appendChild(frag);
+}
+
+/* Auto-build a side-by-side before/after image for a day and share/save it.
+ * Uses the latest Arrive + latest Leave shot; the date stamps are already
+ * burned into each photo, so the composite is a ready-to-send proof sheet. */
+function loadImgEl(src) {
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+}
+async function buildDayComposite(day) {
+  const entries = state.log.filter((e) => e.day === day);
+  const latest = (tag) => entries.filter((e) => e.tag === tag).sort((a, b) => b.ts - a.ts)[0];
+  const picks = [latest('arrive'), latest('leave')].filter(Boolean);
+  if (!picks.length) return null;
+  const imgs = await Promise.all(picks.map((e) => loadImgEl(e.img)));
+  const hw = 720, headerH = 86;
+  const scaled = imgs.map((im) => ({ im, w: hw, h: Math.round(im.naturalHeight * (hw / im.naturalWidth)) }));
+  const bodyH = Math.max(...scaled.map((s) => s.h));
+  const c = document.createElement('canvas');
+  c.width = hw * scaled.length; c.height = headerH + bodyH;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#E31837'; ctx.fillRect(0, 0, c.width, headerH);
+  ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle';
+  ctx.font = '800 40px Archivo, Inter, sans-serif';
+  const dd = parseISO(day) || new Date(picks[0].ts);
+  ctx.fillText(`RTS Floor · ${weekdayShort(dd)} ${monthDay(dd)}`, 26, headerH / 2);
+  let x = 0;
+  for (const s of scaled) { ctx.drawImage(s.im, x, headerH, s.w, s.h); x += hw; }
+  return c.toDataURL('image/jpeg', 0.72);
+}
+async function shareDay(day) {
+  let url = null;
+  try { url = await buildDayComposite(day); } catch {}
+  if (!url) { alert('No photos to share for that day yet.'); return; }
+  try {
+    const blob = await (await fetch(url)).blob();
+    const file = new File([blob], `rts-floor-${day}.jpg`, { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: `RTS Floor ${day}` });
+      return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a');
+  a.href = url; a.download = `rts-floor-${day}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 /* fullscreen photo viewer with share/save */
