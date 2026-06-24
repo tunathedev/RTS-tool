@@ -1238,13 +1238,13 @@ function renderFlip() {
     head = `<div class="flip-daynum">${flipKey}-day shelf life</div>
             <div class="flip-sub">Sell by</div>
             <div class="flip-weekday">${weekdayShort(sb)}</div>
-            <div class="flip-date">${monthDay(sb)}</div>`;
+            <div class="flip-date">${mmdd(sb)}</div>`;
   }
   $('flipCard').innerHTML =
     `${head}
      <div class="flip-count">${items.length} item${items.length === 1 ? '' : 's'}</div>
      <ul class="flip-list">${items.map((it) => `<li>${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</li>`).join('')}</ul>`;
-  $('flipPulled').textContent = 'Pulled ' + monthDay(getPullDate());
+  $('flipPulled').textContent = 'Pulled ' + mmdd(getPullDate());
 }
 
 function flipBy(delta) {
@@ -1834,6 +1834,7 @@ function stripTime(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function fmtDate(d) { const z = (n) => String(n).padStart(2, '0'); return `${z(d.getMonth() + 1)}/${z(d.getDate())}/${d.getFullYear()}`; }
 function monthDay(d) { return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+function mmdd(d) { const z = (n) => String(n).padStart(2, '0'); return `${z(d.getMonth() + 1)}/${z(d.getDate())}`; }
 function weekdayShort(d) { return d.toLocaleDateString(undefined, { weekday: 'short' }); }
 
 /* ---------------- misc ---------------- */
