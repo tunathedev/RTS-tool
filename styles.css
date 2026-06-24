@@ -897,3 +897,7 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .pull-hole-chip.on { background: #f59e0b; color: #fff; border-color: #f59e0b; }
 .fz-section.fill { color: #b45309; border-bottom-color: #f59e0b; }
 .fz-card.hole { box-shadow: inset 5px 0 0 #f59e0b, 0 2px 6px rgba(0,0,0,.07); }
+/* Browse: a flagged hole gets a 🕳️ prefix + amber stripe */
+.product-item.hole { background: #fffdf3; box-shadow: inset 4px 0 0 #f59e0b; }
+.product-item.hole .name::before { content: '🕳️ '; }
+.add-btn { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }

@@ -402,13 +402,13 @@ function renderList() {
     }
 
     const row = document.createElement('div');
-    row.className = 'product-item' + (it.discontinued ? ' discontinued' : '');
+    row.className = 'product-item' + (it.discontinued ? ' discontinued' : '') + (isHole(it.name) ? ' hole' : '');
 
     const tap = document.createElement('div');
     tap.className = 'tap';
     tap.innerHTML =
       `<div class="tap-text">
-         <div class="name">${isHole(it.name) ? '🕳️ ' : ''}${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
+         <div class="name">${it.discontinued ? '⛔ ' : ''}${it.holiday ? (SEASON_EMOJI[it._season] || '🎉') + ' ' : ''}${it.cakeSide ? '🎂 ' : ''}${escapeHtml(it.name)}</div>
          <div class="meta">${it.pkgDate ? 'Follow package date' : 'Sell by ' + fmtDate(sellByFor(it))}${it.freezerDays ? ` · ❄️ ${it.freezerDays}d frozen` : ''}</div>
        </div>`;
     tap.insertBefore(thumbEl(it.image, 'product-thumb'), tap.firstChild);
@@ -423,7 +423,25 @@ function renderList() {
     add.dataset.name = it.name;
     add.textContent = inList(it.name) ? '✓' : '＋';
     add.setAttribute('aria-label', inList(it.name) ? 'Remove from pull list' : 'Add to pull list');
-    add.addEventListener('click', (e) => { e.stopPropagation(); toggleList(it.name); });
+    add.title = 'Tap to add · press & hold to flag a hole';
+    // tap = add/remove · press-and-hold = flag/clear a hole (fill first)
+    let lpTimer = null, lpFired = false;
+    const lpStart = () => {
+      lpFired = false;
+      lpTimer = setTimeout(() => { lpFired = true; try { navigator.vibrate && navigator.vibrate(30); } catch {} toggleHole(it.name); }, 500);
+    };
+    const lpCancel = () => { clearTimeout(lpTimer); };
+    add.addEventListener('touchstart', lpStart, { passive: true });
+    add.addEventListener('touchend', lpCancel);
+    add.addEventListener('touchmove', lpCancel, { passive: true });
+    add.addEventListener('mousedown', lpStart);
+    add.addEventListener('mouseup', lpCancel);
+    add.addEventListener('mouseleave', lpCancel);
+    add.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (lpFired) { lpFired = false; return; }   // long-press already toggled the hole
+      toggleList(it.name);
+    });
 
     row.append(tap, badge, add);
     frag.appendChild(row);
@@ -743,11 +761,19 @@ function toggleHole(name) {
   if (p) { p.hole = !p.hole; }
   else { p = { name, qty: 1, done: false, labels: false, hole: true }; state.pull.push(p); }
   savePullList();
-  updateAddButton(name);
-  renderList();
+  updateAddButton(name);   // in-place so a long-press isn't interrupted by a full re-render
+  updateHoleRow(name);
   renderPullList();
   syncCremeProduction();
   updateSheetAddBtn();
+}
+
+// toggle just the 🕳️ marker on a Browse row without rebuilding the list
+function updateHoleRow(name) {
+  const hole = isHole(name);
+  for (const b of document.querySelectorAll('#productList .add-btn')) {
+    if (b.dataset.name === name) { const row = b.closest('.product-item'); if (row) row.classList.toggle('hole', hole); }
+  }
 }
 
 // update the +/✓ state of a Browse row's add button without re-rendering the list
