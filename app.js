@@ -115,6 +115,7 @@ function effective(src, patch, key, isAdded) {
     category: patch.category ?? src.category,
     days, pkgDate: days == null,
     upc: ('upc' in patch ? patch.upc : src.upc) || '',
+    plu: ('plu' in patch ? patch.plu : src.plu) || '',
     image: ('image' in patch ? patch.image : src.image) || undefined,
     par: ('par' in patch ? patch.par : src.par) || undefined,
     boxQty: ('boxQty' in patch ? patch.boxQty : src.boxQty) || undefined,
@@ -435,7 +436,8 @@ function renderList() {
 
 function matches(it, term) {
   return it.name.toLowerCase().includes(term) || it.category.toLowerCase().includes(term)
-    || (TABLE_NAME[it._table] || '').toLowerCase().includes(term);
+    || (TABLE_NAME[it._table] || '').toLowerCase().includes(term)
+    || (it.plu && String(it.plu).includes(term)) || (it.upc && String(it.upc).includes(term));
 }
 
 const isDesktop = () => window.matchMedia('(min-width: 720px)').matches;
@@ -480,6 +482,7 @@ function openItemEditor(it, fromSheet) {
   $('edCategory').value = it ? it.category : '';
   $('edTable').value = it && it.table ? String(it.table) : '';
   $('edUpc').value = it ? (it.upc || '') : '';
+  $('edPlu').value = it ? (it.plu || '') : '';
   $('edBox').value = it && it.boxQty ? it.boxQty : '';
   $('edImage').value = it ? (it.image || '') : '';
   $('edTall').value = par.tall || ''; $('edWide').value = par.wide || ''; $('edDeep').value = par.deep || '';
@@ -518,6 +521,7 @@ function readEditor() {
     category: $('edCategory').value.trim() || 'Other',
     table: parseInt($('edTable').value, 10) || null,
     upc: normUpc($('edUpc').value),
+    plu: $('edPlu').value.trim(),
     image: $('edImage').value.trim(),
     boxQty: box || null,
     par: (tall || wide || deep) ? { tall, wide, deep } : null,
@@ -587,6 +591,7 @@ function exportCatalog() {
     const items = state.items.filter((i) => i.category === c).map((i) => {
       const o = { name: i.name, days: i.days, pkgDate: i.pkgDate };
       if (i.upc) o.upc = i.upc;
+      if (i.plu) o.plu = i.plu;
       if (i.image) o.image = i.image;
       if (i.par) o.par = i.par;
       if (i.boxQty) o.boxQty = i.boxQty;
@@ -620,6 +625,9 @@ function importCatalog(file) {
 }
 
 function renderUpc(it) {
+  $('detailPlu').innerHTML = it.plu
+    ? `<span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>`
+    : '';
   $('detailUpc').innerHTML = it.upc
     ? `UPC <span class="upc-num">${escapeHtml(String(it.upc))}</span>`
     : '';
@@ -835,7 +843,7 @@ function renderPullList() {
     row.innerHTML = `
       <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} aria-label="Mark pulled" />
       <div class="pull-main">
-        <div class="pull-name">${escapeHtml(it.name)}</div>
+        <div class="pull-name">${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</div>
         <div class="pull-sub">${escapeHtml(it.category)} · sell by ${sell}</div>
       </div>
       <div class="qty">
@@ -1152,7 +1160,7 @@ function renderFlip() {
   $('flipCard').innerHTML =
     `${head}
      <div class="flip-count">${items.length} item${items.length === 1 ? '' : 's'}</div>
-     <ul class="flip-list">${items.map((it) => `<li>${escapeHtml(it.name)}</li>`).join('')}</ul>`;
+     <ul class="flip-list">${items.map((it) => `<li>${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</li>`).join('')}</ul>`;
   $('flipPulled').textContent = 'Pulled ' + monthDay(getPullDate());
 }
 
@@ -1583,7 +1591,7 @@ function wireEvents() {
   $('edPkg').addEventListener('change', (e) => { $('edDays').disabled = e.target.checked; commitEditor(); });
   $('edHoliday').addEventListener('change', (e) => { $('edSeasonField').hidden = !e.target.checked; commitEditor(); });
   // auto-save edits as you type / change
-  ['edName', 'edCategory', 'edUpc', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays']
+  ['edName', 'edCategory', 'edUpc', 'edPlu', 'edBox', 'edImage', 'edTall', 'edWide', 'edDeep', 'edDays']
     .forEach((id) => $(id).addEventListener('input', scheduleAutoSave));
   ['edTable', 'edSeason', 'edCake', 'edDisc'].forEach((id) => $(id).addEventListener('change', commitEditor));
   // export / import

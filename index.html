@@ -233,6 +233,9 @@
           <button type="button" class="ed-scan" id="edScanUpc" aria-label="Scan UPC" title="Scan barcode">📷</button>
         </div>
       </label>
+      <label class="ed-field">PLU (label code)
+        <input type="text" id="edPlu" inputmode="numeric" autocomplete="off" placeholder="e.g. 1234" />
+      </label>
       <label class="ed-field">Items per box
         <input type="number" id="edBox" min="0" inputmode="numeric" />
       </label>
@@ -288,6 +291,7 @@
         <h2 id="detailName"></h2>
         <div class="shelf" id="detailShelf"></div>
         <button type="button" class="shelf-edit-link" id="shelfEditBtn">✏️ Edit item</button>
+        <div class="plu" id="detailPlu"></div>
         <div class="upc" id="detailUpc"></div>
       </div>
     </div>

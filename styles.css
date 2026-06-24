@@ -183,6 +183,16 @@ main { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 12px 90px
 /* ---------- Par level + UPC (in detail sheet) ---------- */
 .upc { font-size: .76rem; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
 .upc .upc-num { font-weight: 700; color: var(--ink); letter-spacing: .5px; }
+.plu { margin-top: 6px; }
+.plu:empty { display: none; }
+/* PLU label code — high-contrast pill so it's easy to read off while labeling */
+.plu-tag {
+  display: inline-flex; align-items: center; font-family: var(--font-head); font-weight: 800;
+  font-size: .72rem; letter-spacing: .5px; color: #fff; background: var(--fresh);
+  border-radius: 6px; padding: 1px 7px; font-variant-numeric: tabular-nums; vertical-align: middle;
+}
+.detail-head-text .plu-tag { font-size: .82rem; padding: 2px 9px; }
+.flip-list .plu-tag, .pull-name .plu-tag { margin-left: 4px; }
 
 .par-block { margin-top: 14px; }
 .par-block:empty { display: none; }
