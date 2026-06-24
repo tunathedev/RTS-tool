@@ -832,6 +832,16 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
   padding: 14px 12px calc(env(safe-area-inset-bottom, 0px) + 28px);
   display: flex; flex-direction: column; gap: 12px;
 }
+.fz-section {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 8px 2px 0; padding: 6px 4px 8px;
+  font-family: var(--font-head); font-weight: 800; font-size: .98rem; color: var(--ink);
+  border-bottom: 2px solid #cfd6df;
+}
+.fz-section:first-child { margin-top: 0; }
+.fz-section.done { opacity: .5; }
+.fz-section-name { min-width: 0; }
+.fz-section-count { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
 .fz-card {
   display: flex; align-items: center; gap: 14px; padding: 18px 16px; min-height: 92px;
   background: #fff; border: 1px solid var(--line); border-radius: 16px;

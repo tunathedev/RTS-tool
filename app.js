@@ -905,11 +905,25 @@ function renderFreezer() {
     list.innerHTML = '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
     return;
   }
-  // remaining first (in table order), then pulled, dimmed at the bottom
-  const remaining = ordered.filter((it) => !pullOf(it).done);
-  const pulled = ordered.filter((it) => pullOf(it).done);
+  // walk-the-freezer order: keep items in table/section order with light
+  // dividers; pulled items dim in place so you go straight down each section
+  const counts = new Map();
+  for (const it of ordered) {
+    const k = freezerGroupKey(it); const c = counts.get(k) || { t: 0, d: 0 };
+    c.t++; if (pullOf(it).done) c.d++; counts.set(k, c);
+  }
   const frag = document.createDocumentFragment();
-  for (const it of [...remaining, ...pulled]) {
+  let lastKey = null;
+  for (const it of ordered) {
+    const k = freezerGroupKey(it);
+    if (k !== lastKey) {
+      lastKey = k;
+      const c = counts.get(k);
+      const h = document.createElement('div');
+      h.className = 'fz-section' + (c.d === c.t ? ' done' : '');
+      h.innerHTML = `<span class="fz-section-name">🧊 ${escapeHtml(freezerGroupLabel(it))}</span><span class="fz-section-count">${c.d}/${c.t}</span>`;
+      frag.appendChild(h);
+    }
     const p = pullOf(it);
     const card = document.createElement('div');
     card.className = 'fz-card' + (p.done ? ' done' : '');
@@ -929,6 +943,11 @@ function renderFreezer() {
   }
   list.innerHTML = '';
   list.appendChild(frag);
+}
+function freezerGroupKey(it) { return it.holiday ? 's' + it._season : 't' + it._table; }
+function freezerGroupLabel(it) {
+  if (it.holiday) return (SEASON_EMOJI[it._season] || '🎉') + ' ' + (SEASON_NAME[it._season] || 'Seasonal');
+  return 'Table ' + it._table + ' · ' + (TABLE_NAME[it._table] || 'Other');
 }
 
 function pullListText() {
@@ -1830,6 +1849,8 @@ function switchTab(which) {
     $(tabId).setAttribute('aria-selected', String(on));
     $(viewId).hidden = !on;
   }
+  // entering the Pull List with items waiting jumps straight into Freezer Mode
+  if (which === 'list' && state.pull.length && $('freezerView').hidden) openFreezer();
 }
 
 /* Flip Book lives in a floating overlay (button stacked above Scan) */
