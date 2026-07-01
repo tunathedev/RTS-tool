@@ -1988,6 +1988,8 @@ function wireEvents() {
   $('sheetHoleBtn').addEventListener('click', () => { if (state.current) toggleHole(state.current.name); });
   $('copyBtn').addEventListener('click', copyOrShare);
   $('clearBtn').addEventListener('click', clearList);
+  $('a2hsClose').addEventListener('click', dismissInstall);
+  $('a2hsInstall').addEventListener('click', doInstall);
   $('freezerBtn').addEventListener('click', openFreezer);
   $('freezerExit').addEventListener('click', closeFreezer);
   $('wxRefresh').addEventListener('click', loadWeather);
@@ -2039,7 +2041,7 @@ function setupLock() {
   const PIN = '1905';
   const lock = $('lockScreen');
   if (!lock) return;
-  try { if (sessionStorage.getItem('rts.unlocked') === '1') { lock.hidden = true; return; } } catch {}
+  try { if (sessionStorage.getItem('rts.unlocked') === '1') { lock.hidden = true; setTimeout(maybeShowInstall, 1200); return; } } catch {}
   let entered = '';
   const renderDots = () => {
     [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < entered.length));
@@ -2052,6 +2054,7 @@ function setupLock() {
     if (entered === PIN) {
       try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
       lock.hidden = true;
+      setTimeout(maybeShowInstall, 1200);
     } else {
       $('lockError').textContent = 'Wrong PIN — try again';
       lock.classList.add('shake');
@@ -2160,6 +2163,57 @@ function showUpdateToast(reg) {
     else location.reload();
   };
 }
+/* ---------------- Add to Home Screen prompt ---------------- */
+const A2HS_KEY = 'rts.a2hs.dismissed';
+let deferredInstall = null;
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function iosSafari() { return isIOS() && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(navigator.userAgent); }
+function shareGlyph() {
+  return '<svg class="a2hs-share" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' +
+    '<path fill="currentColor" d="M12 3l4 4-1.4 1.4L13 6.8V15h-2V6.8L9.4 8.4 8 7l4-4z"/>' +
+    '<path fill="currentColor" d="M5 11h3v2H6v7h12v-7h-2v-2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z"/></svg>';
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredInstall = e;
+  const lock = $('lockScreen');
+  if (!lock || lock.hidden) maybeShowInstall();   // already unlocked → offer now
+});
+window.addEventListener('appinstalled', dismissInstall);
+
+function maybeShowInstall() {
+  const el = $('a2hs'); if (!el || !el.hidden) return;
+  if (isStandalone()) return;
+  try { if (localStorage.getItem(A2HS_KEY) === '1') return; } catch {}
+  const canInstall = !!deferredInstall;   // Android / desktop Chrome
+  const ios = iosSafari();                // iOS Safari → manual instructions
+  if (!canInstall && !ios) return;        // this browser can't add to home screen
+  if (canInstall) {
+    $('a2hsInstall').hidden = false;
+    $('a2hsSub').textContent = 'One tap to open it like an app — even offline.';
+  } else {
+    $('a2hsInstall').hidden = true;
+    $('a2hsSub').innerHTML = 'Tap ' + shareGlyph() + ' <b>Share</b>, then <b>Add to Home Screen</b>.';
+  }
+  el.hidden = false;
+  requestAnimationFrame(() => el.classList.add('show'));
+}
+function dismissInstall() {
+  try { localStorage.setItem(A2HS_KEY, '1'); } catch {}
+  const el = $('a2hs'); if (el) { el.classList.remove('show'); el.hidden = true; }
+}
+async function doInstall() {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  try { await deferredInstall.userChoice; } catch {}
+  deferredInstall = null;
+  dismissInstall();
+}
+
 if ('serviceWorker' in navigator) {
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {

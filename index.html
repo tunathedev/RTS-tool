@@ -17,6 +17,13 @@
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SA50 RTS" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>" />
 </head>
 <body>
@@ -368,6 +375,17 @@
   <div class="update-toast" id="updateToast" hidden>
     ⚡ New version ready
     <button type="button" id="updateReload">Reload</button>
+  </div>
+
+  <!-- first-time "Add to Home Screen" prompt -->
+  <div class="a2hs" id="a2hs" hidden>
+    <img class="a2hs-icon" src="icon-192.png" alt="" width="48" height="48" />
+    <div class="a2hs-text">
+      <div class="a2hs-title">Add SA50 RTS to your Home Screen</div>
+      <div class="a2hs-sub" id="a2hsSub">One tap to open it like an app — even offline.</div>
+    </div>
+    <button type="button" class="a2hs-install" id="a2hsInstall" hidden>Install</button>
+    <button type="button" class="a2hs-close" id="a2hsClose" aria-label="Not now">✕</button>
   </div>
 
   <script src="sync-config.js"></script>

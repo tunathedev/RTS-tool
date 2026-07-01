@@ -901,3 +901,29 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .product-item.hole { background: #fffdf3; box-shadow: inset 4px 0 0 #f59e0b; }
 .product-item.hole .name::before { content: '🕳️ '; }
 .add-btn { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+/* ---------- Add to Home Screen prompt ---------- */
+.a2hs {
+  position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  z-index: 1050; max-width: 520px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  padding: 12px 12px 12px 14px; box-shadow: 0 12px 34px rgba(0,0,0,.24);
+  transform: translateY(160%); transition: transform .3s ease;
+}
+.a2hs.show { transform: translateY(0); }
+.a2hs-icon { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 11px; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.a2hs-text { flex: 1; min-width: 0; }
+.a2hs-title { font-family: var(--font-head); font-weight: 800; font-size: .92rem; color: var(--ink); line-height: 1.2; }
+.a2hs-sub { font-size: .78rem; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.a2hs-sub b { color: var(--ink); }
+.a2hs-share { vertical-align: -3px; color: #2563eb; }
+.a2hs-install {
+  flex: 0 0 auto; border: none; background: var(--heb); color: #fff; border-radius: 999px;
+  font-family: var(--font-head); font-weight: 800; font-size: .84rem; padding: 10px 16px; cursor: pointer;
+}
+.a2hs-install:active { transform: scale(.97); }
+.a2hs-close {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; border: none;
+  background: #f1f2f4; color: var(--muted); font-size: .9rem; cursor: pointer;
+}
