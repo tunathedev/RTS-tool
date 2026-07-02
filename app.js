@@ -18,6 +18,8 @@ const LS_DISC = 'rts.hideDiscontinued';
 const LS_PROD = 'rts.production.v1';
 const LS_COMPBOX = 'rts.componentBox.v1';
 const LS_LOGINIT = 'rts.logInitials';
+const LS_PROFILES = 'rts.profiles.v1';
+const LS_ME = 'rts.me';
 
 const state = {
   data: null,
@@ -36,6 +38,8 @@ const state = {
   prod: {},           // production plan: id -> { make, done }
   compBox: {},        // component name -> items per box (for box-pull math)
   log: [],            // floor log entries: { id, ts, day, tag, by, note, img }
+  profiles: {},       // people: id -> { id, name, emoji, color, pin, createdAt }
+  me: null,           // the profile signed in on this device
 
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
@@ -1360,7 +1364,7 @@ let captureTag = 'leave';     // which button launched the camera
 function openFloorLog() {
   $('logView').hidden = false;
   document.body.classList.add('log-open');
-  try { $('logInitials').value = localStorage.getItem(LS_LOGINIT) || ''; } catch {}
+  try { $('logInitials').value = state.me ? initialsOf(state.me.name) : (localStorage.getItem(LS_LOGINIT) || ''); } catch {}
   loadFloorLog();
   renderFloorLog();
 }
@@ -2037,38 +2041,147 @@ function wireEvents() {
 }
 
 /* ---------------- PIN lock screen ---------------- */
-function setupLock() {
-  const PIN = '1905';
-  const lock = $('lockScreen');
-  if (!lock) return;
-  try { if (sessionStorage.getItem('rts.unlocked') === '1') { lock.hidden = true; setTimeout(maybeShowInstall, 1200); return; } } catch {}
-  let entered = '';
-  const renderDots = () => {
-    [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < entered.length));
-  };
-  function press(k) {
-    if (k === 'del') { entered = entered.slice(0, -1); $('lockError').textContent = ''; renderDots(); return; }
-    if (!/^[0-9]$/.test(k) || entered.length >= 4) return;
-    entered += k; renderDots();
-    if (entered.length < 4) return;
-    if (entered === PIN) {
-      try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
-      lock.hidden = true;
-      setTimeout(maybeShowInstall, 1200);
-    } else {
-      $('lockError').textContent = 'Wrong PIN — try again';
-      lock.classList.add('shake');
-      setTimeout(() => { lock.classList.remove('shake'); entered = ''; renderDots(); }, 450);
-    }
+/* ---------------- Profiles & login ---------------- */
+const ACCENTS = ['#E31837', '#2563eb', '#00857C', '#7c3aed', '#ea580c', '#16a34a', '#db2777', '#0891b2', '#475569', '#ca8a04'];
+const AVATARS = ['🤠', '🧑‍🍳', '🥖', '🧁', '🍰', '🍩', '🥐', '🎂', '🌮', '☕', '🌟', '🔥', '🦸', '🐺', '😎', '🚀'];
+
+function loadProfiles() {
+  try { state.profiles = JSON.parse(localStorage.getItem(LS_PROFILES) || '{}') || {}; } catch { state.profiles = {}; }
+}
+function saveProfiles(fromRemote) {
+  try { localStorage.setItem(LS_PROFILES, JSON.stringify(state.profiles)); } catch {}
+  if (!fromRemote) pushSync('profiles', state.profiles);
+}
+function initialsOf(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+// header identity + personal accent (accent touches only; HEB red stays the brand)
+function applyMe() {
+  const p = state.me;
+  const root = document.documentElement.style;
+  const av = $('meAvatar');
+  if (p) {
+    root.setProperty('--me', p.color);
+    av.hidden = false; av.textContent = p.emoji || initialsOf(p.name); av.style.background = p.color;
+    $('howdy').innerHTML = `Howdy, <b>${escapeHtml(p.name)}</b>!`;
+    try { localStorage.setItem(LS_ME, p.id); } catch {}
+    const li = $('logInitials'); if (li && !li.value) li.value = initialsOf(p.name);
+  } else {
+    root.removeProperty('--me');
+    av.hidden = true;
+    $('howdy').textContent = '🤠 Howdy, Partner!';
   }
-  $('lockKeys').addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (b) press(b.dataset.k);
+}
+
+let loginMode = 'login';   // 'login' | 'create'
+let loginTarget = null;    // profile being unlocked
+let loginDraft = null;     // { name, emoji, color } during create
+let pinEntered = '';
+
+function showLockScreen(id) { for (const s of ['lockRoster', 'lockSetup', 'lockPin']) $(s).hidden = (s !== id); }
+function renderRoster() {
+  const list = Object.values(state.profiles).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  $('rosterGrid').innerHTML = list.map((p) =>
+    `<button type="button" class="roster-tile" data-id="${p.id}">
+       <span class="roster-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span>
+       <span class="roster-name">${escapeHtml(p.name)}</span>
+     </button>`).join('');
+}
+function openRoster() {
+  if (!Object.keys(state.profiles).length) { openSetup(); return; }
+  renderRoster(); showLockScreen('lockRoster');
+}
+function openSetup() {
+  loginDraft = { name: '', emoji: AVATARS[0], color: ACCENTS[0] };
+  $('setupName').value = ''; $('setupError').textContent = '';
+  $('emojiGrid').innerHTML = AVATARS.map((e) => `<button type="button" class="emoji-opt${e === loginDraft.emoji ? ' on' : ''}" data-e="${e}">${e}</button>`).join('');
+  $('colorGrid').innerHTML = ACCENTS.map((c) => `<button type="button" class="color-opt${c === loginDraft.color ? ' on' : ''}" data-c="${c}" style="background:${c}" aria-label="color"></button>`).join('');
+  showLockScreen('lockSetup');
+  setTimeout(() => $('setupName').focus(), 60);
+}
+function beginPin(mode, p) {
+  loginMode = mode; pinEntered = ''; loginTarget = mode === 'login' ? p : null;
+  $('pinWho').innerHTML = `<span class="pin-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span> ${escapeHtml(p.name)}`;
+  $('pinPrompt').textContent = mode === 'login' ? 'Enter your PIN' : 'Create a 4-digit PIN';
+  $('lockError').textContent = ''; renderDots(); showLockScreen('lockPin');
+}
+function renderDots() { [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < pinEntered.length)); }
+function pinPress(k) {
+  if (k === 'del') { pinEntered = pinEntered.slice(0, -1); $('lockError').textContent = ''; renderDots(); return; }
+  if (!/^[0-9]$/.test(k) || pinEntered.length >= 4) return;
+  pinEntered += k; renderDots();
+  if (pinEntered.length < 4) return;
+  if (loginMode === 'login') {
+    if (pinEntered === loginTarget.pin) loginSuccess(loginTarget);
+    else pinError('Wrong PIN — try again');
+  } else {
+    const id = 'u_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+    const prof = { id, name: loginDraft.name, emoji: loginDraft.emoji, color: loginDraft.color, pin: pinEntered, createdAt: Date.now() };
+    state.profiles[id] = prof; saveProfiles();
+    loginSuccess(prof);
+  }
+}
+function pinError(msg) {
+  $('lockError').textContent = msg;
+  $('lockScreen').classList.add('shake');
+  setTimeout(() => { $('lockScreen').classList.remove('shake'); pinEntered = ''; renderDots(); }, 450);
+}
+function loginSuccess(profile) {
+  state.me = profile; applyMe();
+  try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
+  $('lockScreen').hidden = true;
+  setTimeout(maybeShowInstall, 1200);
+}
+function switchUser() {
+  try { sessionStorage.removeItem('rts.unlocked'); } catch {}
+  pinEntered = ''; $('lockScreen').hidden = false; openRoster();
+}
+
+function setupLock() {
+  const lock = $('lockScreen'); if (!lock) return;
+  loadProfiles();
+  $('lockKeys').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) pinPress(b.dataset.k); });
+  $('pinBack').addEventListener('click', openRoster);
+  $('rosterNew').addEventListener('click', openSetup);
+  $('setupBack').addEventListener('click', openRoster);
+  $('rosterGrid').addEventListener('click', (e) => {
+    const t = e.target.closest('.roster-tile'); if (!t) return;
+    const p = state.profiles[t.dataset.id]; if (p) beginPin('login', p);
   });
+  $('emojiGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('.emoji-opt'); if (!b) return;
+    loginDraft.emoji = b.dataset.e;
+    [...$('emojiGrid').children].forEach((x) => x.classList.toggle('on', x === b));
+  });
+  $('colorGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('.color-opt'); if (!b) return;
+    loginDraft.color = b.dataset.c;
+    [...$('colorGrid').children].forEach((x) => x.classList.toggle('on', x === b));
+  });
+  $('setupNext').addEventListener('click', () => {
+    const name = $('setupName').value.trim();
+    if (!name) { $('setupError').textContent = 'Enter your name'; return; }
+    loginDraft.name = name; beginPin('create', loginDraft);
+  });
+  $('meAvatar').addEventListener('click', switchUser);
   document.addEventListener('keydown', (e) => {
-    if (lock.hidden) return;
-    if (/^[0-9]$/.test(e.key)) press(e.key);
-    else if (e.key === 'Backspace') { e.preventDefault(); press('del'); }
+    if (lock.hidden || $('lockPin').hidden) return;
+    if (/^[0-9]$/.test(e.key)) pinPress(e.key);
+    else if (e.key === 'Backspace') { e.preventDefault(); pinPress('del'); }
   });
+
+  let meId = null, unlocked = false;
+  try { meId = localStorage.getItem(LS_ME); } catch {}
+  try { unlocked = sessionStorage.getItem('rts.unlocked') === '1'; } catch {}
+  if (unlocked && meId && state.profiles[meId]) {
+    state.me = state.profiles[meId]; applyMe();
+    lock.hidden = true; setTimeout(maybeShowInstall, 1200); return;
+  }
+  applyMe();
+  openRoster();
 }
 
 /* ---------------- Global sync (optional · Firebase Realtime DB) ----------------
@@ -2076,7 +2189,7 @@ function setupLock() {
  * sync of the catalog, pull list, production plan and case-pack sizes across
  * all devices. Until then everything stays device-only (localStorage). */
 const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {}, timers: {}, pending: {} };
-const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox'];
+const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox', 'profiles'];
 
 function setSyncStatus(t, level) {
   const el = $('syncStatus'); if (el) el.textContent = t;
@@ -2087,7 +2200,7 @@ function setSyncStatus(t, level) {
   pill.className = 'sync-pill' + (cls ? ' ' + cls : '');
   pill.hidden = !label;
 }
-function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : state.compBox; }
+function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : p === 'profiles' ? state.profiles : state.compBox; }
 function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
 
 // coalesce rapid writes per path (e.g. +/- qty bursts) into one network write
@@ -2127,6 +2240,14 @@ function onRemote(path, wrapper) {
       state.prod = data || {}; saveProduction(); renderProduction();
     } else if (path === 'compBox') {
       state.compBox = data || {}; saveCompBox(); renderProduction();
+    } else if (path === 'profiles') {
+      // remote wins on shared ids, but keep any local-only profile (e.g. just created)
+      state.profiles = Object.assign({}, state.profiles, data || {});
+      saveProfiles(true);
+      if (state.me && state.profiles[state.me.id]) { state.me = state.profiles[state.me.id]; applyMe(); }
+      if (!$('lockScreen').hidden) renderRoster();
+      const cloudKeys = Object.keys(data || {});
+      if (Object.keys(state.profiles).some((k) => !cloudKeys.includes(k))) setTimeout(() => pushSync('profiles', state.profiles), 50);
     }
   } finally { sync.applying = false; }
 }

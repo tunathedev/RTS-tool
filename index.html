@@ -27,35 +27,63 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>" />
 </head>
 <body>
-  <!-- PIN lock screen -->
+  <!-- Login / profile lock screen -->
   <div class="lock" id="lockScreen">
     <div class="lock-inner">
-      <div class="lock-title">SA50 RTS Ready</div>
-      <div class="lock-sub">Enter PIN</div>
-      <div class="lock-dots" id="lockDots"><span></span><span></span><span></span><span></span></div>
-      <div class="lock-error" id="lockError"></div>
-      <div class="lock-hint">Hint: the year the world's greatest operator opened</div>
-      <div class="lock-keys" id="lockKeys">
-        <button type="button" data-k="1">1</button>
-        <button type="button" data-k="2">2</button>
-        <button type="button" data-k="3">3</button>
-        <button type="button" data-k="4">4</button>
-        <button type="button" data-k="5">5</button>
-        <button type="button" data-k="6">6</button>
-        <button type="button" data-k="7">7</button>
-        <button type="button" data-k="8">8</button>
-        <button type="button" data-k="9">9</button>
-        <span class="lock-spacer"></span>
-        <button type="button" data-k="0">0</button>
-        <button type="button" data-k="del" class="lock-del" aria-label="Delete">⌫</button>
-      </div>
+      <div class="lock-brand">SA<span class="app-title-50">50</span> RTS Ready</div>
+
+      <!-- who's on shift -->
+      <section class="lock-screen" id="lockRoster" hidden>
+        <div class="lock-sub">Tap your name to clock in</div>
+        <div class="roster" id="rosterGrid"></div>
+        <button type="button" class="lock-new" id="rosterNew">＋ New profile</button>
+      </section>
+
+      <!-- create a profile -->
+      <section class="lock-screen" id="lockSetup" hidden>
+        <div class="lock-sub">Set up your profile</div>
+        <input type="text" id="setupName" class="lock-input" maxlength="16" placeholder="Your name" autocomplete="off" />
+        <div class="picker-label">Pick an avatar</div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+        <div class="picker-label">Pick your color</div>
+        <div class="color-grid" id="colorGrid"></div>
+        <div class="lock-error" id="setupError"></div>
+        <div class="setup-actions">
+          <button type="button" class="btn-ghost lock-ghost" id="setupBack">Back</button>
+          <button type="button" class="btn" id="setupNext">Next: set a PIN</button>
+        </div>
+      </section>
+
+      <!-- PIN pad -->
+      <section class="lock-screen" id="lockPin" hidden>
+        <div class="pin-who" id="pinWho"></div>
+        <div class="lock-sub" id="pinPrompt">Enter your PIN</div>
+        <div class="lock-dots" id="lockDots"><span></span><span></span><span></span><span></span></div>
+        <div class="lock-error" id="lockError"></div>
+        <div class="lock-keys" id="lockKeys">
+          <button type="button" data-k="1">1</button>
+          <button type="button" data-k="2">2</button>
+          <button type="button" data-k="3">3</button>
+          <button type="button" data-k="4">4</button>
+          <button type="button" data-k="5">5</button>
+          <button type="button" data-k="6">6</button>
+          <button type="button" data-k="7">7</button>
+          <button type="button" data-k="8">8</button>
+          <button type="button" data-k="9">9</button>
+          <span class="lock-spacer"></span>
+          <button type="button" data-k="0">0</button>
+          <button type="button" data-k="del" class="lock-del" aria-label="Delete">⌫</button>
+        </div>
+        <button type="button" class="lock-back" id="pinBack">‹ Back</button>
+      </section>
     </div>
   </div>
 
   <header class="topbar">
     <div class="topbar-inner">
+      <button type="button" class="me-avatar" id="meAvatar" aria-label="Switch user" hidden></button>
       <div class="brand-left">
-        <p class="howdy">🤠 Howdy, Partner!</p>
+        <p class="howdy" id="howdy">🤠 Howdy, Partner!</p>
         <h1 class="app-title">SA<span class="app-title-50">50</span> RTS Ready</h1>
         <span class="sync-pill" id="syncPill" hidden></span>
       </div>

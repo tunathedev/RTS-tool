@@ -14,6 +14,7 @@
   --bad: #cf1a2b;
   --radius: 14px;
   --maxw: 760px;
+  --me: var(--heb);   /* signed-in person's accent color (falls back to brand red) */
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-head: "Archivo", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -927,3 +928,56 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
   flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; border: none;
   background: #f1f2f4; color: var(--muted); font-size: .9rem; cursor: pointer;
 }
+
+/* ---------- Login / profiles ---------- */
+.lock-inner { max-width: 340px; }
+.lock-brand { font-family: var(--font-head); font-weight: 900; font-size: 1.5rem; margin-bottom: 20px; }
+.lock-brand .app-title-50 { font-size: 1.5rem; }
+.lock-screen { width: 100%; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+.lock.shake .lock-inner { animation: shake .42s; }
+
+/* roster */
+.roster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.roster-tile {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); border-radius: 14px;
+  padding: 12px 6px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.roster-tile:active { transform: scale(.96); }
+.roster-av {
+  width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.75rem; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+.roster-name { font-size: .78rem; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lock-new {
+  margin-top: 18px; width: 100%; background: #fff; color: var(--heb); border: none; border-radius: 999px;
+  font-family: var(--font-head); font-weight: 800; font-size: .92rem; padding: 13px 18px; cursor: pointer;
+}
+
+/* setup */
+.lock-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: none; font-size: 16px; }
+.picker-label { text-align: left; font-size: .74rem; font-weight: 800; letter-spacing: .3px; opacity: .92; margin: 14px 0 8px; }
+.emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; }
+.emoji-opt { background: rgba(255,255,255,.12); border: 2px solid transparent; border-radius: 11px; font-size: 1.3rem; padding: 6px 0; cursor: pointer; }
+.emoji-opt.on { border-color: #fff; background: rgba(255,255,255,.3); }
+.color-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.color-opt { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; }
+.color-opt.on { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.45); }
+.setup-actions { display: flex; gap: 10px; margin-top: 18px; }
+.setup-actions .btn { flex: 1; }
+.lock-ghost { background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+#setupError, #lockError { min-height: 18px; }
+
+/* pin */
+.pin-who { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; margin-bottom: 12px; }
+.pin-av { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.lock-back { margin-top: 16px; background: none; border: none; color: #fff; opacity: .85; font-size: .85rem; cursor: pointer; }
+
+/* header avatar */
+.me-avatar {
+  flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(255,255,255,.65);
+  color: #fff; font-size: 1.2rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+}
+.me-avatar:active { transform: scale(.94); }
+.howdy b { font-weight: 800; }
