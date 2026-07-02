@@ -40,6 +40,7 @@ const state = {
   log: [],            // floor log entries: { id, ts, day, tag, by, note, img }
   profiles: {},       // people: id -> { id, name, emoji, color, pin, createdAt }
   me: null,           // the profile signed in on this device
+  feed: {},           // shift feed posts: id -> { uid, name, emoji, color, type, text, photo?, ts, reactions }
 
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
@@ -843,6 +844,10 @@ function toggleDone(name) {
   p.done = !p.done;
   savePullList();
   renderPullList();
+  // narrate to the feed when the whole floor is set (once per completion)
+  const n = state.pull.length, done = state.pull.filter((x) => x.done).length;
+  if (n > 0 && done === n) { if (!floorSetAnnounced) { floorSetAnnounced = true; autoPost(`✅ set the floor — ${n} item${n === 1 ? '' : 's'} pulled`); } }
+  else floorSetAnnounced = false;
 }
 
 function toggleLabels(name) {
@@ -1449,6 +1454,8 @@ async function onLogFile(e) {
   $('logHint').textContent = sync.on ? 'Saved ✓' : '⚠︎ Saved on this device — will upload when sync connects.';
   if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/log/' + id), entry); } catch {} }
   renderFloorLog();
+  const tm = TAG_META[captureTag] || {};
+  autoPost(`${tm.emoji || '📸'} logged the ${tm.label || ''} floor photo`);
 }
 
 function deleteLogEntry(id) {
@@ -1587,6 +1594,148 @@ async function sharePhoto() {
   const a = document.createElement('a');
   a.href = viewerSrc; a.download = 'rts-floor.jpg';
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------------- Shift Feed (async team communication) ----------------
+ * Posts live under rts/feed/{id} (live-subscribed). Each post carries the
+ * author's identity denormalized so it renders without a lookup. Types:
+ * note / handoff / props, plus 'auto' posts the app writes to narrate wins. */
+const LS_FEEDREAD = 'rts.feedRead';
+const FEED_REACTS = ['👍', '❤️', '🔥', '👏'];
+const FEED_TYPE = { note: '📝 Note', handoff: '🤝 Handoff', props: '🎉 Props', auto: '' };
+let feedType = 'note';
+let feedPhotoData = null;
+let floorSetAnnounced = false;
+
+function onFeed(val) {
+  state.feed = val || {};
+  if (!$('feedView').hidden) renderFeed();
+  updateFeedBadge();
+}
+function feedPosts() { return Object.values(state.feed).sort((a, b) => b.ts - a.ts); }
+function updateFeedBadge() {
+  let last = 0; try { last = +localStorage.getItem(LS_FEEDREAD) || 0; } catch {}
+  const meId = state.me && state.me.id;
+  const n = feedPosts().filter((p) => p.ts > last && p.uid !== meId).length;
+  const b = $('feedBadge'); if (!b) return;
+  b.textContent = n > 9 ? '9+' : n; b.hidden = n === 0;
+}
+function markFeedRead() {
+  const posts = feedPosts();
+  const max = posts.length ? posts[0].ts : Date.now();
+  try { localStorage.setItem(LS_FEEDREAD, String(max)); } catch {}
+  updateFeedBadge();
+}
+function openFeed() {
+  $('feedView').hidden = false; document.body.classList.add('feed-open');
+  renderFeed(); markFeedRead();
+  setTimeout(() => $('feedText').focus(), 80);
+}
+function closeFeed() { $('feedView').hidden = true; document.body.classList.remove('feed-open'); }
+
+function timeAgo(ts) {
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (s < 60) return 'just now';
+  const m = Math.round(s / 60); if (m < 60) return m + 'm';
+  const h = Math.round(m / 60); if (h < 24) return h + 'h';
+  return Math.round(h / 24) + 'd';
+}
+function renderFeed() {
+  const tl = $('feedTimeline');
+  const posts = feedPosts();
+  if (!posts.length) {
+    tl.innerHTML = '<div class="feed-empty">💬 No posts yet.<br>Leave a note, a handoff, or props for the team.</div>';
+    return;
+  }
+  const meId = state.me && state.me.id;
+  const frag = document.createDocumentFragment();
+  for (const p of posts) {
+    const card = document.createElement('div');
+    card.className = 'feed-post' + (p.type === 'auto' ? ' auto' : '') + (p.type === 'props' ? ' props' : '');
+    const badge = FEED_TYPE[p.type] ? `<span class="feed-type-badge ${p.type}">${FEED_TYPE[p.type]}</span>` : '';
+    const reacts = FEED_REACTS.map((e) => {
+      const users = (p.reactions && p.reactions[e]) || {};
+      const n = Object.keys(users).length;
+      const mine = meId && users[meId];
+      return `<button type="button" class="feed-react${mine ? ' mine' : ''}" data-e="${e}">${e}${n ? ' ' + n : ''}</button>`;
+    }).join('');
+    card.innerHTML =
+      `<span class="feed-av" style="background:${p.color || 'var(--heb)'}">${p.emoji || '🙂'}</span>
+       <div class="feed-body">
+         <div class="feed-meta"><b>${escapeHtml(p.name || 'Someone')}</b> ${badge} <time>${timeAgo(p.ts)}</time></div>
+         ${p.text ? `<div class="feed-text">${escapeHtml(p.text)}</div>` : ''}
+         ${p.photo ? `<img class="feed-img" loading="lazy" src="${p.photo}" alt="" />` : ''}
+         <div class="feed-reacts">${reacts}</div>
+       </div>`;
+    if (p.photo) card.querySelector('.feed-img').addEventListener('click', () => openPhoto(p.photo));
+    card.querySelectorAll('.feed-react').forEach((b) => b.addEventListener('click', () => toggleReaction(p.id, b.dataset.e)));
+    frag.appendChild(card);
+  }
+  tl.innerHTML = ''; tl.appendChild(frag);
+}
+
+function newPostId() { return 'p_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
+function writeFeed(post) {
+  state.feed[post.id] = post;                 // optimistic
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/feed/' + post.id), post); } catch {} }
+}
+function submitPost() {
+  const text = ($('feedText').value || '').trim();
+  if (!text && !feedPhotoData) return;
+  if (!state.me) { alert('Pick your profile first (tap your avatar).'); return; }
+  const p = state.me;
+  const post = { id: newPostId(), uid: p.id, name: p.name, emoji: p.emoji, color: p.color, type: feedType, ts: Date.now() };
+  if (text) post.text = text;
+  if (feedPhotoData) post.photo = feedPhotoData;
+  writeFeed(post);
+  $('feedText').value = ''; feedPhotoData = null; $('feedPhotoPreview').hidden = true; $('feedPhotoPreview').innerHTML = '';
+  setFeedType('note');
+  renderFeed(); markFeedRead();
+}
+// app-written posts that narrate wins (attributed to the current user)
+function autoPost(text) {
+  if (!state.me || !sync.on) return;
+  const p = state.me;
+  writeFeed({ id: newPostId(), uid: p.id, name: p.name, emoji: p.emoji, color: p.color, type: 'auto', text, ts: Date.now() });
+  if (!$('feedView').hidden) renderFeed();
+  updateFeedBadge();
+}
+function toggleReaction(postId, emoji) {
+  const post = state.feed[postId]; if (!post || !state.me) return;
+  post.reactions = post.reactions || {};
+  const map = post.reactions[emoji] = post.reactions[emoji] || {};
+  if (map[state.me.id]) delete map[state.me.id]; else map[state.me.id] = true;
+  const val = Object.keys(map).length ? map : null;
+  if (!val) delete post.reactions[emoji];
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/feed/' + postId + '/reactions/' + emoji), val); } catch {} }
+  renderFeed();
+}
+function setFeedType(t) {
+  feedType = t;
+  $('feedTypes').querySelectorAll('.feed-type').forEach((b) => b.classList.toggle('on', b.dataset.type === t));
+}
+async function onFeedFile(e) {
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  try { feedPhotoData = await compressPhoto(file); } catch { return; }
+  const pv = $('feedPhotoPreview');
+  pv.hidden = false;
+  pv.innerHTML = `<img src="${feedPhotoData}" alt=""/><button type="button" class="feed-photo-x" aria-label="Remove photo">✕</button>`;
+  pv.querySelector('.feed-photo-x').addEventListener('click', () => { feedPhotoData = null; pv.hidden = true; pv.innerHTML = ''; });
+}
+function compressPhoto(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const ow = img.naturalWidth || 1000, oh = img.naturalHeight || 1000;
+      const s = Math.min(1, 1000 / ow), w = Math.round(ow * s), h = Math.round(oh * s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      try { res(c.toDataURL('image/jpeg', 0.6)); } catch (err) { rej(err); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('load')); };
+    img.src = url;
+  });
 }
 
 /* ---------------- date + freshness ---------------- */
@@ -1996,6 +2145,14 @@ function wireEvents() {
   $('a2hsInstall').addEventListener('click', doInstall);
   $('freezerBtn').addEventListener('click', openFreezer);
   $('freezerExit').addEventListener('click', closeFreezer);
+  // shift feed
+  $('feedBtn').addEventListener('click', openFeed);
+  $('feedClose').addEventListener('click', closeFeed);
+  $('feedSend').addEventListener('click', submitPost);
+  $('feedText').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submitPost(); } });
+  $('feedTypes').addEventListener('click', (e) => { const b = e.target.closest('.feed-type'); if (b) setFeedType(b.dataset.type); });
+  $('feedPhoto').addEventListener('click', () => { $('feedFile').value = ''; $('feedFile').click(); });
+  $('feedFile').addEventListener('change', onFeedFile);
   $('wxRefresh').addEventListener('click', loadWeather);
   $('wxToggle').addEventListener('click', toggleWeather);
   $('wxChip').addEventListener('click', toggleWeather);
@@ -2031,6 +2188,7 @@ function wireEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('photoViewer').hidden) closePhoto();
+    else if (!$('feedView').hidden) closeFeed();
     else if (!$('freezerView').hidden) closeFreezer();
     else if (!$('scanModal').hidden) closeScanner();
     else if (!$('itemEditor').hidden) cancelItemEditor();
@@ -2264,6 +2422,7 @@ async function initSync() {
     await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
+    dbMod.onValue(dbMod.ref(sync.db, 'rts/feed'), (snap) => onFeed(snap.val()));   // live shift feed
     if (logPendingLoad && !$('logView').hidden) { logPendingLoad = false; loadFloorLog(); renderFloorLog(); }
     setSyncStatus('☁︎ Global sync on', 'on');
   } catch (e) {
