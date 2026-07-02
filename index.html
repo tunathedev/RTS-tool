@@ -254,19 +254,29 @@
     </div>
   </div>
 
-  <!-- SHIFT FEED overlay (async team communication) -->
-  <div class="feed-overlay" id="feedView" role="dialog" aria-modal="true" aria-label="Shift feed" hidden>
+  <!-- SHIFT HUB overlay (feed · board · you) -->
+  <div class="feed-overlay" id="feedView" role="dialog" aria-modal="true" aria-label="Shift hub" hidden>
     <div class="feed-head">
-      <span class="flip-title">💬 Shift Feed</span>
-      <button type="button" class="flip-close" id="feedClose" aria-label="Close feed">✕</button>
+      <span class="flip-title">💬 Shift</span>
+      <button type="button" class="flip-close" id="feedClose" aria-label="Close">✕</button>
     </div>
-    <div class="feed-timeline" id="feedTimeline"></div>
-    <div class="feed-composer">
+    <div class="hub-tabs" id="hubTabs">
+      <button type="button" class="hub-tab on" data-hub="feed">Feed</button>
+      <button type="button" class="hub-tab" data-hub="board">Board</button>
+      <button type="button" class="hub-tab" data-hub="you">You</button>
+    </div>
+    <div class="hub-scroll" id="hubScroll">
+      <div class="feed-timeline" id="feedTimeline"></div>
+      <div class="hub-view" id="boardView" hidden></div>
+      <div class="hub-view" id="youView" hidden></div>
+    </div>
+    <div class="feed-composer" id="feedComposer">
       <div class="feed-types" id="feedTypes">
         <button type="button" class="feed-type on" data-type="note">📝 Note</button>
         <button type="button" class="feed-type" data-type="handoff">🤝 Handoff</button>
         <button type="button" class="feed-type" data-type="props">🎉 Props</button>
       </div>
+      <select id="feedTarget" class="feed-target" hidden aria-label="Props to"></select>
       <div class="feed-photo-preview" id="feedPhotoPreview" hidden></div>
       <div class="feed-input-row">
         <button type="button" class="feed-photo" id="feedPhoto" aria-label="Add photo">📷</button>

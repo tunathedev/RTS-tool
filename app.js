@@ -41,6 +41,7 @@ const state = {
   profiles: {},       // people: id -> { id, name, emoji, color, pin, createdAt }
   me: null,           // the profile signed in on this device
   feed: {},           // shift feed posts: id -> { uid, name, emoji, color, type, text, photo?, ts, reactions }
+  tasks: {},          // claimable to-dos: id -> { id, text, by, byName, claimedBy, claimedName, done, ts }
 
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
@@ -1609,7 +1610,7 @@ let floorSetAnnounced = false;
 
 function onFeed(val) {
   state.feed = val || {};
-  if (!$('feedView').hidden) renderFeed();
+  refreshHub();
   updateFeedBadge();
 }
 function feedPosts() { return Object.values(state.feed).sort((a, b) => b.ts - a.ts); }
@@ -1628,8 +1629,7 @@ function markFeedRead() {
 }
 function openFeed() {
   $('feedView').hidden = false; document.body.classList.add('feed-open');
-  renderFeed(); markFeedRead();
-  setTimeout(() => $('feedText').focus(), 80);
+  setHub('feed'); markFeedRead();
 }
 function closeFeed() { $('feedView').hidden = true; document.body.classList.remove('feed-open'); }
 
@@ -1662,7 +1662,7 @@ function renderFeed() {
     card.innerHTML =
       `<span class="feed-av" style="background:${p.color || 'var(--heb)'}">${p.emoji || '🙂'}</span>
        <div class="feed-body">
-         <div class="feed-meta"><b>${escapeHtml(p.name || 'Someone')}</b> ${badge} <time>${timeAgo(p.ts)}</time></div>
+         <div class="feed-meta"><b>${escapeHtml(p.name || 'Someone')}</b> ${badge}${p.target && p.targetName ? ' → <b>' + escapeHtml(p.targetName) + '</b>' : ''} <time>${timeAgo(p.ts)}</time></div>
          ${p.text ? `<div class="feed-text">${escapeHtml(p.text)}</div>` : ''}
          ${p.photo ? `<img class="feed-img" loading="lazy" src="${p.photo}" alt="" />` : ''}
          <div class="feed-reacts">${reacts}</div>
@@ -1687,6 +1687,7 @@ function submitPost() {
   const post = { id: newPostId(), uid: p.id, name: p.name, emoji: p.emoji, color: p.color, type: feedType, ts: Date.now() };
   if (text) post.text = text;
   if (feedPhotoData) post.photo = feedPhotoData;
+  if (feedType === 'props') { const tv = $('feedTarget').value; if (tv && state.profiles[tv]) { post.target = tv; post.targetName = state.profiles[tv].name; } }
   writeFeed(post);
   $('feedText').value = ''; feedPhotoData = null; $('feedPhotoPreview').hidden = true; $('feedPhotoPreview').innerHTML = '';
   setFeedType('note');
@@ -1713,6 +1714,8 @@ function toggleReaction(postId, emoji) {
 function setFeedType(t) {
   feedType = t;
   $('feedTypes').querySelectorAll('.feed-type').forEach((b) => b.classList.toggle('on', b.dataset.type === t));
+  const tgt = $('feedTarget');
+  if (t === 'props') { populateFeedTarget(); tgt.hidden = false; } else { tgt.hidden = true; }
 }
 async function onFeedFile(e) {
   const file = e.target.files && e.target.files[0]; if (!file) return;
@@ -1736,6 +1739,141 @@ function compressPhoto(file) {
     img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('load')); };
     img.src = url;
   });
+}
+
+/* ---------------- Shift Hub: Board, You, Tasks ---------------- */
+let hubView = 'feed';
+function refreshHub() {
+  if ($('feedView').hidden) return;
+  if (hubView === 'feed') renderFeed(); else if (hubView === 'board') renderBoard(); else renderYou();
+}
+function setHub(which) {
+  hubView = which;
+  $('hubTabs').querySelectorAll('.hub-tab').forEach((b) => b.classList.toggle('on', b.dataset.hub === which));
+  $('feedTimeline').hidden = which !== 'feed';
+  $('boardView').hidden = which !== 'board';
+  $('youView').hidden = which !== 'you';
+  $('feedComposer').style.display = which === 'feed' ? '' : 'none';
+  refreshHub();
+}
+function startOfToday() { return stripTime(new Date()).getTime(); }
+function profileName(uid) { const p = state.profiles[uid]; return p ? p.name : null; }
+function avatarHtml(uidOrProfile, cls) {
+  const p = typeof uidOrProfile === 'string' ? state.profiles[uidOrProfile] : uidOrProfile;
+  if (!p) return '';
+  return `<span class="hub-av ${cls || ''}" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span>`;
+}
+
+/* tasks */
+function onTasks(val) { state.tasks = val || {}; if (!$('feedView').hidden && hubView === 'board') renderBoard(); }
+function newTaskId() { return 't_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
+function writeTask(t) { state.tasks[t.id] = t; if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/tasks/' + t.id), t); } catch {} } }
+function addTask(text) {
+  if (!text || !text.trim() || !state.me) return;
+  writeTask({ id: newTaskId(), text: text.trim(), by: state.me.id, byName: state.me.name, claimedBy: null, claimedName: null, done: false, ts: Date.now() });
+  renderBoard();
+}
+function claimTask(id) {
+  const t = state.tasks[id]; if (!t || !state.me) return;
+  if (t.claimedBy === state.me.id) { t.claimedBy = null; t.claimedName = null; }
+  else { t.claimedBy = state.me.id; t.claimedName = state.me.name; }
+  writeTask(t); renderBoard();
+}
+function toggleTask(id) {
+  const t = state.tasks[id]; if (!t) return;
+  t.done = !t.done;
+  if (t.done && state.me && !t.claimedBy) { t.claimedBy = state.me.id; t.claimedName = state.me.name; }
+  writeTask(t); renderBoard();
+}
+function deleteTask(id) {
+  delete state.tasks[id];
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/tasks/' + id), null); } catch {} }
+  renderBoard();
+}
+
+function renderBoard() {
+  const el = $('boardView');
+  const today = startOfToday();
+  const todays = feedPosts().filter((p) => p.ts >= today);
+  const activeIds = [...new Set(todays.map((p) => p.uid))].filter((id) => state.profiles[id]);
+  const active = activeIds.length
+    ? activeIds.map((id) => `<div class="hub-person">${avatarHtml(id)}<span>${escapeHtml(state.profiles[id].name)}</span></div>`).join('')
+    : '<div class="hub-dim">No posts yet today.</div>';
+  const holes = state.pull.filter((p) => p.hole && !p.done).length;
+  const handoffs = todays.filter((p) => p.type === 'handoff').length;
+  const meId = state.me && state.me.id;
+  const tasks = Object.values(state.tasks).sort((a, b) => (a.done - b.done) || (b.ts - a.ts));
+  const taskRows = tasks.length ? tasks.map((t) => {
+    const claim = t.claimedBy ? `<span class="task-claim">${escapeHtml(t.claimedName || 'claimed')}</span>` : '';
+    return `<div class="task-row${t.done ? ' done' : ''}">
+      <button type="button" class="task-check${t.done ? ' on' : ''}" data-id="${t.id}" aria-label="Done">${t.done ? '✓' : ''}</button>
+      <div class="task-main"><div class="task-text">${escapeHtml(t.text)}</div><div class="task-sub">${escapeHtml(t.byName || '')}${claim ? ' · ' + claim : ''}</div></div>
+      ${t.done ? '' : `<button type="button" class="task-claimbtn${t.claimedBy === meId ? ' mine' : ''}" data-claim="${t.id}">${t.claimedBy === meId ? 'Drop' : 'Claim'}</button>`}
+      <button type="button" class="task-del" data-del="${t.id}" aria-label="Delete">🗑️</button>
+    </div>`;
+  }).join('') : '<div class="hub-dim">No tasks yet — add one below.</div>';
+
+  el.innerHTML =
+    `<div class="hub-card"><div class="hub-h">On shift today</div><div class="hub-people">${active}</div></div>
+     <div class="hub-card"><div class="hub-h">Open work</div>
+       <div class="hub-stats">
+         <div class="hub-stat"><b>${holes}</b><span>🕳️ holes to fill</span></div>
+         <div class="hub-stat"><b>${handoffs}</b><span>🤝 handoffs today</span></div>
+       </div></div>
+     <div class="hub-card"><div class="hub-h">Tasks</div>
+       <div class="task-list">${taskRows}</div>
+       <div class="task-add"><input type="text" id="taskInput" placeholder="Add a task…" autocomplete="off" /><button type="button" id="taskAdd">Add</button></div>
+     </div>`;
+  el.querySelectorAll('.task-check').forEach((b) => b.addEventListener('click', () => toggleTask(b.dataset.id)));
+  el.querySelectorAll('.task-claimbtn').forEach((b) => b.addEventListener('click', () => claimTask(b.dataset.claim)));
+  el.querySelectorAll('.task-del').forEach((b) => b.addEventListener('click', () => { if (confirm('Delete this task?')) deleteTask(b.dataset.del); }));
+  const ti = $('taskInput'), ta = $('taskAdd');
+  if (ta) ta.addEventListener('click', () => addTask(ti.value));
+  if (ti) ti.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTask(ti.value); } });
+}
+
+function reactionCount(p) { let n = 0; for (const e in (p.reactions || {})) n += Object.keys(p.reactions[e]).length; return n; }
+function renderYou() {
+  const el = $('youView');
+  if (!state.me) { el.innerHTML = '<div class="hub-dim">Sign in to see your day.</div>'; return; }
+  const me = state.me, today = startOfToday(), week = today - 6 * 86400000;
+  const posts = feedPosts();
+  const mine = posts.filter((p) => p.uid === me.id);
+  const mineToday = mine.filter((p) => p.ts >= today);
+  const floorSets = mineToday.filter((p) => p.type === 'auto' && /set the floor/i.test(p.text || '')).length;
+  const photos = mineToday.filter((p) => p.type === 'auto' && /floor photo/i.test(p.text || '')).length;
+  const shared = mineToday.filter((p) => p.type !== 'auto').length;
+  const propsRx = posts.filter((p) => p.ts >= today && p.type === 'props' && p.target === me.id).length;
+  const reactsRx = mineToday.reduce((s, p) => s + reactionCount(p), 0);
+  const days = new Set(mine.filter((p) => p.type === 'auto' && /set the floor/i.test(p.text || '')).map((p) => toISO(new Date(p.ts))));
+  let streak = 0, d = new Date();
+  if (!days.has(toISO(d))) d = addDays(d, -1);   // yesterday still counts today
+  while (days.has(toISO(d))) { streak++; d = addDays(d, -1); }
+  const lb = {};
+  for (const p of posts) if (p.ts >= week && p.type === 'props' && p.target) lb[p.target] = (lb[p.target] || 0) + 1;
+  const board = Object.entries(lb).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([uid, n]) => `<div class="hub-person">${avatarHtml(uid)}<span>${escapeHtml(profileName(uid) || '—')}</span><b>${n} 🎉</b></div>`).join('')
+    || '<div class="hub-dim">No props yet this week — be the first to give some.</div>';
+
+  el.innerHTML =
+    `<div class="hub-card you-hero">${avatarHtml(me, 'big')}
+       <div><div class="you-name">${escapeHtml(me.name)}</div><div class="you-streak">🔥 ${streak}-day floor streak</div></div></div>
+     <div class="hub-card"><div class="hub-h">Your day</div>
+       <div class="hub-stats wrap">
+         <div class="hub-stat"><b>${floorSets}</b><span>🧊 floors set</span></div>
+         <div class="hub-stat"><b>${photos}</b><span>📸 photos</span></div>
+         <div class="hub-stat"><b>${shared}</b><span>💬 posts</span></div>
+         <div class="hub-stat"><b>${propsRx}</b><span>🎉 props got</span></div>
+         <div class="hub-stat"><b>${reactsRx}</b><span>👏 reactions</span></div>
+       </div></div>
+     <div class="hub-card"><div class="hub-h">Props this week</div><div class="hub-people col">${board}</div></div>`;
+}
+
+function populateFeedTarget() {
+  const meId = state.me && state.me.id;
+  const opts = Object.values(state.profiles).filter((p) => p.id !== meId)
+    .map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+  $('feedTarget').innerHTML = '<option value="">Props to… (everyone)</option>' + opts;
 }
 
 /* ---------------- date + freshness ---------------- */
@@ -2151,6 +2289,7 @@ function wireEvents() {
   $('feedSend').addEventListener('click', submitPost);
   $('feedText').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submitPost(); } });
   $('feedTypes').addEventListener('click', (e) => { const b = e.target.closest('.feed-type'); if (b) setFeedType(b.dataset.type); });
+  $('hubTabs').addEventListener('click', (e) => { const b = e.target.closest('.hub-tab'); if (b) setHub(b.dataset.hub); });
   $('feedPhoto').addEventListener('click', () => { $('feedFile').value = ''; $('feedFile').click(); });
   $('feedFile').addEventListener('change', onFeedFile);
   $('wxRefresh').addEventListener('click', loadWeather);
@@ -2423,6 +2562,7 @@ async function initSync() {
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
     dbMod.onValue(dbMod.ref(sync.db, 'rts/feed'), (snap) => onFeed(snap.val()));   // live shift feed
+    dbMod.onValue(dbMod.ref(sync.db, 'rts/tasks'), (snap) => onTasks(snap.val())); // live tasks
     if (logPendingLoad && !$('logView').hidden) { logPendingLoad = false; loadFloorLog(); renderFloorLog(); }
     setSyncStatus('☁︎ Global sync on', 'on');
   } catch (e) {
