@@ -2339,6 +2339,7 @@ function wireEvents() {
 
 /* ---------------- PIN lock screen ---------------- */
 /* ---------------- Profiles & login ---------------- */
+const MASTER_PIN = '1905';   // default/master PIN — always unlocks any profile (fallback for a forgotten PIN)
 const ACCENTS = ['#E31837', '#2563eb', '#00857C', '#7c3aed', '#ea580c', '#16a34a', '#db2777', '#0891b2', '#475569', '#ca8a04'];
 const AVATARS = ['🤠', '🧑‍🍳', '🥖', '🧁', '🍰', '🍩', '🥐', '🎂', '🌮', '☕', '🌟', '🔥', '🦸', '🐺', '😎', '🚀'];
 
@@ -2412,7 +2413,7 @@ function pinPress(k) {
   pinEntered += k; renderDots();
   if (pinEntered.length < 4) return;
   if (loginMode === 'login') {
-    if (pinEntered === loginTarget.pin) loginSuccess(loginTarget);
+    if (pinEntered === loginTarget.pin || pinEntered === MASTER_PIN) loginSuccess(loginTarget);
     else pinError('Wrong PIN — try again');
   } else {
     const id = 'u_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
