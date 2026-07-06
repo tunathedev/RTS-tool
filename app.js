@@ -2374,23 +2374,21 @@ function applyMe() {
   }
 }
 
-let loginMode = 'login';   // 'login' | 'create'
-let loginTarget = null;    // profile being unlocked
-let loginDraft = null;     // { name, emoji, color } during create
+let loginMode = 'identify';   // 'identify' (type your PIN) | 'create' (set a new PIN)
+let loginDraft = null;        // { name, emoji, color } during create
 let pinEntered = '';
 
 function showLockScreen(id) { for (const s of ['lockRoster', 'lockSetup', 'lockPin']) $(s).hidden = (s !== id); }
-function renderRoster() {
-  const list = Object.values(state.profiles).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-  $('rosterGrid').innerHTML = list.map((p) =>
-    `<button type="button" class="roster-tile" data-id="${p.id}">
-       <span class="roster-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span>
-       <span class="roster-name">${escapeHtml(p.name)}</span>
-     </button>`).join('');
-}
-function openRoster() {
-  if (!Object.keys(state.profiles).length) { openSetup(); return; }
-  renderRoster(); showLockScreen('lockRoster');
+function renderDots() { [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < pinEntered.length)); }
+
+// primary screen: just type your PIN, it identifies you
+function openPin() {
+  loginMode = 'identify'; pinEntered = '';
+  $('pinWho').hidden = true; $('pinWho').innerHTML = '';
+  $('pinPrompt').textContent = 'Enter your PIN';
+  $('lockError').textContent = '';
+  $('pinBack').hidden = true; $('pinNew').hidden = false;
+  renderDots(); showLockScreen('lockPin');
 }
 function openSetup() {
   loginDraft = { name: '', emoji: AVATARS[0], color: ACCENTS[0] };
@@ -2400,22 +2398,46 @@ function openSetup() {
   showLockScreen('lockSetup');
   setTimeout(() => $('setupName').focus(), 60);
 }
-function beginPin(mode, p) {
-  loginMode = mode; pinEntered = ''; loginTarget = mode === 'login' ? p : null;
+function beginCreatePin() {
+  loginMode = 'create'; pinEntered = '';
+  const p = loginDraft;
+  $('pinWho').hidden = false;
   $('pinWho').innerHTML = `<span class="pin-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span> ${escapeHtml(p.name)}`;
-  $('pinPrompt').textContent = mode === 'login' ? 'Enter your PIN' : 'Create a 4-digit PIN';
-  $('lockError').textContent = ''; renderDots(); showLockScreen('lockPin');
+  $('pinPrompt').textContent = 'Create a 4-digit PIN';
+  $('lockError').textContent = '';
+  $('pinBack').hidden = false; $('pinNew').hidden = true;
+  renderDots(); showLockScreen('lockPin');
 }
-function renderDots() { [...$('lockDots').children].forEach((d, i) => d.classList.toggle('on', i < pinEntered.length)); }
+// master 1905 → pick who you are (fallback for a forgotten PIN)
+function renderRoster() {
+  const list = Object.values(state.profiles).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  $('rosterGrid').innerHTML = list.map((p) =>
+    `<button type="button" class="roster-tile" data-id="${p.id}">
+       <span class="roster-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span>
+       <span class="roster-name">${escapeHtml(p.name)}</span>
+     </button>`).join('');
+}
+function openRoster() { renderRoster(); showLockScreen('lockRoster'); }
+
 function pinPress(k) {
   if (k === 'del') { pinEntered = pinEntered.slice(0, -1); $('lockError').textContent = ''; renderDots(); return; }
   if (!/^[0-9]$/.test(k) || pinEntered.length >= 4) return;
   pinEntered += k; renderDots();
   if (pinEntered.length < 4) return;
-  if (loginMode === 'login') {
-    if (pinEntered === loginTarget.pin || pinEntered === MASTER_PIN) loginSuccess(loginTarget);
-    else pinError('Wrong PIN — try again');
+  if (loginMode === 'identify') {
+    const match = Object.values(state.profiles).find((p) => p.pin === pinEntered);
+    if (match) { loginSuccess(match); return; }
+    if (pinEntered === MASTER_PIN) {   // master fallback → choose your name
+      if (Object.keys(state.profiles).length) { pinEntered = ''; renderDots(); openRoster(); }
+      else { pinEntered = ''; renderDots(); openSetup(); }
+      return;
+    }
+    pinError('PIN not recognized');
   } else {
+    // create mode: PINs must be unique so they can identify a person
+    if (Object.values(state.profiles).some((p) => p.pin === pinEntered) || pinEntered === MASTER_PIN) {
+      pinError('That PIN is taken — pick another'); return;
+    }
     const id = 'u_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
     const prof = { id, name: loginDraft.name, emoji: loginDraft.emoji, color: loginDraft.color, pin: pinEntered, createdAt: Date.now() };
     state.profiles[id] = prof; saveProfiles();
@@ -2435,19 +2457,21 @@ function loginSuccess(profile) {
 }
 function switchUser() {
   try { sessionStorage.removeItem('rts.unlocked'); } catch {}
-  pinEntered = ''; $('lockScreen').hidden = false; openRoster();
+  $('lockScreen').hidden = false; openPin();
 }
 
 function setupLock() {
   const lock = $('lockScreen'); if (!lock) return;
   loadProfiles();
   $('lockKeys').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) pinPress(b.dataset.k); });
-  $('pinBack').addEventListener('click', openRoster);
+  $('pinNew').addEventListener('click', openSetup);
+  $('pinBack').addEventListener('click', () => showLockScreen('lockSetup'));   // back to editing the new profile
   $('rosterNew').addEventListener('click', openSetup);
-  $('setupBack').addEventListener('click', openRoster);
+  $('rosterBack').addEventListener('click', openPin);
+  $('setupBack').addEventListener('click', openPin);
   $('rosterGrid').addEventListener('click', (e) => {
     const t = e.target.closest('.roster-tile'); if (!t) return;
-    const p = state.profiles[t.dataset.id]; if (p) beginPin('login', p);
+    const p = state.profiles[t.dataset.id]; if (p) loginSuccess(p);   // master already authorized via 1905
   });
   $('emojiGrid').addEventListener('click', (e) => {
     const b = e.target.closest('.emoji-opt'); if (!b) return;
@@ -2462,7 +2486,7 @@ function setupLock() {
   $('setupNext').addEventListener('click', () => {
     const name = $('setupName').value.trim();
     if (!name) { $('setupError').textContent = 'Enter your name'; return; }
-    loginDraft.name = name; beginPin('create', loginDraft);
+    loginDraft.name = name; beginCreatePin();
   });
   $('meAvatar').addEventListener('click', switchUser);
   document.addEventListener('keydown', (e) => {
@@ -2479,7 +2503,7 @@ function setupLock() {
     lock.hidden = true; setTimeout(maybeShowInstall, 1200); return;
   }
   applyMe();
-  openRoster();
+  if (Object.keys(state.profiles).length) openPin(); else openSetup();
 }
 
 /* ---------------- Global sync (optional · Firebase Realtime DB) ----------------

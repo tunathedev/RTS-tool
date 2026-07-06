@@ -32,11 +32,12 @@
     <div class="lock-inner">
       <div class="lock-brand">SA<span class="app-title-50">50</span> RTS Ready</div>
 
-      <!-- who's on shift -->
+      <!-- master (1905) fallback: pick who you are -->
       <section class="lock-screen" id="lockRoster" hidden>
-        <div class="lock-sub">Tap your name to clock in</div>
+        <div class="lock-sub">Tap your name</div>
         <div class="roster" id="rosterGrid"></div>
         <button type="button" class="lock-new" id="rosterNew">＋ New profile</button>
+        <button type="button" class="lock-back" id="rosterBack">‹ Back</button>
       </section>
 
       <!-- create a profile -->
@@ -74,7 +75,10 @@
           <button type="button" data-k="0">0</button>
           <button type="button" data-k="del" class="lock-del" aria-label="Delete">⌫</button>
         </div>
-        <button type="button" class="lock-back" id="pinBack">‹ Back</button>
+        <div class="pin-foot">
+          <button type="button" class="lock-back" id="pinBack" hidden>‹ Back</button>
+          <button type="button" class="lock-new-link" id="pinNew">＋ New profile</button>
+        </div>
       </section>
     </div>
   </div>
