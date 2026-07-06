@@ -488,7 +488,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "plu": "32336"
         },
         {
           "name": "Coffee Cake Strawberry Cheese",
@@ -733,7 +734,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "plu": "28380"
         },
         {
           "name": "Half Lemon Crème Cake",
@@ -757,7 +759,8 @@
             "tall": 3,
             "wide": 2,
             "deep": 1
-          }
+          },
+          "plu": "28379"
         },
         {
           "name": "Half Strawberry Crème Cake",
@@ -769,7 +772,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "plu": "28378"
         }
       ]
     },
@@ -1305,7 +1309,8 @@
             "tall": 4,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "plu": "32173"
         },
         {
           "name": "Cookies Oatmeal Raisin 18 ct",
@@ -1317,7 +1322,8 @@
             "tall": 4,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "plu": "32162"
         },
         {
           "name": "Madeleines Original",
@@ -1353,7 +1359,8 @@
             "tall": 4,
             "wide": 1,
             "deep": 2
-          }
+          },
+          "plu": "32192"
         },
         {
           "name": "Cookies Sugar 18 ct",
@@ -1365,7 +1372,8 @@
             "tall": 4,
             "wide": 2,
             "deep": 2
-          }
+          },
+          "plu": "32124"
         },
         {
           "name": "Cookies Red Frosted",
@@ -1396,7 +1404,8 @@
             "tall": 4,
             "wide": 4,
             "deep": 2
-          }
+          },
+          "plu": "32094"
         },
         {
           "name": "Cookies Snickerdoodle",
@@ -1750,7 +1759,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 3
-          }
+          },
+          "plu": "26371"
         },
         {
           "name": "Muffin Blueberry 4 ct",
@@ -1762,7 +1772,8 @@
             "tall": 3,
             "wide": 2,
             "deep": 3
-          }
+          },
+          "plu": "26533"
         },
         {
           "name": "Muffin Chocolate Chunk 4 ct",
@@ -1774,7 +1785,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 3
-          }
+          },
+          "plu": "26326"
         },
         {
           "name": "Muffin Double Chocolate Chip 4 ct",
@@ -1786,7 +1798,8 @@
             "tall": 3,
             "wide": 1,
             "deep": 3
-          }
+          },
+          "plu": "32221"
         },
         {
           "name": "Muffin Pistachio 4 ct",
@@ -2036,14 +2049,16 @@
           "days": 3,
           "pkgDate": false,
           "upc": "23200700000",
-          "image": "https://images.heb.com/is/image/HEBGrocery/014386556"
+          "image": "https://images.heb.com/is/image/HEBGrocery/014386556",
+          "plu": "32007"
         },
         {
           "name": "Pie Pumpkin 10\"",
           "days": 3,
           "pkgDate": false,
           "upc": "22600100000",
-          "image": "https://images.heb.com/is/image/HEBGrocery/010533516"
+          "image": "https://images.heb.com/is/image/HEBGrocery/010533516",
+          "plu": "26001"
         },
         {
           "name": "Pie Pecan 8\"",
