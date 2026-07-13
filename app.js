@@ -20,6 +20,7 @@ const LS_COMPBOX = 'rts.componentBox.v1';
 const LS_LOGINIT = 'rts.logInitials';
 const LS_PROFILES = 'rts.profiles.v1';
 const LS_ME = 'rts.me';
+const LS_PULLDAY = 'rts.pullDay';   // the calendar day the current pull list belongs to
 
 const state = {
   data: null,
@@ -42,6 +43,8 @@ const state = {
   me: null,           // the profile signed in on this device
   feed: {},           // shift feed posts: id -> { uid, name, emoji, color, type, text, photo?, ts, reactions }
   tasks: {},          // claimable to-dos: id -> { id, text, by, byName, claimedBy, claimedName, done, ts }
+  pullDay: null,      // day the current pull list is for (auto-archives + clears on a new day)
+  pullHistory: {},    // archived daily pull lists: day -> { day, ts, by, items, total, pulled }
 
   imgCache: new Map(),
   scan: { controls: null, active: false, mode: 'lookup', onCapture: null, lastCode: '' },
@@ -67,6 +70,8 @@ async function init() {
   loadDiscPref();
   rebuildItems();
   loadPullList();
+  loadPullDay();
+  checkPullRollover();   // new day → archive yesterday's list and start fresh
   loadProduction();
   buildCategoryFilter();
   buildCatDatalist();
@@ -874,6 +879,63 @@ function pullDivider(text) {
   d.className = 'pull-divider';
   d.textContent = text;
   return d;
+}
+
+/* ---------------- Daily rollover: save the day, clear for tomorrow ---------------- */
+let pendingRollover = null;   // set when a rollover happened before sync was ready
+function loadPullDay() { try { state.pullDay = localStorage.getItem(LS_PULLDAY) || null; } catch { state.pullDay = null; } }
+function savePullDay() { try { if (state.pullDay) localStorage.setItem(LS_PULLDAY, state.pullDay); } catch {} pushSync('pullday', state.pullDay); }
+
+function archivePullDay(day) {
+  if (!day || !state.pull.length) return;
+  const rec = {
+    day, ts: Date.now(), by: state.me ? state.me.name : '',
+    items: state.pull.map((p) => ({ name: p.name, qty: p.qty || 1, done: !!p.done })),
+    total: state.pull.reduce((s, p) => s + (p.qty || 0), 0),
+    pulled: state.pull.filter((p) => p.done).length,
+    count: state.pull.length,
+  };
+  state.pullHistory[day] = rec;
+  if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/pullHistory/' + day), rec); } catch {} }
+}
+
+// If the loaded pull list is from a previous day, archive it and start the day fresh.
+function checkPullRollover() {
+  const today = toISO(new Date());
+  if (!state.pullDay) { state.pullDay = today; savePullDay(); return; }
+  if (state.pullDay === today) return;
+  const oldDay = state.pullDay;
+  if (state.pull.length) archivePullDay(oldDay);
+  state.pull = []; savePullList();
+  floorSetAnnounced = false;
+  state.pullDay = today; savePullDay();
+  pendingRollover = { oldDay };   // ensure the cloud reflects the clear once sync connects
+  renderPullList(); renderList(); syncCremeProduction();
+}
+
+/* ---------------- Past pulls (archived days) ---------------- */
+let historyLoaded = false;
+function openHistory() {
+  $('historyView').hidden = false; document.body.classList.add('history-open');
+  if (sync.on && !historyLoaded) {
+    historyLoaded = true;
+    try { sync.mod.get(sync.mod.ref(sync.db, 'rts/pullHistory')).then((snap) => { state.pullHistory = snap.val() || state.pullHistory; renderHistory(); }).catch(() => {}); } catch {}
+  }
+  renderHistory();
+}
+function closeHistory() { $('historyView').hidden = true; document.body.classList.remove('history-open'); }
+function renderHistory() {
+  const el = $('historyList');
+  const days = Object.values(state.pullHistory).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  if (!days.length) { el.innerHTML = '<div class="hub-dim" style="padding:40px;text-align:center">No saved days yet. Each day\'s pull list is archived here when a new day starts.</div>'; return; }
+  el.innerHTML = days.map((d) => {
+    const dd = parseISO(d.day) || new Date(d.ts);
+    const rows = (d.items || []).map((it) => `<div class="hist-item"><span class="hist-chk">${it.done ? '✓' : '·'}</span>${escapeHtml(it.name)}<b>×${it.qty}</b></div>`).join('');
+    return `<div class="hist-card">
+      <div class="hist-head"><span class="hist-date">${weekdayShort(dd)} · ${fmtDate(dd)}</span><span class="hist-sum">${d.pulled}/${d.count} pulled${d.by ? ' · ' + escapeHtml(d.by) : ''}</span></div>
+      <div class="hist-items">${rows}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderPullList() {
@@ -2283,6 +2345,9 @@ function wireEvents() {
   $('a2hsInstall').addEventListener('click', doInstall);
   $('freezerBtn').addEventListener('click', openFreezer);
   $('freezerExit').addEventListener('click', closeFreezer);
+  $('historyBtn').addEventListener('click', openHistory);
+  $('historyBtnEmpty').addEventListener('click', openHistory);
+  $('historyClose').addEventListener('click', closeHistory);
   // shift feed
   $('feedBtn').addEventListener('click', openFeed);
   $('feedClose').addEventListener('click', closeFeed);
@@ -2307,7 +2372,10 @@ function wireEvents() {
   $('discToggle').addEventListener('click', toggleDisc);
   // flush any pending (coalesced) sync writes before the app is backgrounded/closed
   window.addEventListener('pagehide', flushAllPush);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAllPush(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushAllPush();
+    else checkPullRollover();   // reopened (maybe a new day) → roll the pull list over
+  });
   $('edSave').addEventListener('click', saveItemEditor);
   $('edDelete').addEventListener('click', deleteItemEditor);
   $('edReset').addEventListener('click', resetItemEditor);
@@ -2327,6 +2395,7 @@ function wireEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('photoViewer').hidden) closePhoto();
+    else if (!$('historyView').hidden) closeHistory();
     else if (!$('feedView').hidden) closeFeed();
     else if (!$('freezerView').hidden) closeFreezer();
     else if (!$('scanModal').hidden) closeScanner();
@@ -2511,7 +2580,7 @@ function setupLock() {
  * sync of the catalog, pull list, production plan and case-pack sizes across
  * all devices. Until then everything stays device-only (localStorage). */
 const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {}, timers: {}, pending: {} };
-const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox', 'profiles'];
+const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox', 'profiles', 'pullday'];
 
 function setSyncStatus(t, level) {
   const el = $('syncStatus'); if (el) el.textContent = t;
@@ -2522,7 +2591,7 @@ function setSyncStatus(t, level) {
   pill.className = 'sync-pill' + (cls ? ' ' + cls : '');
   pill.hidden = !label;
 }
-function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : p === 'profiles' ? state.profiles : state.compBox; }
+function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : p === 'profiles' ? state.profiles : p === 'pullday' ? state.pullDay : state.compBox; }
 function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
 
 // coalesce rapid writes per path (e.g. +/- qty bursts) into one network write
@@ -2570,6 +2639,9 @@ function onRemote(path, wrapper) {
       if (!$('lockScreen').hidden) renderRoster();
       const cloudKeys = Object.keys(data || {});
       if (Object.keys(state.profiles).some((k) => !cloudKeys.includes(k))) setTimeout(() => pushSync('profiles', state.profiles), 50);
+    } else if (path === 'pullday') {
+      state.pullDay = data || state.pullDay;   // adopt the shared day; rollover is driven locally on open
+      try { if (state.pullDay) localStorage.setItem(LS_PULLDAY, state.pullDay); } catch {}
     }
   } finally { sync.applying = false; }
 }
@@ -2585,6 +2657,18 @@ async function initSync() {
     const app = appMod.initializeApp(cfg);
     await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
+    // if we rolled the day over before sync was ready, make the cloud reflect the cleared list first
+    if (pendingRollover) {
+      try {
+        const rec = state.pullHistory[pendingRollover.oldDay];
+        if (rec) dbMod.set(dbMod.ref(sync.db, 'rts/pullHistory/' + pendingRollover.oldDay), rec);
+        dbMod.set(dbMod.ref(sync.db, 'rts/pull'), { data: [], ts: Date.now() });
+        dbMod.set(dbMod.ref(sync.db, 'rts/pullday'), { data: state.pullDay, ts: Date.now() });
+        sync.last['pull'] = JSON.stringify([]);
+        sync.last['pullday'] = JSON.stringify(state.pullDay);
+      } catch {}
+      pendingRollover = null;
+    }
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
     dbMod.onValue(dbMod.ref(sync.db, 'rts/feed'), (snap) => onFeed(snap.val()));   // live shift feed
     dbMod.onValue(dbMod.ref(sync.db, 'rts/tasks'), (snap) => onTasks(snap.val())); // live tasks

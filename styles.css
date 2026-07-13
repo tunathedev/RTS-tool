@@ -1108,3 +1108,14 @@ body.feed-open .fab { display: none; }
 /* PIN-first login footer */
 .pin-foot { margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .lock-new-link { background: none; border: none; color: #fff; opacity: .95; font-family: var(--font-head); font-weight: 800; font-size: .9rem; cursor: pointer; text-decoration: underline; }
+
+/* ---------- Past pulls (history) ---------- */
+body.history-open .fab { display: none; }
+.hist-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.hist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.hist-date { font-family: var(--font-head); font-weight: 800; font-size: 1rem; }
+.hist-sum { font-size: .74rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.hist-items { display: flex; flex-direction: column; gap: 2px; }
+.hist-item { display: flex; align-items: center; gap: 8px; font-size: .86rem; padding: 3px 0; }
+.hist-item b { margin-left: auto; color: var(--heb-dark); font-variant-numeric: tabular-nums; }
+.hist-chk { flex: 0 0 auto; width: 16px; text-align: center; color: var(--ok); font-weight: 900; }
