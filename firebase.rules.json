@@ -1,0 +1,25 @@
+{
+  "//": "Realtime Database rules for SA50 RTS Ready. Paste into Firebase console → Realtime Database → Rules → Publish. These keep the app working exactly as-is (any signed-in/anonymous user can read+write under rts/), and add generous size caps so nobody can bloat the DB with huge blobs. The real defense against random scripts is App Check (see SECURITY.md) — enable it in MONITOR mode first, then Enforce.",
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rts": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+
+      "feed": {
+        "$post": {
+          "text":  { ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 2000)" },
+          "photo": { ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 900000)" }
+        }
+      },
+
+      "log": {
+        "$id": {
+          "img":  { ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 900000)" },
+          "note": { ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 2000)" }
+        }
+      }
+    }
+  }
+}

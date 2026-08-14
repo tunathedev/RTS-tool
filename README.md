@@ -191,3 +191,12 @@ Notes: test-mode rules make the database open read/write — fine behind the PIN
 for a small team, but for tighter control add Realtime Database rules or Auth.
 When sync first connects, the cloud copy becomes the source of truth (a device
 with only local edits will be overwritten by the shared data).
+
+### Security
+
+The `apiKey` in `sync-config.js` is a Firebase **Web** API key — it is public by
+design (Google intends it to ship in client code), so it is **not** a leaked
+secret and does not need rotating. Real protection comes from the database rules
+and App Check. To harden: publish [`firebase.rules.json`](./firebase.rules.json)
+and follow [`SECURITY.md`](./SECURITY.md) (App Check is the key step). Treat the
+synced data as internal, not confidential.

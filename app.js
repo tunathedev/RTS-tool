@@ -2655,6 +2655,19 @@ async function initSync() {
     const authMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     const dbMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
     const app = appMod.initializeApp(cfg);
+    // Optional App Check — attests requests come from the real app, blocking random
+    // scripts that have the public config. Inert until you set a reCAPTCHA v3 site key
+    // in sync-config.js (appCheckKey); failure here never blocks sync.
+    if (cfg.appCheckKey) {
+      try {
+        if (cfg.appCheckDebug) self.FIREBASE_APPCHECK_DEBUG_TOKEN = cfg.appCheckDebug;
+        const acMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js');
+        acMod.initializeAppCheck(app, {
+          provider: new acMod.ReCaptchaV3Provider(cfg.appCheckKey),
+          isTokenAutoRefreshEnabled: true,
+        });
+      } catch (e) { /* App Check is optional — never break sync if it can't load */ }
+    }
     await authMod.signInAnonymously(authMod.getAuth(app));   // rules require a signed-in token
     sync.db = dbMod.getDatabase(app); sync.mod = dbMod; sync.on = true;
     // if we rolled the day over before sync was ready, make the cloud reflect the cleared list first
