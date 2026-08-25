@@ -1125,3 +1125,20 @@ body.history-open .fab { display: none; }
 .hist-item { display: flex; align-items: center; gap: 8px; font-size: .86rem; padding: 3px 0; }
 .hist-item b { margin-left: auto; color: var(--heb-dark); font-variant-numeric: tabular-nums; }
 .hist-chk { flex: 0 0 auto; width: 16px; text-align: center; color: var(--ok); font-weight: 900; }
+
+/* ---------- Roster: manage / archive ---------- */
+.roster-tile { position: relative; }
+.roster-tile.archived { opacity: .5; }
+.roster-del {
+  position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%;
+  background: #fff; color: var(--heb); border: 2px solid var(--heb); font-size: .8rem; font-weight: 900;
+  display: flex; align-items: center; justify-content: center; z-index: 2;
+}
+.roster-tag { font-size: .58rem; font-weight: 800; color: #fff; opacity: .85; margin-top: -2px; }
+.roster-hint { font-size: .72rem; opacity: .9; margin-top: 12px; line-height: 1.4; min-height: 1em; }
+.roster-actions { display: flex; gap: 10px; margin-top: 12px; }
+.lock-new, .lock-manage { flex: 1; margin-top: 0; }
+.lock-manage {
+  background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.4);
+  border-radius: 999px; font-family: var(--font-head); font-weight: 800; font-size: .92rem; padding: 13px 12px; cursor: pointer;
+}

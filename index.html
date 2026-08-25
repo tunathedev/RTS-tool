@@ -32,11 +32,15 @@
     <div class="lock-inner">
       <div class="lock-brand">SA<span class="app-title-50">50</span> RTS Ready</div>
 
-      <!-- master (1905) fallback: pick who you are -->
+      <!-- master (1905) fallback: pick who you are / manage profiles -->
       <section class="lock-screen" id="lockRoster" hidden>
         <div class="lock-sub">Tap your name</div>
         <div class="roster" id="rosterGrid"></div>
-        <button type="button" class="lock-new" id="rosterNew">＋ New profile</button>
+        <div class="roster-hint" id="rosterHint"></div>
+        <div class="roster-actions">
+          <button type="button" class="lock-new" id="rosterNew">＋ New</button>
+          <button type="button" class="lock-manage" id="rosterManage">🗑 Manage</button>
+        </div>
         <button type="button" class="lock-back" id="rosterBack">‹ Back</button>
       </section>
 

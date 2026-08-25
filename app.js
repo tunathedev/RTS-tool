@@ -2477,16 +2477,47 @@ function beginCreatePin() {
   $('pinBack').hidden = false; $('pinNew').hidden = true;
   renderDots(); showLockScreen('lockPin');
 }
-// master 1905 → pick who you are (fallback for a forgotten PIN)
+// master 1905 → pick who you are (fallback for a forgotten PIN) + manage profiles
+const ARCHIVE_MS = 21 * 24 * 60 * 60 * 1000;   // auto-archive after 3 weeks of no logins
+let rosterManage = false;
 function renderRoster() {
-  const list = Object.values(state.profiles).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  const all = Object.values(state.profiles).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  const list = rosterManage ? all : all.filter((p) => !p.archived);
   $('rosterGrid').innerHTML = list.map((p) =>
-    `<button type="button" class="roster-tile" data-id="${p.id}">
+    `<button type="button" class="roster-tile${p.archived ? ' archived' : ''}" data-id="${p.id}">
+       ${rosterManage ? `<span class="roster-del" data-del="${p.id}" role="button" aria-label="Delete">✕</span>` : ''}
        <span class="roster-av" style="background:${p.color}">${p.emoji || initialsOf(p.name)}</span>
        <span class="roster-name">${escapeHtml(p.name)}</span>
+       ${p.archived ? '<span class="roster-tag">💤 archived</span>' : ''}
      </button>`).join('');
+  $('rosterManage').textContent = rosterManage ? '✓ Done' : '🗑 Manage';
+  const nArch = all.filter((p) => p.archived).length;
+  $('rosterHint').textContent = rosterManage
+    ? 'Tap ✕ to delete. Tap a 💤 name to bring it back. (Inactive 3+ weeks auto-archive.)'
+    : (nArch ? `${nArch} archived for inactivity — they return automatically when they log in.` : '');
 }
-function openRoster() { renderRoster(); showLockScreen('lockRoster'); }
+function openRoster() { rosterManage = false; renderRoster(); showLockScreen('lockRoster'); }
+
+function deleteProfile(id) {
+  delete state.profiles[id];
+  if (state.me && state.me.id === id) { state.me = null; applyMe(); }
+  saveProfiles(); renderRoster();
+}
+function restoreProfile(id) {
+  const p = state.profiles[id]; if (!p) return;
+  p.archived = false; p.lastSeen = Date.now();
+  saveProfiles(); renderRoster();
+}
+// hide people who haven't logged in for 3+ weeks (data kept; they un-archive on next login)
+function pruneInactiveProfiles() {
+  const cutoff = Date.now() - ARCHIVE_MS;
+  let changed = false;
+  for (const p of Object.values(state.profiles)) {
+    const seen = p.lastSeen || p.createdAt || 0;
+    if (!p.archived && seen && seen < cutoff) { p.archived = true; p.archivedAt = Date.now(); changed = true; }
+  }
+  if (changed) { saveProfiles(); if (!$('lockScreen').hidden && !$('lockRoster').hidden) renderRoster(); }
+}
 
 function pinPress(k) {
   if (k === 'del') { pinEntered = pinEntered.slice(0, -1); $('lockError').textContent = ''; renderDots(); return; }
@@ -2508,7 +2539,7 @@ function pinPress(k) {
       pinError('That PIN is taken — pick another'); return;
     }
     const id = 'u_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
-    const prof = { id, name: loginDraft.name, emoji: loginDraft.emoji, color: loginDraft.color, pin: pinEntered, createdAt: Date.now() };
+    const prof = { id, name: loginDraft.name, emoji: loginDraft.emoji, color: loginDraft.color, pin: pinEntered, createdAt: Date.now(), lastSeen: Date.now() };
     state.profiles[id] = prof; saveProfiles();
     loginSuccess(prof);
   }
@@ -2519,6 +2550,9 @@ function pinError(msg) {
   setTimeout(() => { $('lockScreen').classList.remove('shake'); pinEntered = ''; renderDots(); }, 450);
 }
 function loginSuccess(profile) {
+  profile.lastSeen = Date.now();
+  if (profile.archived) profile.archived = false;   // logging in reactivates you
+  state.profiles[profile.id] = profile; saveProfiles();
   state.me = profile; applyMe();
   try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
   $('lockScreen').hidden = true;
@@ -2537,10 +2571,15 @@ function setupLock() {
   $('pinBack').addEventListener('click', () => showLockScreen('lockSetup'));   // back to editing the new profile
   $('rosterNew').addEventListener('click', openSetup);
   $('rosterBack').addEventListener('click', openPin);
+  $('rosterManage').addEventListener('click', () => { rosterManage = !rosterManage; renderRoster(); });
   $('setupBack').addEventListener('click', openPin);
   $('rosterGrid').addEventListener('click', (e) => {
+    const del = e.target.closest('.roster-del');
+    if (del) { e.stopPropagation(); const id = del.dataset.del; const p = state.profiles[id]; if (p && confirm(`Delete "${p.name}"? This removes the profile for everyone.`)) deleteProfile(id); return; }
     const t = e.target.closest('.roster-tile'); if (!t) return;
-    const p = state.profiles[t.dataset.id]; if (p) loginSuccess(p);   // master already authorized via 1905
+    const p = state.profiles[t.dataset.id]; if (!p) return;
+    if (rosterManage) { if (p.archived) restoreProfile(p.id); return; }   // manage mode: tap 💤 to restore
+    loginSuccess(p);   // master already authorized via 1905
   });
   $('emojiGrid').addEventListener('click', (e) => {
     const b = e.target.closest('.emoji-opt'); if (!b) return;
@@ -2564,11 +2603,15 @@ function setupLock() {
     else if (e.key === 'Backspace') { e.preventDefault(); pinPress('del'); }
   });
 
+  pruneInactiveProfiles();   // archive anyone inactive 3+ weeks (based on local data; re-checked after sync)
+
   let meId = null, unlocked = false;
   try { meId = localStorage.getItem(LS_ME); } catch {}
   try { unlocked = sessionStorage.getItem('rts.unlocked') === '1'; } catch {}
   if (unlocked && meId && state.profiles[meId]) {
-    state.me = state.profiles[meId]; applyMe();
+    state.me = state.profiles[meId];
+    state.me.lastSeen = Date.now(); saveProfiles();   // opening the app counts as active
+    applyMe();
     lock.hidden = true; setTimeout(maybeShowInstall, 1200); return;
   }
   applyMe();
@@ -2632,13 +2675,13 @@ function onRemote(path, wrapper) {
     } else if (path === 'compBox') {
       state.compBox = data || {}; saveCompBox(); renderProduction();
     } else if (path === 'profiles') {
-      // remote wins on shared ids, but keep any local-only profile (e.g. just created)
-      state.profiles = Object.assign({}, state.profiles, data || {});
-      saveProfiles(true);
+      // authoritative (so deletes propagate) but never drop the person signed in here
+      const next = data || {};
+      if (state.me && !next[state.me.id]) { next[state.me.id] = state.me; setTimeout(() => pushSync('profiles', state.profiles), 50); }
+      state.profiles = next;
       if (state.me && state.profiles[state.me.id]) { state.me = state.profiles[state.me.id]; applyMe(); }
+      saveProfiles(true);
       if (!$('lockScreen').hidden) renderRoster();
-      const cloudKeys = Object.keys(data || {});
-      if (Object.keys(state.profiles).some((k) => !cloudKeys.includes(k))) setTimeout(() => pushSync('profiles', state.profiles), 50);
     } else if (path === 'pullday') {
       state.pullDay = data || state.pullDay;   // adopt the shared day; rollover is driven locally on open
       try { if (state.pullDay) localStorage.setItem(LS_PULLDAY, state.pullDay); } catch {}
@@ -2683,6 +2726,7 @@ async function initSync() {
       pendingRollover = null;
     }
     for (const p of SYNC_PATHS) dbMod.onValue(dbMod.ref(sync.db, 'rts/' + p), (snap) => onRemote(p, snap.val()));
+    setTimeout(pruneInactiveProfiles, 3000);   // re-check inactivity against the synced roster
     dbMod.onValue(dbMod.ref(sync.db, 'rts/feed'), (snap) => onFeed(snap.val()));   // live shift feed
     dbMod.onValue(dbMod.ref(sync.db, 'rts/tasks'), (snap) => onTasks(snap.val())); // live tasks
     if (logPendingLoad && !$('logView').hidden) { logPendingLoad = false; loadFloorLog(); renderFloorLog(); }
