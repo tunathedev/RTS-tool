@@ -43,8 +43,10 @@
   background: #E31837; color: #fff;
   display: flex; align-items: center; justify-content: center;
   padding: calc(env(safe-area-inset-top,0px) + 24px) 24px 24px;
+  overflow-y: auto;   /* scroll when content (e.g. a long roster) is taller than the screen */
 }
-.lock-inner { width: 100%; max-width: 280px; text-align: center; }
+/* margin:auto centers when there's room but still lets tall content scroll to the top */
+.lock-inner { width: 100%; max-width: 280px; text-align: center; margin: auto; }
 .lock-title { font-family: var(--font-head); font-weight: 800; font-size: 1.25rem; }
 .lock-sub { font-size: .9rem; margin-top: 14px; }
 .lock-dots { display: flex; justify-content: center; gap: 16px; margin: 14px 0 6px; }
@@ -938,7 +940,11 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .lock.shake .lock-inner { animation: shake .42s; }
 
 /* roster */
-.roster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.roster {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  max-height: 56vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 2px; margin: 2px 0;
+}
 .roster-tile {
   background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); border-radius: 14px;
   padding: 12px 6px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;
