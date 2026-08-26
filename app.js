@@ -76,6 +76,7 @@ async function init() {
   checkPullRollover();   // new day → archive yesterday's list and start fresh
   loadProduction();
   loadPlatters();
+  ensureManagedPlatters();   // seed/repair known pan de polvo + mantecada recipes & case packs
   buildCategoryFilter();
   buildCatDatalist();
   renderHeader();
@@ -1196,11 +1197,24 @@ const DEFAULT_PLATTERS = [
     recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 6 }, { n: 'Cookies Sugar 18 ct', q: 6 }, { n: 'Cookie Candy', q: 6 }, { n: 'Chocolate Chunk 18 ct', q: 6 }, { n: 'Brownie Bites Two-Bite', q: 28 }] },
   { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray',
     recipe: [{ n: 'Sliced Loaf Marble', q: 0 }, { n: 'Sliced Loaf Lemon Creme', q: 0 }, { n: 'Sliced Loaf Danish Butter', q: 0 }] },
-  { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '3 lb',
-    recipe: [{ n: 'Pan de Polvo', q: 0 }, { n: 'Pan de Polvo Powdered', q: 0 }] },
-  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '3 lb',
-    recipe: [{ n: 'Pan de Polvo', q: 0 }] },
+  { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '1 cinnamon + 1 powdered sleeve',
+    recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }, { n: 'Bulk Powdered Pan de Polvo', q: 1 }] },
+  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: 'cinnamon sleeves',
+    recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }] },
+  { id: 'plt-mantecada-15', group: 'Mexican Pastries', name: 'Mantecada Platter (15 ct)', note: '15 ct',
+    recipe: [{ n: 'Bulk Mantecada', q: 15 }] },
+  { id: 'plt-mantecada-6', group: 'Mexican Pastries', name: 'Mantecada Platter (6 ct)', note: '6 ct',
+    recipe: [{ n: 'Bulk Mantecada', q: 6 }] },
 ];
+
+/* Bulk prep components (not retail SKUs): case packs by sleeve/piece. */
+const DEFAULT_COMPBOX = {
+  'Bulk Cinnamon Pan de Polvo': 6,   // sleeves per case
+  'Bulk Powdered Pan de Polvo': 6,
+  'Bulk Mantecada': 36,              // mantecada per case (→ 2× 15ct or 6× 6ct)
+};
+// managed platters whose recipes are known — corrected in place if still placeholders/missing
+const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada)/.test(p.id));
 
 function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
@@ -1229,6 +1243,20 @@ function componentBox(name) {
   const it = state.byName.get(name);
   if (it && it.boxQty) return it.boxQty;
   return state.compBox[name] || null;
+}
+function suppressedPlatters() { try { return JSON.parse(localStorage.getItem('rts.platSuppressed') || '[]') || []; } catch { return []; } }
+// keep the known platters (pan de polvo, mantecada) correct without stomping user edits or deletes
+function ensureManagedPlatters() {
+  const supp = suppressedPlatters();
+  let changed = false;
+  for (const def of MANAGED_PLATTERS) {
+    if (supp.includes(def.id)) continue;   // user deleted it — don't resurrect
+    const cur = state.platters[def.id];
+    if (!cur || !cur.recipe || cur.recipe.every((c) => !c.q)) { state.platters[def.id] = JSON.parse(JSON.stringify(def)); changed = true; }
+  }
+  for (const k in DEFAULT_COMPBOX) if (state.compBox[k] == null) { state.compBox[k] = DEFAULT_COMPBOX[k]; changed = true; }
+  if (changed) { try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
+  return changed;
 }
 function setCompBox(name) {
   const cur = state.compBox[name] || '';
@@ -1376,8 +1404,11 @@ function savePlatter() {
 function deletePlatter() {
   if (!editingPlatterId) return;
   if (!confirm('Delete this platter?')) return;
-  delete state.platters[editingPlatterId];
-  delete state.prod[editingPlatterId];
+  const id = editingPlatterId;
+  if (MANAGED_PLATTERS.some((d) => d.id === id)) {   // remember so it isn't auto-recreated
+    try { const s = suppressedPlatters(); if (!s.includes(id)) { s.push(id); localStorage.setItem('rts.platSuppressed', JSON.stringify(s)); } } catch {}
+  }
+  delete state.platters[id]; delete state.prod[id];
   savePlatters(); saveProduction();
   closePlatterEditor(); afterPlatterChange();
 }
@@ -2876,9 +2907,14 @@ function onRemote(path, wrapper) {
     } else if (path === 'prod') {
       state.prod = data || {}; saveProduction(); renderProduction();
     } else if (path === 'compBox') {
-      state.compBox = data || {}; saveCompBox(); renderProduction();
+      state.compBox = data || {};
+      if (ensureManagedPlatters()) setTimeout(() => { pushSync('platters', state.platters); pushSync('compBox', state.compBox); }, 60);
+      saveCompBox(); renderProduction();
     } else if (path === 'platters') {
-      if (data && typeof data === 'object') { state.platters = data; savePlatters(true); }
+      if (data && typeof data === 'object') { state.platters = data; }
+      const fixed = ensureManagedPlatters();
+      try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); } catch {}
+      if (fixed) setTimeout(() => { pushSync('platters', state.platters); pushSync('compBox', state.compBox); }, 60);
       afterPlatterChange();
     } else if (path === 'profiles') {
       // authoritative (so deletes propagate) but never drop the person signed in here
