@@ -20,3 +20,7 @@ window.SYNC_CONFIG = {
   //   appCheckKey: "6Lc...your-reCAPTCHA-v3-site-key...",   // from Firebase → App Check
   //   appCheckDebug: "your-debug-token",                    // ONLY for localhost testing
 };
+
+/* Optional usage analytics → private Google Sheet (no location, no IP, no in-app view).
+ * Off until you paste your Apps Script web-app URL here. Setup: see ANALYTICS.md. */
+window.ANALYTICS_URL = "";

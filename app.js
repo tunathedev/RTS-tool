@@ -87,6 +87,7 @@ async function init() {
   syncDiscBtn();
   loadWeather();
   initSync();
+  track('app_open', { signedIn: !!state.me });   // captures opens even before login (spot outsiders)
 }
 
 // Normalize a UPC/EAN to digits only (drops spaces, dashes).
@@ -755,7 +756,7 @@ function inList(name) { return state.pull.some((p) => p.name === name); }
 function toggleList(name) {
   const i = state.pull.findIndex((p) => p.name === name);
   if (i >= 0) state.pull.splice(i, 1);
-  else state.pull.push({ name, qty: 1, done: false, labels: false });
+  else { state.pull.push({ name, qty: 1, done: false, labels: false }); track('pull_add', name); }
   savePullList();
   updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
   renderPullList();
@@ -771,6 +772,7 @@ function toggleHole(name) {
   let p = state.pull.find((x) => x.name === name);
   if (p) { p.hole = !p.hole; }
   else { p = { name, qty: 1, done: false, labels: false, hole: true }; state.pull.push(p); }
+  if (p.hole) track('hole', name);
   savePullList();
   updateAddButton(name);   // in-place so a long-press isn't interrupted by a full re-render
   updateHoleRow(name);
@@ -852,7 +854,7 @@ function toggleDone(name) {
   renderPullList();
   // narrate to the feed when the whole floor is set (once per completion)
   const n = state.pull.length, done = state.pull.filter((x) => x.done).length;
-  if (n > 0 && done === n) { if (!floorSetAnnounced) { floorSetAnnounced = true; autoPost(`✅ set the floor — ${n} item${n === 1 ? '' : 's'} pulled`); } }
+  if (n > 0 && done === n) { if (!floorSetAnnounced) { floorSetAnnounced = true; autoPost(`✅ set the floor — ${n} item${n === 1 ? '' : 's'} pulled`); track('floor_set', { items: n }); } }
   else floorSetAnnounced = false;
 }
 
@@ -916,7 +918,7 @@ function checkPullRollover() {
 /* ---------------- Past pulls (archived days) ---------------- */
 let historyLoaded = false;
 function openHistory() {
-  $('historyView').hidden = false; document.body.classList.add('history-open');
+  $('historyView').hidden = false; document.body.classList.add('history-open'); track('screen', 'history');
   if (sync.on && !historyLoaded) {
     historyLoaded = true;
     try { sync.mod.get(sync.mod.ref(sync.db, 'rts/pullHistory')).then((snap) => { state.pullHistory = snap.val() || state.pullHistory; renderHistory(); }).catch(() => {}); } catch {}
@@ -1034,7 +1036,7 @@ function openFreezer() {
   if (!state.pull.length) return;
   $('freezerView').hidden = false;
   document.body.classList.add('freezer-open');
-  renderFreezer();
+  renderFreezer(); track('screen', 'freezer');
 }
 function closeFreezer() { $('freezerView').hidden = true; document.body.classList.remove('freezer-open'); }
 
@@ -1432,6 +1434,7 @@ let captureTag = 'leave';     // which button launched the camera
 function openFloorLog() {
   $('logView').hidden = false;
   document.body.classList.add('log-open');
+  track('screen', 'floorlog');
   try { $('logInitials').value = state.me ? initialsOf(state.me.name) : (localStorage.getItem(LS_LOGINIT) || ''); } catch {}
   loadFloorLog();
   renderFloorLog();
@@ -1519,6 +1522,7 @@ async function onLogFile(e) {
   renderFloorLog();
   const tm = TAG_META[captureTag] || {};
   autoPost(`${tm.emoji || '📸'} logged the ${tm.label || ''} floor photo`);
+  track('floor_photo', captureTag);
 }
 
 function deleteLogEntry(id) {
@@ -1691,7 +1695,7 @@ function markFeedRead() {
 }
 function openFeed() {
   $('feedView').hidden = false; document.body.classList.add('feed-open');
-  setHub('feed'); markFeedRead();
+  setHub('feed'); markFeedRead(); track('screen', 'feed');
 }
 function closeFeed() { $('feedView').hidden = true; document.body.classList.remove('feed-open'); }
 
@@ -1751,6 +1755,7 @@ function submitPost() {
   if (feedPhotoData) post.photo = feedPhotoData;
   if (feedType === 'props') { const tv = $('feedTarget').value; if (tv && state.profiles[tv]) { post.target = tv; post.targetName = state.profiles[tv].name; } }
   writeFeed(post);
+  track('feed_post', feedType);
   $('feedText').value = ''; feedPhotoData = null; $('feedPhotoPreview').hidden = true; $('feedPhotoPreview').innerHTML = '';
   setFeedType('note');
   renderFeed(); markFeedRead();
@@ -1844,6 +1849,7 @@ function claimTask(id) {
 function toggleTask(id) {
   const t = state.tasks[id]; if (!t) return;
   t.done = !t.done;
+  if (t.done) track('task_done', t.text);
   if (t.done && state.me && !t.claimedBy) { t.claimedBy = state.me.id; t.claimedName = state.me.name; }
   writeTask(t); renderBoard();
 }
@@ -2293,12 +2299,13 @@ function switchTab(which) {
     $(tabId).setAttribute('aria-selected', String(on));
     $(viewId).hidden = !on;
   }
+  track('screen', which);
   // entering the Pull List with items waiting jumps straight into Freezer Mode
   if (which === 'list' && state.pull.length && $('freezerView').hidden) openFreezer();
 }
 
 /* Flip Book lives in a floating overlay (button stacked above Scan) */
-function openFlip() { $('flipView').hidden = false; document.body.classList.add('flip-open'); renderFlip(); }
+function openFlip() { $('flipView').hidden = false; document.body.classList.add('flip-open'); renderFlip(); track('screen', 'flip'); }
 function closeFlip() { $('flipView').hidden = true; document.body.classList.remove('flip-open'); }
 
 function wireEvents() {
@@ -2556,6 +2563,7 @@ function loginSuccess(profile) {
   state.me = profile; applyMe();
   try { sessionStorage.setItem('rts.unlocked', '1'); } catch {}
   $('lockScreen').hidden = true;
+  sessionStart = Date.now(); track('login');
   setTimeout(maybeShowInstall, 1200);
 }
 function switchUser() {
@@ -2798,6 +2806,68 @@ async function doInstall() {
   try { await deferredInstall.userChoice; } catch {}
   deferredInstall = null;
   dismissInstall();
+}
+
+/* ---------------- Usage analytics (passive · no permission · off-app export) ----------------
+ * Sends lightweight usage events to window.ANALYTICS_URL (a Google Apps Script web
+ * app that appends rows to a private Google Sheet). NO location, NO IP, NO message
+ * contents — just who / when / device / which action. Inert until ANALYTICS_URL is
+ * set; every call is failure-tolerant so analytics can never affect the app. */
+const APP_VERSION = 'v24';
+const LS_DEVICE = 'rts.deviceId';
+const LS_AQ = 'rts.analyticsQueue';
+let sessionStart = Date.now();
+let aQueue = [];
+try { aQueue = JSON.parse(localStorage.getItem(LS_AQ) || '[]') || []; } catch {}
+
+function deviceId() {
+  let id = null;
+  try { id = localStorage.getItem(LS_DEVICE); } catch {}
+  if (!id) { id = 'd_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); try { localStorage.setItem(LS_DEVICE, id); } catch {} }
+  return id;
+}
+function deviceInfo() {
+  const ua = navigator.userAgent;
+  const os = /iphone|ipad|ipod/i.test(ua) ? 'iOS' : /android/i.test(ua) ? 'Android' : /windows/i.test(ua) ? 'Windows' : /mac os|macintosh/i.test(ua) ? 'Mac' : 'Other';
+  const type = /ipad|tablet/i.test(ua) ? 'tablet' : (/mobile|iphone|android/i.test(ua) ? 'phone' : 'desktop');
+  const browser = /crios|chrome/i.test(ua) ? 'Chrome' : /fxios|firefox/i.test(ua) ? 'Firefox' : /edg/i.test(ua) ? 'Edge' : /safari/i.test(ua) ? 'Safari' : 'Other';
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch {}
+  const installed = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  return { device: deviceId(), os, type, browser, tz, lang: navigator.language || '', installed: !!installed, screen: (screen.width + 'x' + screen.height), ver: APP_VERSION };
+}
+function saveAQ() { try { localStorage.setItem(LS_AQ, JSON.stringify(aQueue.slice(-200))); } catch {} }
+function track(event, detail) {
+  if (!window.ANALYTICS_URL) return;   // disabled until an endpoint is configured
+  try {
+    aQueue.push(Object.assign({
+      t: new Date().toISOString(),
+      who: state.me ? state.me.name : '(not signed in)',
+      event,
+      detail: detail == null ? '' : (typeof detail === 'string' ? detail : JSON.stringify(detail)),
+    }, deviceInfo()));
+    saveAQ();
+    if (aQueue.length >= 8) flushAnalytics(false);
+  } catch {}
+}
+function flushAnalytics(beacon) {
+  if (!window.ANALYTICS_URL || !aQueue.length) return;
+  const body = JSON.stringify({ rows: aQueue.slice() });
+  try {
+    if (beacon && navigator.sendBeacon) {
+      if (navigator.sendBeacon(window.ANALYTICS_URL, new Blob([body], { type: 'text/plain;charset=UTF-8' }))) { aQueue = []; saveAQ(); }
+    } else {
+      fetch(window.ANALYTICS_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body })
+        .then(() => { aQueue = []; saveAQ(); }).catch(() => {});
+    }
+  } catch {}
+}
+if (window.ANALYTICS_URL) {
+  setInterval(() => flushAnalytics(false), 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') { track('session_end', { secs: Math.round((Date.now() - sessionStart) / 1000) }); flushAnalytics(true); }
+  });
+  window.addEventListener('pagehide', () => flushAnalytics(true));
+  if (aQueue.length) setTimeout(() => flushAnalytics(false), 2000);   // send anything left over from last time
 }
 
 if ('serviceWorker' in navigator) {
