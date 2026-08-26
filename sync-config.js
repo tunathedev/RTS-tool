@@ -23,4 +23,4 @@ window.SYNC_CONFIG = {
 
 /* Optional usage analytics → private Google Sheet (no location, no IP, no in-app view).
  * Off until you paste your Apps Script web-app URL here. Setup: see ANALYTICS.md. */
-window.ANALYTICS_URL = "https://script.google.com/macros/s/AKfycbzB5AvVrWQUO1nGg866d91FP5ArT3OrJOUGbu8IlPXIhkR6Td3gHAhD_Qz9WJqg2dmF/exec";
+window.ANALYTICS_URL = "https://script.google.com/macros/s/AKfycbzZSLjax2I8vdy9waxLbz8165n4yAlk2b-aSxMCNa6RE1X1n5KrkHTqVEXDKnx1CliX/exec";
