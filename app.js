@@ -479,6 +479,7 @@ const isDesktop = () => window.matchMedia('(min-width: 720px)').matches;
 /* ---------------- Detail sheet ---------------- */
 function openSheet(it) {
   state.current = it;
+  track('item_view', it.name);
   $('detailCategory').textContent = it.category;
   $('detailName').textContent = it.name;
   $('hebLink').href = HEB_SEARCH(hebQuery(it.name));
@@ -602,6 +603,7 @@ function scheduleAutoSave() { clearTimeout(autoSaveTimer); autoSaveTimer = setTi
 
 function saveItemEditor() {
   commitEditor();
+  track('catalog_save', $('edName').value.trim());
   const key = editorKey;
   closeItemEditor();
   const updated = state.items.find((i) => i._key === key);
@@ -611,6 +613,7 @@ function saveItemEditor() {
 function deleteItemEditor() {
   if (!editorKey) return;
   if (!confirm('Delete this item from the catalog?')) return;
+  track('catalog_delete', $('edName').value.trim());
   const added = state.cust.added.find((a) => a._key === editorKey);
   if (added) state.cust.added = state.cust.added.filter((a) => a._key !== editorKey);
   else { if (!state.cust.deleted.includes(editorKey)) state.cust.deleted.push(editorKey); delete state.cust.patches[editorKey]; }
@@ -755,7 +758,7 @@ function inList(name) { return state.pull.some((p) => p.name === name); }
 
 function toggleList(name) {
   const i = state.pull.findIndex((p) => p.name === name);
-  if (i >= 0) state.pull.splice(i, 1);
+  if (i >= 0) { state.pull.splice(i, 1); track('pull_remove', name); }
   else { state.pull.push({ name, qty: 1, done: false, labels: false }); track('pull_add', name); }
   savePullList();
   updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
@@ -1132,6 +1135,7 @@ function pullListText() {
 }
 
 async function copyOrShare() {
+  track('copy_list');
   const text = pullListText();
   try {
     if (navigator.share) { await navigator.share({ title: 'Pull List', text }); return; }
@@ -1627,6 +1631,7 @@ async function buildDayComposite(day) {
   return c.toDataURL('image/jpeg', 0.72);
 }
 async function shareDay(day) {
+  track('share_day', day);
   let url = null;
   try { url = await buildDayComposite(day); } catch {}
   if (!url) { alert('No photos to share for that day yet.'); return; }
@@ -1776,6 +1781,7 @@ function toggleReaction(postId, emoji) {
   const val = Object.keys(map).length ? map : null;
   if (!val) delete post.reactions[emoji];
   if (sync.on) { try { sync.mod.set(sync.mod.ref(sync.db, 'rts/feed/' + postId + '/reactions/' + emoji), val); } catch {} }
+  track('feed_react', emoji);
   renderFeed();
 }
 function setFeedType(t) {
@@ -1838,12 +1844,13 @@ function writeTask(t) { state.tasks[t.id] = t; if (sync.on) { try { sync.mod.set
 function addTask(text) {
   if (!text || !text.trim() || !state.me) return;
   writeTask({ id: newTaskId(), text: text.trim(), by: state.me.id, byName: state.me.name, claimedBy: null, claimedName: null, done: false, ts: Date.now() });
+  track('task_add', text.trim());
   renderBoard();
 }
 function claimTask(id) {
   const t = state.tasks[id]; if (!t || !state.me) return;
   if (t.claimedBy === state.me.id) { t.claimedBy = null; t.claimedName = null; }
-  else { t.claimedBy = state.me.id; t.claimedName = state.me.name; }
+  else { t.claimedBy = state.me.id; t.claimedName = state.me.name; track('task_claim', t.text); }
   writeTask(t); renderBoard();
 }
 function toggleTask(id) {
@@ -2141,6 +2148,7 @@ function sellTip(ctx) {
 const ZXING_CDN = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm';
 
 async function openScanner(mode = 'lookup', onCapture = null) {
+  track('scan', mode);
   state.scan.mode = mode;
   state.scan.onCapture = onCapture;
   state.scan.lastCode = '';
@@ -2309,8 +2317,9 @@ function openFlip() { $('flipView').hidden = false; document.body.classList.add(
 function closeFlip() { $('flipView').hidden = true; document.body.classList.remove('flip-open'); }
 
 function wireEvents() {
-  $('search').addEventListener('input', renderList);
-  $('categoryFilter').addEventListener('change', renderList);
+  let searchT = null;
+  $('search').addEventListener('input', () => { renderList(); clearTimeout(searchT); searchT = setTimeout(() => { const q = $('search').value.trim(); if (q) track('search', q.slice(0, 40)); }, 900); });
+  $('categoryFilter').addEventListener('change', () => { renderList(); if ($('categoryFilter').value) track('filter', $('categoryFilter').value); });
   $('pullDate').addEventListener('change', onPullDateChange);
   $('todayBtn').addEventListener('click', setToday);
   $('tabBrowse').addEventListener('click', () => switchTab('browse'));
@@ -2506,6 +2515,8 @@ function renderRoster() {
 function openRoster() { rosterManage = false; renderRoster(); showLockScreen('lockRoster'); }
 
 function deleteProfile(id) {
+  const gone = state.profiles[id];
+  track('profile_delete', gone ? gone.name : id);
   delete state.profiles[id];
   if (state.me && state.me.id === id) { state.me = null; applyMe(); }
   saveProfiles(); renderRoster();
@@ -2535,10 +2546,12 @@ function pinPress(k) {
     const match = Object.values(state.profiles).find((p) => p.pin === pinEntered);
     if (match) { loginSuccess(match); return; }
     if (pinEntered === MASTER_PIN) {   // master fallback → choose your name
+      track('master_used');
       if (Object.keys(state.profiles).length) { pinEntered = ''; renderDots(); openRoster(); }
       else { pinEntered = ''; renderDots(); openSetup(); }
       return;
     }
+    track('pin_fail');
     pinError('PIN not recognized');
   } else {
     // create mode: PINs must be unique so they can identify a person
@@ -2548,6 +2561,7 @@ function pinPress(k) {
     const id = 'u_' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
     const prof = { id, name: loginDraft.name, emoji: loginDraft.emoji, color: loginDraft.color, pin: pinEntered, createdAt: Date.now(), lastSeen: Date.now() };
     state.profiles[id] = prof; saveProfiles();
+    track('profile_new', prof.name);
     loginSuccess(prof);
   }
 }
@@ -2567,6 +2581,7 @@ function loginSuccess(profile) {
   setTimeout(maybeShowInstall, 1200);
 }
 function switchUser() {
+  track('switch_user');
   try { sessionStorage.removeItem('rts.unlocked'); } catch {}
   $('lockScreen').hidden = false; openPin();
 }
@@ -2813,10 +2828,11 @@ async function doInstall() {
  * app that appends rows to a private Google Sheet). NO location, NO IP, NO message
  * contents — just who / when / device / which action. Inert until ANALYTICS_URL is
  * set; every call is failure-tolerant so analytics can never affect the app. */
-const APP_VERSION = 'v24';
+const APP_VERSION = 'v26';
 const LS_DEVICE = 'rts.deviceId';
 const LS_AQ = 'rts.analyticsQueue';
 let sessionStart = Date.now();
+const sessionId = 's_' + Math.random().toString(36).slice(2, 10);
 let aQueue = [];
 try { aQueue = JSON.parse(localStorage.getItem(LS_AQ) || '[]') || []; } catch {}
 
@@ -2832,18 +2848,27 @@ function deviceInfo() {
   const type = /ipad|tablet/i.test(ua) ? 'tablet' : (/mobile|iphone|android/i.test(ua) ? 'phone' : 'desktop');
   const browser = /crios|chrome/i.test(ua) ? 'Chrome' : /fxios|firefox/i.test(ua) ? 'Firefox' : /edg/i.test(ua) ? 'Edge' : /safari/i.test(ua) ? 'Safari' : 'Other';
   let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch {}
+  let net = ''; try { net = (navigator.connection && navigator.connection.effectiveType) || ''; } catch {}
+  let dark = ''; try { dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch {}
   const installed = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-  return { device: deviceId(), os, type, browser, tz, lang: navigator.language || '', installed: !!installed, screen: (screen.width + 'x' + screen.height), ver: APP_VERSION };
+  return {
+    device: deviceId(), os, type, browser, tz, lang: navigator.language || '',
+    installed: !!installed, screen: (screen.width + 'x' + screen.height),
+    viewport: (window.innerWidth + 'x' + window.innerHeight), net, dark,
+    referrer: (document.referrer || '').slice(0, 120), ver: APP_VERSION,
+  };
 }
 function saveAQ() { try { localStorage.setItem(LS_AQ, JSON.stringify(aQueue.slice(-200))); } catch {} }
 function track(event, detail) {
   if (!window.ANALYTICS_URL) return;   // disabled until an endpoint is configured
   try {
+    const d = new Date();
     aQueue.push(Object.assign({
-      t: new Date().toISOString(),
+      t: d.toISOString(),
       who: state.me ? state.me.name : '(not signed in)',
       event,
       detail: detail == null ? '' : (typeof detail === 'string' ? detail : JSON.stringify(detail)),
+      date: toISO(d), hour: d.getHours(), dow: d.toLocaleDateString(undefined, { weekday: 'short' }), session: sessionId,
     }, deviceInfo()));
     saveAQ();
     if (aQueue.length >= 8) flushAnalytics(false);

@@ -6,15 +6,24 @@ and shows **nothing in the app** except a one-line footer notice. Nothing is wri
 to the public Firebase database.
 
 ## What is captured
-Per event: timestamp, the profile name (or "(not signed in)"), the event, a small
-detail, and device context — a random per-device id, phone/tablet/desktop, OS,
-browser, installed-as-app vs browser, timezone, language, screen size, app version.
+Per event: timestamp, profile name (or "(not signed in)"), the event, a small
+detail, **date / hour / weekday**, a **session id**, and device context — a random
+per-device id, phone/tablet/desktop, OS, browser, installed-as-app vs browser,
+timezone, language, screen + viewport size, network type, light/dark, referrer,
+and app version.
 
 **Not captured:** location, IP address, PINs, or any feed/message contents.
 
-Events: `app_open` (fires even before login — good for spotting outsiders), `login`,
-`session_end` (with seconds), `screen` (which view), `pull_add`, `floor_set`,
-`floor_photo`, `feed_post`, `hole`, `task_done`.
+Events: `app_open` (before login too), `login`, `logout/session_end`, `switch_user`,
+`screen` (which view), `pull_add`, `pull_remove`, `floor_set`, `floor_photo`,
+`hole`, `feed_post`, `feed_react`, `task_add`, `task_claim`, `task_done`,
+`item_view`, `catalog_save`, `catalog_delete`, `scan`, `search`, `filter`,
+`copy_list`, `share_day`, `profile_new`, `profile_delete`, and the security
+signals **`pin_fail`** and **`master_used`** (1905).
+
+The Sheet auto-builds three tabs: **Dashboard** (KPIs, by-event/person/screen,
+logins-per-day chart, by-hour, devices), **Review** (possible outsiders), and
+**Security** (failed PINs + master uses).
 
 ## Spotting outsiders ("is corporate looking?")
 In the Sheet, sort/filter by **device** and **type/os/browser**. Signals that stand
