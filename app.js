@@ -945,11 +945,19 @@ function renderHistory() {
 
 function renderPullList() {
   const n = state.pull.length;
+  const platterHtml = platterComponentsHtml();   // components to pull for platters (build-to-par)
+  const hasPlatters = !!platterHtml;
   $('listCount').textContent = n;
-  $('pullListEmpty').hidden = n > 0;
-  $('pullListWrap').hidden = n === 0;
+  $('pullListEmpty').hidden = n > 0 || hasPlatters;
+  $('pullListWrap').hidden = !(n > 0 || hasPlatters);
+  $('pullPlatters').innerHTML = platterHtml;
   if (!$('freezerView').hidden) renderFreezer();   // keep freezer mode in sync
-  if (n === 0) return;
+  if (n === 0) {
+    // platter components only (no shelf pulls) — show just that card
+    $('pullSummary').innerHTML = hasPlatters ? 'No shelf items on the list — platter components below.' : '';
+    $('pullItems').innerHTML = '';
+    return;
+  }
 
   const ordered = state.items.filter((it) => inList(it.name));
   const totalQty = state.pull.reduce((s, p) => s + p.qty, 0);
@@ -1036,7 +1044,7 @@ function renderPullList() {
  * giant item names, a big check target per row, nothing easy to miss-tap.
  * Remaining items sit on top; pulled ones sink to the bottom, dimmed. */
 function openFreezer() {
-  if (!state.pull.length) return;
+  if (!state.pull.length && !platterPrep().size) return;
   $('freezerView').hidden = false;
   document.body.classList.add('freezer-open');
   renderFreezer(); track('screen', 'freezer');
@@ -1053,9 +1061,15 @@ function renderFreezer() {
   $('freezerBar').style.width = pct + '%';
 
   const list = $('freezerList');
-  if (!n) { list.innerHTML = '<div class="fz-empty">Pull list is empty.</div>'; return; }
+  const platterHtml = platterComponentsHtml();
+  if (!n) {
+    list.innerHTML = platterHtml
+      ? platterHtml + '<div class="fz-empty">No shelf items to pull — grab the platter components above.</div>'
+      : '<div class="fz-empty">Pull list is empty.</div>';
+    return;
+  }
   if (done === n) {
-    list.innerHTML = '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
+    list.innerHTML = platterHtml + '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
     return;
   }
   const holeOf = (it) => { const p = state.pull.find((x) => x.name === it.name); return !!(p && p.hole && !p.done); };
@@ -1079,6 +1093,7 @@ function renderFreezer() {
   };
 
   const frag = document.createDocumentFragment();
+  if (platterHtml) { const pc = document.createElement('div'); pc.innerHTML = platterHtml; frag.appendChild(pc); }
   // holes first — empty spots to fill before walking the freezer
   const holes = ordered.filter(holeOf);
   if (holes.length) {
@@ -1204,6 +1219,58 @@ function setProdMake(id, delta) {
   if (p.make === 0) p.done = false;
   saveProduction(); renderProduction();
 }
+
+/* Platters build to par: how many to make = par − how many are already on the floor.
+ * (Crème-cake production stays pull-list-driven via syncCremeProduction.) */
+function parOf(it) { const p = state.prod[it.id] || {}; return p.par != null ? p.par : (it.par || 0); }
+function onHandOf(it) { const p = state.prod[it.id] || {}; return p.onHand || 0; }
+function platterMake(it) {
+  if (it.cake) return (state.prod[it.id] || {}).make || 0;
+  return Math.max(0, parOf(it) - onHandOf(it));
+}
+function setPar(id) {
+  const it = PRODUCTION.find((x) => x.id === id); if (!it) return;
+  const p = prodOf(id);
+  const v = prompt(`Par for "${it.name}" — how many to keep on the floor?`, parOf(it));
+  if (v === null) return;
+  const n = parseInt(v, 10);
+  p.par = Number.isFinite(n) && n >= 0 ? n : 0;
+  saveProduction(); afterPlatterChange();
+}
+function setOnHand(id, delta) {
+  const p = prodOf(id);
+  p.onHand = Math.max(0, (p.onHand || 0) + delta);
+  saveProduction(); afterPlatterChange();
+}
+function afterPlatterChange() {
+  renderProduction(); renderPullList();
+  if (!$('freezerView').hidden) renderFreezer();
+}
+// components a platter is assembled from, rolled up to total pieces to pull (frozen)
+function platterPrep() {
+  const prep = new Map();
+  for (const it of PRODUCTION) {
+    if (it.cake) continue;
+    const make = platterMake(it);
+    if (make <= 0) continue;
+    for (const c of (it.recipe || [])) if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * make);
+  }
+  return prep;
+}
+// the "pull these frozen for platters" card, shown in the Pull List and Freezer Mode
+function platterComponentsHtml() {
+  const prep = platterPrep();
+  if (!prep.size) return '';
+  let totalBoxes = 0, anyBox = false;
+  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
+    const box = state.compBox[n];
+    let right;
+    if (box) { const boxes = Math.ceil(q / box); totalBoxes += boxes; anyBox = true; right = `<b>${boxes} box${boxes === 1 ? '' : 'es'}</b> <small>${q} pcs</small>`; }
+    else right = `<b>${q} pcs</b> <small>set box in Production</small>`;
+    return `<div class="platc-row"><span class="platc-name">${escapeHtml(n)}</span><span class="platc-qty">${right}</span></div>`;
+  }).join('');
+  return `<div class="platc"><div class="platc-head">🎉 Platter components — pull these from the freezer</div>${rows}${anyBox ? `<div class="platc-total">Total <b>${totalBoxes}</b> box${totalBoxes === 1 ? '' : 'es'}</div>` : ''}</div>`;
+}
 function toggleProdDone(id) {
   const p = prodOf(id);
   if (!p.make) return;
@@ -1218,7 +1285,7 @@ function clearProduction() {
 }
 
 function updateProdCount() {
-  const n = PRODUCTION.filter((it) => (state.prod[it.id] || {}).make > 0).length;
+  const n = PRODUCTION.filter((it) => platterMake(it) > 0).length;
   $('prodCount').textContent = n;
 }
 
@@ -1245,46 +1312,60 @@ function renderProduction() {
       h.className = 'cat-header'; h.textContent = it.group;
       wrap.appendChild(h); lastGroup = it.group;
     }
-    if (p.make > 0) {
+    const make = platterMake(it);
+    if (make > 0) {
       planned++;
       if (p.done) doneCount++;
-      if (it.cake) { totalHalves += p.make; wholesToSlice += Math.ceil(p.make / 2); }
+      if (it.cake) { totalHalves += make; wholesToSlice += Math.ceil(make / 2); }
       else {
-        totalPlatters += p.make;
+        totalPlatters += make;
         let anyTbd = false;
         for (const c of (it.recipe || [])) {
-          if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * p.make);
+          if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * make);
           else anyTbd = true;
         }
-        if (anyTbd) tbd.push(`${p.make}× ${it.name}`);
+        if (anyTbd) tbd.push(`${make}× ${it.name}`);
       }
     }
     const sub = it.cake
-      ? (p.make > 0 ? `${p.make} halves · slice ${Math.ceil(p.make / 2)} whole${Math.ceil(p.make / 2) === 1 ? '' : 's'}` : 'sliced half creme cake')
+      ? (make > 0 ? `${make} halves · slice ${Math.ceil(make / 2)} whole${Math.ceil(make / 2) === 1 ? '' : 's'}` : 'sliced half creme cake')
       : recipeSummary(it);
 
     const row = document.createElement('div');
-    row.className = 'pull-item' + (p.done ? ' done' : '');
+    row.className = 'pull-item prod-item' + (p.done ? ' done' : '');
+    const parLine = it.cake ? '' :
+      `<div class="prod-par">
+         <button type="button" class="par-chip" data-par="${it.id}">Par ${parOf(it)}</button>
+         <span class="prod-oh">on floor
+           <span class="qty"><button type="button" data-oh="dec" aria-label="fewer on floor">−</button><span class="qty-n">${onHandOf(it)}</span><button type="button" data-oh="inc" aria-label="more on floor">+</button></span>
+         </span>
+         <span class="prod-build">build <b>${make}</b></span>
+       </div>`;
+    const cakeQty = !it.cake ? '' :
+      `<div class="qty"><button type="button" data-act="dec" aria-label="Decrease">−</button><span class="qty-n">${make}</span><button type="button" data-act="inc" aria-label="Increase">+</button></div>`;
     row.innerHTML = `
-      <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} ${p.make ? '' : 'disabled'} aria-label="Mark produced" />
+      <input type="checkbox" class="pull-check" ${p.done ? 'checked' : ''} ${make ? '' : 'disabled'} aria-label="Mark produced" />
       <div class="pull-main">
         <div class="pull-name">${escapeHtml(it.name)}</div>
-        <div class="pull-sub">${escapeHtml(sub)}${it.cake && p.make > 0 ? ' <span class="from-pull">↳ from pull list</span>' : ''}</div>
+        <div class="pull-sub">${escapeHtml(sub)}${it.cake && make > 0 ? ' <span class="from-pull">↳ from pull list</span>' : ''}</div>
+        ${parLine}
       </div>
-      <div class="qty">
-        <button type="button" data-act="dec" aria-label="Decrease">−</button>
-        <span>${p.make}</span>
-        <button type="button" data-act="inc" aria-label="Increase">+</button>
-      </div>`;
+      ${cakeQty}`;
     row.querySelector('.pull-check').addEventListener('change', () => toggleProdDone(it.id));
-    row.querySelector('[data-act="dec"]').addEventListener('click', () => setProdMake(it.id, -1));
-    row.querySelector('[data-act="inc"]').addEventListener('click', () => setProdMake(it.id, +1));
+    if (it.cake) {
+      row.querySelector('[data-act="dec"]').addEventListener('click', () => setProdMake(it.id, -1));
+      row.querySelector('[data-act="inc"]').addEventListener('click', () => setProdMake(it.id, +1));
+    } else {
+      row.querySelector('.par-chip').addEventListener('click', () => setPar(it.id));
+      row.querySelector('[data-oh="dec"]').addEventListener('click', () => setOnHand(it.id, -1));
+      row.querySelector('[data-oh="inc"]').addEventListener('click', () => setOnHand(it.id, +1));
+    }
     wrap.appendChild(row);
   }
 
   $('prodSummary').innerHTML = planned === 0
-    ? 'Set how many to make with the + buttons.'
-    : `<strong>${totalPlatters}</strong> platter${totalPlatters === 1 ? '' : 's'} · <strong>${totalHalves}</strong> creme-cake halves · ${doneCount}/${planned} produced`;
+    ? 'Set each platter\'s <strong>Par</strong> and how many are <strong>on the floor</strong> — the app builds the difference.'
+    : `<strong>${totalPlatters}</strong> platter${totalPlatters === 1 ? '' : 's'} to build · <strong>${totalHalves}</strong> crème-cake halves · ${doneCount}/${planned} done`;
 
   // Prep totals (component rollup) + box-pull math
   const prepEl = $('prodPrep');
@@ -1324,13 +1405,14 @@ function productionText() {
   let lastGroup = null;
   const prep = new Map(); let wholes = 0;
   for (const it of PRODUCTION) {
-    const p = state.prod[it.id] || { make: 0 };
-    if (!p.make) continue;
+    const p = state.prod[it.id] || {};
+    const make = platterMake(it);
+    if (!make) continue;
     if (it.group !== lastGroup) { lines.push(`-- ${it.group} --`); lastGroup = it.group; }
-    const extra = it.cake ? ` (slice ${Math.ceil(p.make / 2)})` : '';
-    lines.push(`[${p.done ? 'x' : ' '}] ${p.make}x ${it.name}${extra}`);
-    if (it.cake) wholes += Math.ceil(p.make / 2);
-    else for (const c of (it.recipe || [])) if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * p.make);
+    const extra = it.cake ? ` (slice ${Math.ceil(make / 2)})` : '';
+    lines.push(`[${p.done ? 'x' : ' '}] ${make}x ${it.name}${extra}`);
+    if (it.cake) wholes += Math.ceil(make / 2);
+    else for (const c of (it.recipe || [])) if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * make);
   }
   if (lines.length === 1) return 'Production plan is empty.';
   if (prep.size || wholes) {
@@ -1346,7 +1428,7 @@ function productionText() {
     if (totalBoxes) lines.push(`  TOTAL BOXES TO PULL: ${totalBoxes}`);
   }
   let units = 0;
-  for (const it of PRODUCTION) units += (state.prod[it.id] || {}).make || 0;
+  for (const it of PRODUCTION) units += platterMake(it);
   if (units) { lines.push('', `Containers needed: ${units}`, `Labels needed: ${units}`); }
   return lines.join('\n');
 }
@@ -2309,7 +2391,7 @@ function switchTab(which) {
   }
   track('screen', which);
   // entering the Pull List with items waiting jumps straight into Freezer Mode
-  if (which === 'list' && state.pull.length && $('freezerView').hidden) openFreezer();
+  if (which === 'list' && (state.pull.length || platterPrep().size) && $('freezerView').hidden) openFreezer();
 }
 
 /* Flip Book lives in a floating overlay (button stacked above Scan) */

@@ -1145,3 +1145,24 @@ body.history-open .fab { display: none; }
 
 /* usage disclosure */
 .footer-note { text-align: center; font-size: .66rem; color: var(--muted); opacity: .8; margin-top: 6px; line-height: 1.4; }
+
+/* ---------- Production: par / on-hand + platter components ---------- */
+.prod-item .pull-main { min-width: 0; }
+.prod-par { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); }
+.par-chip { border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 5px 12px; font-weight: 800; font-size: .78rem; cursor: pointer; }
+.par-chip:active { transform: scale(.97); }
+.prod-oh { display: inline-flex; align-items: center; gap: 6px; }
+.prod-oh .qty { border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.prod-oh .qty button { width: 30px; height: 28px; border: none; background: #fff; font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.prod-build { margin-left: auto; font-weight: 700; color: var(--ink); }
+.prod-build b { color: var(--heb-dark); font-family: var(--font-head); font-size: 1rem; }
+
+.platc { background: #fffaf0; border: 1px solid #f0e2bd; border-radius: 12px; padding: 10px 12px; margin: 10px 14px 0; }
+.platc-head { font-family: var(--font-head); font-weight: 800; color: #7a5b00; font-size: .82rem; margin-bottom: 6px; }
+.platc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .86rem; padding: 4px 0; border-bottom: 1px dashed #ecdca6; }
+.platc-row:last-of-type { border-bottom: none; }
+.platc-name { min-width: 0; }
+.platc-qty { flex: 0 0 auto; white-space: nowrap; color: var(--ink); }
+.platc-qty b { color: #7a5b00; }
+.platc-qty small { color: var(--muted); font-weight: 600; margin-left: 4px; }
+.platc-total { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0e2bd; font-weight: 800; color: #7a5b00; }
