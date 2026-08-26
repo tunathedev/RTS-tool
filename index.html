@@ -206,10 +206,11 @@
       <div class="prod-prep" id="prodPrep"></div>
       <div class="prod-pack" id="prodPack"></div>
       <div class="pull-actions">
-        <button type="button" class="btn" id="prodCopyBtn">📋 Copy plan</button>
+        <button type="button" class="btn" id="newPlatterBtn">➕ New platter</button>
+        <button type="button" class="btn btn-ghost" id="prodCopyBtn">📋 Copy plan</button>
         <button type="button" class="btn btn-ghost-danger" id="prodClearBtn">Clear plan</button>
       </div>
-      <div class="prod-note">📦 Component counts &amp; container/box math — coming next.</div>
+      <div class="prod-note">📦 Set each platter's <strong>Par</strong> and <strong>on-floor</strong> count; tap ✏️ to edit its recipe. Case quantities come from each product's "Items per box."</div>
     </section>
   </main>
 
@@ -416,6 +417,40 @@
         <button type="button" class="btn-ghost" id="edReset">Reset to default</button>
         <button type="button" class="btn-ghost btn-ghost-danger" id="edDelete">Delete</button>
         <button type="button" class="btn-ghost" id="edCancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATTER EDITOR modal -->
+  <div class="sheet-backdrop" id="platterBackdrop" hidden></div>
+  <div class="sheet editor-sheet" id="platterEditor" role="dialog" aria-modal="true" aria-label="Edit platter" hidden>
+    <button class="sheet-close" id="platterClose" aria-label="Close">✕</button>
+    <h2 id="platterTitle" class="editor-title">Edit platter</h2>
+    <div class="editor-grid">
+      <label class="ed-field ed-wide">Platter name
+        <input type="text" id="pltName" autocomplete="off" />
+      </label>
+      <label class="ed-field">Group
+        <select id="pltGroup">
+          <option>Platters</option>
+          <option>Mexican Pastries</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label class="ed-field">Note (optional)
+        <input type="text" id="pltNote" autocomplete="off" placeholder="e.g. 3 lb" />
+      </label>
+    </div>
+    <div class="plt-recipe-head">Recipe — product &amp; pieces per platter</div>
+    <div id="pltRecipe"></div>
+    <button type="button" class="chip-btn" id="pltAddRow">➕ Add product</button>
+    <datalist id="pltProductList"></datalist>
+    <div class="editor-actions">
+      <button type="button" class="btn btn-block" id="pltSave">Done</button>
+      <div class="editor-auto">Case quantity comes from each product's “Items per box.”</div>
+      <div class="editor-actions-row">
+        <button type="button" class="btn-ghost btn-ghost-danger" id="pltDelete">Delete platter</button>
+        <button type="button" class="btn-ghost" id="pltCancel">Close</button>
       </div>
     </div>
   </div>

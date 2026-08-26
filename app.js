@@ -17,6 +17,7 @@ const LS_CAKE = 'rts.hideCake';
 const LS_DISC = 'rts.hideDiscontinued';
 const LS_PROD = 'rts.production.v1';
 const LS_COMPBOX = 'rts.componentBox.v1';
+const LS_PLATTERS = 'rts.platters.v1';
 const LS_LOGINIT = 'rts.logInitials';
 const LS_PROFILES = 'rts.profiles.v1';
 const LS_ME = 'rts.me';
@@ -36,8 +37,9 @@ const state = {
   hideHoliday: false,
   hideCake: false,
   hideDisc: false,
-  prod: {},           // production plan: id -> { make, done }
-  compBox: {},        // component name -> items per box (for box-pull math)
+  prod: {},           // production plan: id -> { make, done, par, onHand }
+  compBox: {},        // legacy component name -> items per box (fallback for non-catalog components)
+  platters: {},       // editable platters: id -> { id, name, group, note, recipe:[{n,q}] }
   log: [],            // floor log entries: { id, ts, day, tag, by, note, img }
   profiles: {},       // people: id -> { id, name, emoji, color, pin, createdAt }
   me: null,           // the profile signed in on this device
@@ -73,6 +75,7 @@ async function init() {
   loadPullDay();
   checkPullRollover();   // new day → archive yesterday's list and start fresh
   loadProduction();
+  loadPlatters();
   buildCategoryFilter();
   buildCatDatalist();
   renderHeader();
@@ -831,7 +834,7 @@ function syncCremeProduction() {
     if (it && isHalfItem(it)) { const id = prodIdForHalf(it.name); if (id) sums[id] = (sums[id] || 0) + p.qty; }
   }
   let changed = false;
-  for (const cake of PRODUCTION) {
+  for (const cake of CREME_CAKES) {
     if (!cake.cake) continue;
     const want = sums[cake.id] || 0;
     const rec = state.prod[cake.id] || { make: 0, done: false };
@@ -1172,23 +1175,8 @@ function flashBtn(btn, msg) {
 
 /* ---------------- Production (platters & sliced half creme cakes) ---------------- */
 // recipe component { n: name, q: pieces per platter (0 = count TBD) }
-const PRODUCTION = [
-  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', price: 11.98, note: '~80 holes',
-    recipe: [{ n: 'Glazed donut holes', q: 27 }, { n: 'Chocolate donut holes', q: 27 }, { n: 'Powdered donut holes', q: 26 }] },
-  { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)', price: 11.98,
-    recipe: [{ n: 'Oatmeal cookies', q: 9 }, { n: 'Sugar cookies', q: 9 }, { n: 'Chocolate candy cookies', q: 9 }, { n: 'Chocolate chunk cookies', q: 9 }] },
-  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray', price: 15.98,
-    recipe: [{ n: 'Oatmeal cookies', q: 6 }, { n: 'Sugar cookies', q: 6 }, { n: 'Chocolate candy cookies', q: 6 }, { n: 'Chocolate chunk cookies', q: 6 }, { n: 'Brownie bites', q: 28 }] },
-  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray', price: 11.98,
-    recipe: [{ n: 'Marble loaf slices', q: 0 }, { n: 'Lemon loaf slices', q: 0 }, { n: 'Danish loaf slices', q: 0 }] },
-  { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half (48 oz)', price: 15.98, note: '3 lb',
-    recipe: [{ n: 'Cinnamon pan de polvo', q: 0 }, { n: 'Powdered sugar pan de polvo', q: 0 }] },
-  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon (48 oz)', price: 15.98, note: '3 lb',
-    recipe: [{ n: 'Cinnamon pan de polvo', q: 0 }] },
-  { id: 'plt-mantecada-6', group: 'Mexican Pastries', name: 'Mantecada Cupcakes (6 ct)', note: '6 ct',
-    recipe: [{ n: 'Mantecada cupcakes', q: 6 }] },
-  { id: 'plt-mantecada-15', group: 'Mexican Pastries', name: 'Mantecada Cupcakes (15 ct)', price: 8.98, note: '15 ct',
-    recipe: [{ n: 'Mantecada cupcakes', q: 15 }] },
+/* Crème-cake slicing production is system-defined (pull-list-driven, not editable). */
+const CREME_CAKES = [
   { id: 'cake-marble', group: 'Sliced Half Creme Cakes', name: 'Marble', cake: true },
   { id: 'cake-lemon', group: 'Sliced Half Creme Cakes', name: 'Lemon', cake: true },
   { id: 'cake-strawberry', group: 'Sliced Half Creme Cakes', name: 'Strawberry', cake: true },
@@ -1197,12 +1185,51 @@ const PRODUCTION = [
   { id: 'cake-sockit', group: 'Sliced Half Creme Cakes', name: 'Sock It To Me', cake: true },
 ];
 
+/* Platters are editable, synced data (state.platters). These seed a fresh install;
+ * recipe rows reference catalog products by name (n) with pieces-per-platter (q). */
+const DEFAULT_PLATTERS = [
+  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: '~80 holes',
+    recipe: [{ n: 'Donut Holes Glazed', q: 27 }, { n: 'Donut Holes Devil Food', q: 27 }, { n: 'Donut Holes Powdered', q: 26 }] },
+  { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)',
+    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 9 }, { n: 'Cookies Sugar 18 ct', q: 9 }, { n: 'Cookie Candy', q: 9 }, { n: 'Chocolate Chunk 18 ct', q: 9 }] },
+  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray',
+    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 6 }, { n: 'Cookies Sugar 18 ct', q: 6 }, { n: 'Cookie Candy', q: 6 }, { n: 'Chocolate Chunk 18 ct', q: 6 }, { n: 'Brownie Bites Two-Bite', q: 28 }] },
+  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray',
+    recipe: [{ n: 'Sliced Loaf Marble', q: 0 }, { n: 'Sliced Loaf Lemon Creme', q: 0 }, { n: 'Sliced Loaf Danish Butter', q: 0 }] },
+  { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '3 lb',
+    recipe: [{ n: 'Pan de Polvo', q: 0 }, { n: 'Pan de Polvo Powdered', q: 0 }] },
+  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '3 lb',
+    recipe: [{ n: 'Pan de Polvo', q: 0 }] },
+];
+
 function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
   try { state.compBox = JSON.parse(localStorage.getItem(LS_COMPBOX) || '{}') || {}; } catch { state.compBox = {}; }
 }
 function saveProduction() { try { localStorage.setItem(LS_PROD, JSON.stringify(state.prod)); } catch {} pushSync('prod', state.prod); }
 function saveCompBox() { try { localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} pushSync('compBox', state.compBox); }
+
+/* editable platters (seeded on first run, then synced) */
+function loadPlatters() {
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem(LS_PLATTERS) || 'null'); } catch {}
+  if (stored && typeof stored === 'object' && Object.keys(stored).length) { state.platters = stored; return; }
+  state.platters = {};
+  for (const p of DEFAULT_PLATTERS) state.platters[p.id] = JSON.parse(JSON.stringify(p));
+  savePlatters(true);
+}
+function savePlatters(localOnly) {
+  try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); } catch {}
+  if (!localOnly) pushSync('platters', state.platters);
+}
+function platterList() { return [...Object.values(state.platters), ...CREME_CAKES]; }
+function platterById(id) { return state.platters[id] || CREME_CAKES.find((c) => c.id === id) || null; }
+// case pack for a recipe component: the catalog product's box qty, else a legacy override
+function componentBox(name) {
+  const it = state.byName.get(name);
+  if (it && it.boxQty) return it.boxQty;
+  return state.compBox[name] || null;
+}
 function setCompBox(name) {
   const cur = state.compBox[name] || '';
   const v = prompt(`How many "${name}" come per box (case pack)?`, cur);
@@ -1229,7 +1256,7 @@ function platterMake(it) {
   return Math.max(0, parOf(it) - onHandOf(it));
 }
 function setPar(id) {
-  const it = PRODUCTION.find((x) => x.id === id); if (!it) return;
+  const it = platterById(id); if (!it) return;
   const p = prodOf(id);
   const v = prompt(`Par for "${it.name}" — how many to keep on the floor?`, parOf(it));
   if (v === null) return;
@@ -1249,7 +1276,7 @@ function afterPlatterChange() {
 // components a platter is assembled from, rolled up to total pieces to pull (frozen)
 function platterPrep() {
   const prep = new Map();
-  for (const it of PRODUCTION) {
+  for (const it of platterList()) {
     if (it.cake) continue;
     const make = platterMake(it);
     if (make <= 0) continue;
@@ -1263,7 +1290,7 @@ function platterComponentsHtml() {
   if (!prep.size) return '';
   let totalBoxes = 0, anyBox = false;
   const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
-    const box = state.compBox[n];
+    const box = componentBox(n);
     let right;
     if (box) { const boxes = Math.ceil(q / box); totalBoxes += boxes; anyBox = true; right = `<b>${boxes} box${boxes === 1 ? '' : 'es'}</b> <small>${q} pcs</small>`; }
     else right = `<b>${q} pcs</b> <small>set box in Production</small>`;
@@ -1279,20 +1306,80 @@ function toggleProdDone(id) {
 }
 function clearProduction() {
   if (!Object.keys(state.prod).length) return;
-  if (!confirm('Clear the whole production plan?')) return;
-  state.prod = {};
-  saveProduction(); renderProduction();
+  if (!confirm('Reset on-floor counts and done marks? (Pars are kept.)')) return;
+  for (const id in state.prod) { const r = state.prod[id] || {}; state.prod[id] = { par: r.par, make: 0, onHand: 0, done: false }; }
+  saveProduction(); syncCremeProduction(); renderProduction();
 }
 
 function updateProdCount() {
-  const n = PRODUCTION.filter((it) => platterMake(it) > 0).length;
+  const n = platterList().filter((it) => platterMake(it) > 0).length;
   $('prodCount').textContent = n;
 }
 
 function recipeSummary(it) {
   if (it.cake) return 'sliced half creme cake';
-  const parts = (it.recipe || []).map((c) => (c.q ? c.q + ' ' : '') + c.n.replace(/ (cookies|donut holes|pan de polvo|loaf slices|cupcakes)$/i, ''));
-  return parts.join(' · ') + (it.price ? ` · $${it.price.toFixed(2)}` : '') + (it.note ? ` · ${it.note}` : '');
+  const parts = (it.recipe || []).map((c) => (c.q ? c.q + '× ' : '') + shortProd(c.n));
+  const missing = (it.recipe || []).some((c) => !c.q || !componentBox(c.n));
+  return (parts.join(' · ') || 'no recipe yet') + (it.note ? ` · ${it.note}` : '') + (missing ? ' · ⚠ set counts/case' : '');
+}
+function shortProd(name) { return String(name || '').replace(/\b\d+\s?(ct|oz|in|pk|"|dozen)\b/gi, '').replace(/\s+/g, ' ').trim(); }
+
+/* ---------------- Platter editor (create/edit platters + recipes) ---------------- */
+let editingPlatterId = null;
+function fillProductList() {
+  $('pltProductList').innerHTML = state.items.map((it) => `<option value="${escapeHtml(it.name)}"></option>`).join('');
+}
+function platterRecipeRow(prod, pcs) {
+  const div = document.createElement('div');
+  div.className = 'plt-row';
+  const boxHint = (n) => { const b = componentBox(n); return n ? (b ? `${b}/case` : '⚠ no case qty') : ''; };
+  div.innerHTML = `
+    <input class="plt-prod" list="pltProductList" placeholder="Product" value="${escapeHtml(prod || '')}" autocomplete="off" />
+    <input class="plt-pcs" type="number" min="0" inputmode="numeric" placeholder="pcs" value="${pcs != null && pcs !== '' ? pcs : ''}" />
+    <span class="plt-box">${boxHint(prod)}</span>
+    <button type="button" class="plt-rm" aria-label="Remove product">✕</button>`;
+  div.querySelector('.plt-rm').addEventListener('click', () => div.remove());
+  div.querySelector('.plt-prod').addEventListener('input', (e) => { div.querySelector('.plt-box').textContent = boxHint(e.target.value.trim()); });
+  return div;
+}
+function openPlatterEditor(id) {
+  editingPlatterId = id || null;
+  fillProductList();
+  const p = id ? state.platters[id] : null;
+  $('platterTitle').textContent = p ? 'Edit platter' : 'New platter';
+  $('pltName').value = p ? p.name : '';
+  $('pltGroup').value = p ? (p.group || 'Platters') : 'Platters';
+  $('pltNote').value = p ? (p.note || '') : '';
+  const rec = $('pltRecipe'); rec.innerHTML = '';
+  const rows = (p && p.recipe && p.recipe.length) ? p.recipe : [{ n: '', q: '' }];
+  for (const r of rows) rec.appendChild(platterRecipeRow(r.n, r.q));
+  $('pltDelete').style.display = id ? '' : 'none';
+  $('platterBackdrop').hidden = false; $('platterEditor').hidden = false;
+  setTimeout(() => $('pltName').focus(), 60);
+}
+function closePlatterEditor() { $('platterEditor').hidden = true; $('platterBackdrop').hidden = true; }
+function savePlatter() {
+  const name = $('pltName').value.trim();
+  if (!name) { $('pltName').focus(); return; }
+  const recipe = [];
+  $('pltRecipe').querySelectorAll('.plt-row').forEach((row) => {
+    const n = row.querySelector('.plt-prod').value.trim();
+    const q = parseInt(row.querySelector('.plt-pcs').value, 10);
+    if (n) recipe.push({ n, q: Number.isFinite(q) && q >= 0 ? q : 0 });
+  });
+  const id = editingPlatterId || ('plt-u' + Date.now().toString(36) + Math.floor(Math.random() * 1e3).toString(36));
+  state.platters[id] = { id, name, group: $('pltGroup').value || 'Platters', note: $('pltNote').value.trim(), recipe };
+  savePlatters();
+  track('platter_save', name);
+  closePlatterEditor(); afterPlatterChange();
+}
+function deletePlatter() {
+  if (!editingPlatterId) return;
+  if (!confirm('Delete this platter?')) return;
+  delete state.platters[editingPlatterId];
+  delete state.prod[editingPlatterId];
+  savePlatters(); saveProduction();
+  closePlatterEditor(); afterPlatterChange();
 }
 
 function renderProduction() {
@@ -1305,7 +1392,7 @@ function renderProduction() {
   const tbd = [];              // platters whose piece counts aren't set yet
   let wholesToSlice = 0;
 
-  for (const it of PRODUCTION) {
+  for (const it of platterList()) {
     const p = state.prod[it.id] || { make: 0, done: false };
     if (it.group !== lastGroup) {
       const h = document.createElement('div');
@@ -1340,6 +1427,7 @@ function renderProduction() {
            <span class="qty"><button type="button" data-oh="dec" aria-label="fewer on floor">−</button><span class="qty-n">${onHandOf(it)}</span><button type="button" data-oh="inc" aria-label="more on floor">+</button></span>
          </span>
          <span class="prod-build">build <b>${make}</b></span>
+         <button type="button" class="plt-edit" data-edit="${it.id}" aria-label="Edit platter">✏️</button>
        </div>`;
     const cakeQty = !it.cake ? '' :
       `<div class="qty"><button type="button" data-act="dec" aria-label="Decrease">−</button><span class="qty-n">${make}</span><button type="button" data-act="inc" aria-label="Increase">+</button></div>`;
@@ -1359,6 +1447,7 @@ function renderProduction() {
       row.querySelector('.par-chip').addEventListener('click', () => setPar(it.id));
       row.querySelector('[data-oh="dec"]').addEventListener('click', () => setOnHand(it.id, -1));
       row.querySelector('[data-oh="inc"]').addEventListener('click', () => setOnHand(it.id, +1));
+      row.querySelector('.plt-edit').addEventListener('click', () => openPlatterEditor(it.id));
     }
     wrap.appendChild(row);
   }
@@ -1372,7 +1461,7 @@ function renderProduction() {
   if (!prep.size && !wholesToSlice && !tbd.length) { prepEl.innerHTML = ''; return; }
   let totalBoxes = 0, anyBox = false;
   const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
-    const box = state.compBox[n];
+    const box = componentBox(n);
     let boxHtml;
     if (box) {
       const boxes = Math.ceil(q / box);
@@ -1404,7 +1493,7 @@ function productionText() {
   const lines = [`Production plan — ${fmtDate(stripTime(new Date()))}`];
   let lastGroup = null;
   const prep = new Map(); let wholes = 0;
-  for (const it of PRODUCTION) {
+  for (const it of platterList()) {
     const p = state.prod[it.id] || {};
     const make = platterMake(it);
     if (!make) continue;
@@ -1419,7 +1508,7 @@ function productionText() {
     lines.push('', 'Prep totals:');
     let totalBoxes = 0;
     [...prep.entries()].sort((a, b) => b[1] - a[1]).forEach(([n, q]) => {
-      const box = state.compBox[n];
+      const box = componentBox(n);
       const b = box ? Math.ceil(q / box) : 0;
       if (b) totalBoxes += b;
       lines.push(`  ${n}: ${q}${box ? ` (${b} box)` : ''}`);
@@ -1428,7 +1517,7 @@ function productionText() {
     if (totalBoxes) lines.push(`  TOTAL BOXES TO PULL: ${totalBoxes}`);
   }
   let units = 0;
-  for (const it of PRODUCTION) units += platterMake(it);
+  for (const it of platterList()) units += platterMake(it);
   if (units) { lines.push('', `Containers needed: ${units}`, `Labels needed: ${units}`); }
   return lines.join('\n');
 }
@@ -2409,6 +2498,14 @@ function wireEvents() {
   $('tabProd').addEventListener('click', () => switchTab('prod'));
   $('prodCopyBtn').addEventListener('click', copyProduction);
   $('prodClearBtn').addEventListener('click', clearProduction);
+  // platter editor
+  $('newPlatterBtn').addEventListener('click', () => openPlatterEditor(null));
+  $('pltAddRow').addEventListener('click', () => $('pltRecipe').appendChild(platterRecipeRow('', '')));
+  $('pltSave').addEventListener('click', savePlatter);
+  $('pltDelete').addEventListener('click', deletePlatter);
+  $('pltCancel').addEventListener('click', closePlatterEditor);
+  $('platterClose').addEventListener('click', closePlatterEditor);
+  $('platterBackdrop').addEventListener('click', closePlatterEditor);
   // flip book overlay: open from floating button, close from header
   $('flipFab').addEventListener('click', openFlip);
   $('flipClose').addEventListener('click', closeFlip);
@@ -2493,6 +2590,7 @@ function wireEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('photoViewer').hidden) closePhoto();
+    else if (!$('platterEditor').hidden) closePlatterEditor();
     else if (!$('historyView').hidden) closeHistory();
     else if (!$('feedView').hidden) closeFeed();
     else if (!$('freezerView').hidden) closeFreezer();
@@ -2728,7 +2826,7 @@ function setupLock() {
  * sync of the catalog, pull list, production plan and case-pack sizes across
  * all devices. Until then everything stays device-only (localStorage). */
 const sync = { on: false, applying: false, mod: null, db: null, seen: new Set(), last: {}, timers: {}, pending: {} };
-const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox', 'profiles', 'pullday'];
+const SYNC_PATHS = ['cust', 'pull', 'prod', 'compBox', 'profiles', 'pullday', 'platters'];
 
 function setSyncStatus(t, level) {
   const el = $('syncStatus'); if (el) el.textContent = t;
@@ -2739,7 +2837,7 @@ function setSyncStatus(t, level) {
   pill.className = 'sync-pill' + (cls ? ' ' + cls : '');
   pill.hidden = !label;
 }
-function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : p === 'profiles' ? state.profiles : p === 'pullday' ? state.pullDay : state.compBox; }
+function localOf(p) { return p === 'cust' ? state.cust : p === 'pull' ? state.pull : p === 'prod' ? state.prod : p === 'profiles' ? state.profiles : p === 'pullday' ? state.pullDay : p === 'platters' ? state.platters : state.compBox; }
 function asArr(d) { return Array.isArray(d) ? d : (d && typeof d === 'object' ? Object.values(d) : []); }
 
 // coalesce rapid writes per path (e.g. +/- qty bursts) into one network write
@@ -2779,6 +2877,9 @@ function onRemote(path, wrapper) {
       state.prod = data || {}; saveProduction(); renderProduction();
     } else if (path === 'compBox') {
       state.compBox = data || {}; saveCompBox(); renderProduction();
+    } else if (path === 'platters') {
+      if (data && typeof data === 'object') { state.platters = data; savePlatters(true); }
+      afterPlatterChange();
     } else if (path === 'profiles') {
       // authoritative (so deletes propagate) but never drop the person signed in here
       const next = data || {};
