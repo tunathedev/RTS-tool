@@ -1199,8 +1199,8 @@ const DEFAULT_PLATTERS = [
     recipe: [{ n: 'Sliced Loaf Marble', q: 0 }, { n: 'Sliced Loaf Lemon Creme', q: 0 }, { n: 'Sliced Loaf Danish Butter', q: 0 }] },
   { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '1 cinnamon + 1 powdered sleeve',
     recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }, { n: 'Bulk Powdered Pan de Polvo', q: 1 }] },
-  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: 'cinnamon sleeves',
-    recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }] },
+  { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '2 cinnamon sleeves',
+    recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 2 }] },
   { id: 'plt-mantecada-15', group: 'Mexican Pastries', name: 'Mantecada Platter (15 ct)', note: '15 ct',
     recipe: [{ n: 'Bulk Mantecada', q: 15 }] },
   { id: 'plt-mantecada-6', group: 'Mexican Pastries', name: 'Mantecada Platter (6 ct)', note: '6 ct',
@@ -1245,6 +1245,10 @@ function componentBox(name) {
   return state.compBox[name] || null;
 }
 function suppressedPlatters() { try { return JSON.parse(localStorage.getItem('rts.platSuppressed') || '[]') || []; } catch { return []; } }
+// old auto-generated recipes to replace with the current default (only exact matches, never user edits)
+const SUPERSEDE = {
+  'plt-pdp-cinn': ['[{"n":"Bulk Cinnamon Pan de Polvo","q":1}]'],   // was auto 1 sleeve → now 2
+};
 // keep the known platters (pan de polvo, mantecada) correct without stomping user edits or deletes
 function ensureManagedPlatters() {
   const supp = suppressedPlatters();
@@ -1252,7 +1256,9 @@ function ensureManagedPlatters() {
   for (const def of MANAGED_PLATTERS) {
     if (supp.includes(def.id)) continue;   // user deleted it — don't resurrect
     const cur = state.platters[def.id];
-    if (!cur || !cur.recipe || cur.recipe.every((c) => !c.q)) { state.platters[def.id] = JSON.parse(JSON.stringify(def)); changed = true; }
+    const placeholder = !cur || !cur.recipe || cur.recipe.every((c) => !c.q);
+    const stale = cur && cur.recipe && (SUPERSEDE[def.id] || []).includes(JSON.stringify(cur.recipe));
+    if (placeholder || stale) { state.platters[def.id] = JSON.parse(JSON.stringify(def)); changed = true; }
   }
   for (const k in DEFAULT_COMPBOX) if (state.compBox[k] == null) { state.compBox[k] = DEFAULT_COMPBOX[k]; changed = true; }
   if (changed) { try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
