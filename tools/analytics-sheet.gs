@@ -59,9 +59,8 @@ function section(sh, a1, text) {
   sh.getRange(a1).setValue(text).setFontWeight('bold').setFontColor('#fff').setBackground('#475569');
 }
 function kpi(sh, a1, label, formula) {
-  var c = sh.getRange(a1); c.setValue(label).setFontSize(9).setFontColor('#666');
-  var v = sh.getRange(a1).offset(1, 0); v.setFormula(formula).setFontSize(20).setFontWeight ? null : null;
-  v.setFontSize(20).setFontWeight('bold').setFontColor(RED);
+  sh.getRange(a1).setValue(label).setFontSize(9).setFontColor('#666');
+  sh.getRange(a1).offset(1, 0).setFormula(formula).setFontSize(20).setFontWeight('bold').setFontColor(RED);
 }
 
 function formatEvents(ss) {
