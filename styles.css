@@ -839,48 +839,48 @@ input:focus, select:focus, button:focus-visible { outline-color: var(--heb); }
 .freezer-list {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   width: 100%; max-width: var(--maxw); margin: 0 auto;
-  padding: 14px 12px calc(env(safe-area-inset-bottom, 0px) + 28px);
-  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 10px calc(env(safe-area-inset-bottom, 0px) + 28px);
+  display: flex; flex-direction: column; gap: 7px;
 }
 .fz-section {
   position: sticky; top: 0; z-index: 2;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  margin: 6px 0 0; padding: 10px 6px 8px;
+  margin: 5px 0 0; padding: 9px 6px 7px;
   background: #eef1f5;   /* opaque so cards scroll cleanly underneath */
-  font-family: var(--font-head); font-weight: 800; font-size: .98rem; color: var(--ink);
+  font-family: var(--font-head); font-weight: 800; font-size: .84rem; color: var(--ink);
   border-bottom: 2px solid #cfd6df;
 }
 .fz-section:first-child { margin-top: 0; }
 .fz-section.done { opacity: .5; }
 .fz-section-name { min-width: 0; }
-.fz-section-count { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
+.fz-section-count { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .78rem; }
 .fz-card {
-  display: flex; align-items: center; gap: 12px; padding: 12px 14px; min-height: 64px;
+  display: flex; align-items: center; gap: 11px; padding: 9px 12px; min-height: 52px;
   background: #fff; border: 1px solid var(--line); border-radius: 12px;
   box-shadow: none;
   transition: opacity .18s ease, background .18s ease;
 }
 /* compact done-state: pulled items shrink so the still-to-pull items stay front and center */
-.fz-card.done { opacity: .5; background: #f3f6f4; min-height: 0; padding: 8px 14px; }
+.fz-card.done { opacity: .5; background: #f3f6f4; min-height: 0; padding: 7px 12px; }
 .fz-qty {
-  flex: 0 0 auto; min-width: 48px; text-align: center;
-  font-family: var(--font-head); font-weight: 900; font-size: 1.45rem; color: var(--heb);
+  flex: 0 0 auto; min-width: 40px; text-align: center;
+  font-family: var(--font-head); font-weight: 900; font-size: 1.18rem; color: var(--heb);
   font-variant-numeric: tabular-nums;
 }
-.fz-card.done .fz-qty { color: var(--muted); font-size: 1.05rem; }
+.fz-card.done .fz-qty { color: var(--muted); font-size: .98rem; }
 .fz-info { flex: 1; min-width: 0; }
-.fz-name { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; line-height: 1.15; }
-.fz-card.done .fz-name { text-decoration: line-through; font-size: 1rem; }
-.fz-sub { font-size: .9rem; color: var(--muted); margin-top: 3px; }
+.fz-name { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; line-height: 1.15; }
+.fz-card.done .fz-name { text-decoration: line-through; font-size: .9rem; }
+.fz-sub { font-size: .78rem; color: var(--muted); margin-top: 2px; }
 .fz-card.done .fz-sub { display: none; }
 .fz-check {
-  flex: 0 0 auto; width: 66px; height: 66px; border-radius: 50%;
-  border: 3px solid #c2c8d0; background: #fff; color: #fff;
-  font-size: 1.9rem; font-weight: 900; line-height: 1; cursor: pointer;
+  flex: 0 0 auto; width: 54px; height: 54px; border-radius: 50%;
+  border: 2.5px solid #c2c8d0; background: #fff; color: #fff;
+  font-size: 1.5rem; font-weight: 900; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .15s ease, border-color .15s ease, transform .1s ease;
 }
-.fz-card.done .fz-check { width: 44px; height: 44px; font-size: 1.2rem; border-width: 2px; }
+.fz-card.done .fz-check { width: 40px; height: 40px; font-size: 1.05rem; border-width: 2px; }
 .fz-check:active { transform: scale(.94); }
 .fz-check.on { background: #22c55e; border-color: #22c55e; }
 .fz-alldone {
