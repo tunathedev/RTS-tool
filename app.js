@@ -1221,6 +1221,11 @@ const DEFAULT_COMPBOX = {
   'Donut Holes Glazed': 16,
   'Donut Holes Devil Food': 16,
   'Donut Holes Powdered': 16,
+  // Cookies — come in 18 ct packages; convert tray pieces to packages
+  'Cookies Oatmeal Raisin 18 ct': 18,
+  'Cookies Sugar 18 ct': 18,
+  'Cookie Candy': 18,
+  'Chocolate Chunk 18 ct': 18,
 };
 // managed platters whose recipes are known — corrected in place if still placeholders/missing
 const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada|loaf|doughnut)/.test(p.id));
