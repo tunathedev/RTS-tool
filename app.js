@@ -1189,14 +1189,14 @@ const CREME_CAKES = [
 /* Platters are editable, synced data (state.platters). These seed a fresh install;
  * recipe rows reference catalog products by name (n) with pieces-per-platter (q). */
 const DEFAULT_PLATTERS = [
-  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: '~80 holes',
-    recipe: [{ n: 'Donut Holes Glazed', q: 27 }, { n: 'Donut Holes Devil Food', q: 27 }, { n: 'Donut Holes Powdered', q: 26 }] },
+  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: '1 of each variety',
+    recipe: [{ n: 'Donut Holes Glazed', q: 1 }, { n: 'Donut Holes Devil Food', q: 1 }, { n: 'Donut Holes Powdered', q: 1 }] },
   { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)',
     recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 9 }, { n: 'Cookies Sugar 18 ct', q: 9 }, { n: 'Cookie Candy', q: 9 }, { n: 'Chocolate Chunk 18 ct', q: 9 }] },
   { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray',
     recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 6 }, { n: 'Cookies Sugar 18 ct', q: 6 }, { n: 'Cookie Candy', q: 6 }, { n: 'Chocolate Chunk 18 ct', q: 6 }, { n: 'Brownie Bites Two-Bite', q: 28 }] },
-  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray',
-    recipe: [{ n: 'Sliced Loaf Marble', q: 0 }, { n: 'Sliced Loaf Lemon Creme', q: 0 }, { n: 'Sliced Loaf Danish Butter', q: 0 }] },
+  { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray', note: '1 slice each — Danish, Marble, Lemon',
+    recipe: [{ n: 'Sliced Loaf Marble', q: 1 }, { n: 'Sliced Loaf Lemon Creme', q: 1 }, { n: 'Sliced Loaf Danish Butter', q: 1 }] },
   { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '1 cinnamon + 1 powdered sleeve',
     recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }, { n: 'Bulk Powdered Pan de Polvo', q: 1 }] },
   { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '2 cinnamon sleeves',
@@ -1207,14 +1207,23 @@ const DEFAULT_PLATTERS = [
     recipe: [{ n: 'Bulk Mantecada', q: 6 }] },
 ];
 
-/* Bulk prep components (not retail SKUs): case packs by sleeve/piece. */
+/* Case packs — a seed fallback used only when a product has no catalog box qty.
+ * (componentBox() prefers the catalog item's boxQty; these fill in for a fresh install.) */
 const DEFAULT_COMPBOX = {
   'Bulk Cinnamon Pan de Polvo': 6,   // sleeves per case
   'Bulk Powdered Pan de Polvo': 6,
   'Bulk Mantecada': 36,              // mantecada per case (→ 2× 15ct or 6× 6ct)
+  // Sliced loaf — each variety in its own case of 12 slices (→ 12 trays/case)
+  'Sliced Loaf Marble': 12,
+  'Sliced Loaf Lemon Creme': 12,
+  'Sliced Loaf Danish Butter': 12,
+  // Donut holes — 16 per case of each variety (→ 16 trays/case)
+  'Donut Holes Glazed': 16,
+  'Donut Holes Devil Food': 16,
+  'Donut Holes Powdered': 16,
 };
 // managed platters whose recipes are known — corrected in place if still placeholders/missing
-const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada)/.test(p.id));
+const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada|loaf|doughnut)/.test(p.id));
 
 function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
@@ -1248,6 +1257,7 @@ function suppressedPlatters() { try { return JSON.parse(localStorage.getItem('rt
 // old auto-generated recipes to replace with the current default (only exact matches, never user edits)
 const SUPERSEDE = {
   'plt-pdp-cinn': ['[{"n":"Bulk Cinnamon Pan de Polvo","q":1}]'],   // was auto 1 sleeve → now 2
+  'plt-doughnut': ['[{"n":"Donut Holes Glazed","q":27},{"n":"Donut Holes Devil Food","q":27},{"n":"Donut Holes Powdered","q":26}]'],   // was ~80 holes → now 1 of each
 };
 // keep the known platters (pan de polvo, mantecada) correct without stomping user edits or deletes
 function ensureManagedPlatters() {
