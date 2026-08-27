@@ -1189,11 +1189,11 @@ const CREME_CAKES = [
 /* Platters are editable, synced data (state.platters). These seed a fresh install;
  * recipe rows reference catalog products by name (n) with pieces-per-platter (q). */
 const DEFAULT_PLATTERS = [
-  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: '1 of each variety',
+  { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: "1 of each — Glazed, Devil's Food, Powdered",
     recipe: [{ n: 'Donut Holes Glazed', q: 1 }, { n: 'Donut Holes Devil Food', q: 1 }, { n: 'Donut Holes Powdered', q: 1 }] },
-  { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)',
+  { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)', note: '9 each — Oatmeal Raisin, Sugar, Candy, Chocolate Chunk',
     recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 9 }, { n: 'Cookies Sugar 18 ct', q: 9 }, { n: 'Cookie Candy', q: 9 }, { n: 'Chocolate Chunk 18 ct', q: 9 }] },
-  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray',
+  { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray', note: '6 each cookie + brownie bites',
     recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 6 }, { n: 'Cookies Sugar 18 ct', q: 6 }, { n: 'Cookie Candy', q: 6 }, { n: 'Chocolate Chunk 18 ct', q: 6 }, { n: 'Brownie Bites Two-Bite', q: 28 }] },
   { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray', note: '1 slice each — Danish, Marble, Lemon',
     recipe: [{ n: 'Sliced Loaf Marble', q: 1 }, { n: 'Sliced Loaf Lemon Creme', q: 1 }, { n: 'Sliced Loaf Danish Butter', q: 1 }] },
@@ -1201,9 +1201,9 @@ const DEFAULT_PLATTERS = [
     recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }, { n: 'Bulk Powdered Pan de Polvo', q: 1 }] },
   { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '2 cinnamon sleeves',
     recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 2 }] },
-  { id: 'plt-mantecada-15', group: 'Mexican Pastries', name: 'Mantecada Platter (15 ct)', note: '15 ct',
+  { id: 'plt-mantecada-15', group: 'Mexican Pastries', name: 'Mantecada Platter (15 ct)', note: '15 mantecada',
     recipe: [{ n: 'Bulk Mantecada', q: 15 }] },
-  { id: 'plt-mantecada-6', group: 'Mexican Pastries', name: 'Mantecada Platter (6 ct)', note: '6 ct',
+  { id: 'plt-mantecada-6', group: 'Mexican Pastries', name: 'Mantecada Platter (6 ct)', note: '6 mantecada',
     recipe: [{ n: 'Bulk Mantecada', q: 6 }] },
 ];
 
@@ -1274,6 +1274,13 @@ function ensureManagedPlatters() {
     const placeholder = !cur || !cur.recipe || cur.recipe.every((c) => !c.q);
     const stale = cur && cur.recipe && (SUPERSEDE[def.id] || []).includes(JSON.stringify(cur.recipe));
     if (placeholder || stale) { state.platters[def.id] = JSON.parse(JSON.stringify(def)); changed = true; }
+  }
+  // propagate name/note cleanups to any default platter whose recipe is still unedited (idempotent — never touches user edits)
+  for (const def of DEFAULT_PLATTERS) {
+    if (supp.includes(def.id)) continue;
+    const cur = state.platters[def.id];
+    if (!cur || !cur.recipe || JSON.stringify(cur.recipe) !== JSON.stringify(def.recipe)) continue;
+    if (cur.name !== def.name || cur.note !== def.note) { cur.name = def.name; cur.note = def.note; changed = true; }
   }
   for (const k in DEFAULT_COMPBOX) if (state.compBox[k] == null) { state.compBox[k] = DEFAULT_COMPBOX[k]; changed = true; }
   if (changed) { try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
@@ -1367,9 +1374,15 @@ function updateProdCount() {
 
 function recipeSummary(it) {
   if (it.cake) return 'sliced half creme cake';
-  const parts = (it.recipe || []).map((c) => (c.q ? c.q + '× ' : '') + shortProd(c.n));
-  const missing = (it.recipe || []).some((c) => !c.q || !componentBox(c.n));
-  return (parts.join(' · ') || 'no recipe yet') + (it.note ? ` · ${it.note}` : '') + (missing ? ' · ⚠ set counts/case' : '');
+  const recipe = it.recipe || [];
+  const missing = recipe.some((c) => !c.q || !componentBox(c.n));
+  // prefer the plain-language note; otherwise list the recipe (drop the "1×" noise on singles)
+  let text = it.note && it.note.trim();
+  if (!text) {
+    const parts = recipe.filter((c) => c.q).map((c) => (c.q > 1 ? c.q + '× ' : '') + shortProd(c.n));
+    text = parts.join(' · ') || 'no recipe yet';
+  }
+  return text + (missing ? ' · ⚠ set counts/case' : '');
 }
 function shortProd(name) { return String(name || '').replace(/\b\d+\s?(ct|oz|in|pk|"|dozen)\b/gi, '').replace(/\s+/g, ' ').trim(); }
 
