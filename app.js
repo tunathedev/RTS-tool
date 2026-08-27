@@ -1492,7 +1492,6 @@ function renderProduction() {
            <span class="qty"><button type="button" data-oh="dec" aria-label="fewer on floor">−</button><span class="qty-n">${onHandOf(it)}</span><button type="button" data-oh="inc" aria-label="more on floor">+</button></span>
          </span>
          <span class="prod-build">build <b>${make}</b></span>
-         <button type="button" class="plt-edit" data-edit="${it.id}" aria-label="Edit platter">✏️</button>
        </div>`;
     const cakeQty = !it.cake ? '' :
       `<div class="qty"><button type="button" data-act="dec" aria-label="Decrease">−</button><span class="qty-n">${make}</span><button type="button" data-act="inc" aria-label="Increase">+</button></div>`;
@@ -1512,7 +1511,6 @@ function renderProduction() {
       row.querySelector('.par-chip').addEventListener('click', () => setPar(it.id));
       row.querySelector('[data-oh="dec"]').addEventListener('click', () => setOnHand(it.id, -1));
       row.querySelector('[data-oh="inc"]').addEventListener('click', () => setOnHand(it.id, +1));
-      row.querySelector('.plt-edit').addEventListener('click', () => openPlatterEditor(it.id));
     }
     wrap.appendChild(row);
   }
@@ -2564,7 +2562,6 @@ function wireEvents() {
   $('prodCopyBtn').addEventListener('click', copyProduction);
   $('prodClearBtn').addEventListener('click', clearProduction);
   // platter editor
-  $('newPlatterBtn').addEventListener('click', () => openPlatterEditor(null));
   $('pltAddRow').addEventListener('click', () => $('pltRecipe').appendChild(platterRecipeRow('', '')));
   $('pltSave').addEventListener('click', savePlatter);
   $('pltDelete').addEventListener('click', deletePlatter);
