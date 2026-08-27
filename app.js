@@ -367,11 +367,11 @@ function thumbEl(url, cls) {
     if (!img) {
       img = new Image();
       img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
-      img.addEventListener('load', () => thumbCache.set(url, img));
-      img.addEventListener('error', () => { if (!thumbCache.has(url)) { wrap.classList.add('empty'); img.remove(); } });
+      img.addEventListener('error', () => { thumbCache.delete(url); img.remove(); });
       img.src = url;
+      thumbCache.set(url, img);   // cache the node at creation so re-renders reuse it whether or not it has loaded yet
     }
-    wrap.appendChild(img);   // moving a cached (loaded) node does not reload it
+    wrap.appendChild(img);   // moving a cached node does not reload it
   }
   return wrap;
 }
@@ -752,7 +752,7 @@ function loadPullList() {
     const saved = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
     // keep only items that still exist in the dataset
     state.pull = saved.filter((p) => state.byName.has(p.name))
-      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done, labels: !!p.labels, hole: !!p.hole }));
+      .map((p) => ({ name: p.name, qty: Math.max(1, p.qty | 0 || 1), done: !!p.done, labels: !!p.labels, hole: !!p.hole, addedTs: p.addedTs || null }));
   } catch { state.pull = []; }
 }
 function savePullList() {
@@ -764,7 +764,7 @@ function inList(name) { return state.pull.some((p) => p.name === name); }
 function toggleList(name) {
   const i = state.pull.findIndex((p) => p.name === name);
   if (i >= 0) { state.pull.splice(i, 1); track('pull_remove', name); }
-  else { state.pull.push({ name, qty: 1, done: false, labels: false }); track('pull_add', name); }
+  else { state.pull.push({ name, qty: 1, done: false, labels: false, addedTs: Date.now() }); track('pull_add', name); }
   savePullList();
   updateAddButton(name);   // just flip this row's button — don't rebuild Browse (keeps photos)
   renderPullList();
@@ -779,7 +779,7 @@ function isHole(name) { const p = state.pull.find((x) => x.name === name); retur
 function toggleHole(name) {
   let p = state.pull.find((x) => x.name === name);
   if (p) { p.hole = !p.hole; }
-  else { p = { name, qty: 1, done: false, labels: false, hole: true }; state.pull.push(p); }
+  else { p = { name, qty: 1, done: false, labels: false, hole: true, addedTs: Date.now() }; state.pull.push(p); }
   if (p.hole) track('hole', name);
   savePullList();
   updateAddButton(name);   // in-place so a long-press isn't interrupted by a full re-render
@@ -964,13 +964,13 @@ function renderPullList() {
     return;
   }
 
-  const ordered = state.items.filter((it) => inList(it.name));
+  const pullByName = new Map(state.pull.map((p) => [p.name, p]));   // O(1) lookups instead of repeated scans
+  const ordered = state.items.filter((it) => pullByName.has(it.name));
   const totalQty = state.pull.reduce((s, p) => s + p.qty, 0);
   const doneCount = state.pull.filter((p) => p.done).length;
-  const labeledCount = state.pull.filter((p) => p.labels).length;
   let totalBoxes = 0, boxKnown = false, totalWholes = 0;
   for (const it of ordered) {
-    const p = state.pull.find((x) => x.name === it.name);
+    const p = pullByName.get(it.name);
     if (isHalfItem(it)) { totalWholes += wholesForHalf(p.qty); continue; }
     const b = boxesFor(it, p.qty);
     if (b != null) { totalBoxes += b; boxKnown = true; }
@@ -989,12 +989,12 @@ function renderPullList() {
 
   const wrap = $('pullItems');
   wrap.innerHTML = '';
-  const isHolePend = (it) => { const p = state.pull.find((x) => x.name === it.name); return !!(p && p.hole && !p.done); };
+  const isHolePend = (it) => { const p = pullByName.get(it.name); return !!(p && p.hole && !p.done); };
   const holes = ordered.filter(isHolePend);
   const rest = ordered.filter((it) => !isHolePend(it));
   let didHoleHdr = false, didRestHdr = false;
   for (const it of [...holes, ...rest]) {
-    const p = state.pull.find((x) => x.name === it.name);
+    const p = pullByName.get(it.name);
     const hole = isHolePend(it);
     if (holes.length) {
       if (hole && !didHoleHdr) { didHoleHdr = true; wrap.appendChild(pullDivider('🕳️ Fill first — empty spots')); }
@@ -1021,6 +1021,7 @@ function renderPullList() {
           <span class="pull-name">${hole ? '🕳️ ' : ''}${escapeHtml(it.name)}${it.plu ? ` <span class="plu-tag">PLU ${escapeHtml(String(it.plu))}</span>` : ''}</span>
           <span class="pull-date-wrap">sell by ${sell}</span>
         </div>
+        ${p.addedTs ? `<div class="pull-added">＋ added ${escapeHtml(fmtAdded(p.addedTs))}</div>` : ''}
         <div class="pull-row-ctl">
           <span class="qty">
             <button type="button" data-act="dec" aria-label="Decrease quantity">−</button>
@@ -1049,16 +1050,28 @@ function renderPullList() {
  * giant item names, a big check target per row, nothing easy to miss-tap.
  * Remaining items sit on top; pulled ones sink to the bottom, dimmed. */
 function openFreezer() {
-  if (!state.pull.length && !platterPrep().size) return;
+  if (!state.pull.length && !platterComponents().length) return;
   $('freezerView').hidden = false;
   document.body.classList.add('freezer-open');
   renderFreezer(); track('screen', 'freezer');
 }
-function closeFreezer() { $('freezerView').hidden = true; document.body.classList.remove('freezer-open'); }
+function closeFreezer() { $('freezerView').hidden = true; document.body.classList.remove('freezer-open'); renderPullList(); }
 
+// lightweight progress refresh (header count + bar) with no list teardown; returns true if all pulled
+function updateFreezerProgress() {
+  const pullByName = new Map(state.pull.map((p) => [p.name, p]));
+  const ordered = state.items.filter((it) => pullByName.has(it.name));
+  const n = ordered.length;
+  const done = ordered.filter((it) => (pullByName.get(it.name) || {}).done).length;
+  $('freezerCount').textContent = `${done}/${n}`;
+  $('freezerBar').style.width = (n ? Math.round((done / n) * 100) : 0) + '%';
+  return n > 0 && done === n;
+}
 function renderFreezer() {
-  const ordered = state.items.filter((it) => inList(it.name));
-  const pullOf = (it) => state.pull.find((x) => x.name === it.name) || { qty: 1, done: false };
+  const pullByName = new Map(state.pull.map((p) => [p.name, p]));   // O(1) lookups, no repeated scans
+  const ordered = state.items.filter((it) => pullByName.has(it.name));
+  const pullOf = (it) => pullByName.get(it.name) || { qty: 1, done: false };
+  const holeOf = (it) => { const p = pullByName.get(it.name); return !!(p && p.hole && !p.done); };
   const n = ordered.length;
   const done = ordered.filter((it) => pullOf(it).done).length;
   const pct = n ? Math.round((done / n) * 100) : 0;
@@ -1077,22 +1090,35 @@ function renderFreezer() {
     list.innerHTML = platterHtml + '<div class="fz-alldone"><div class="fz-alldone-emoji">✅</div>All pulled — nice work!<br><span>Tap Exit to head back.</span></div>';
     return;
   }
-  const holeOf = (it) => { const p = state.pull.find((x) => x.name === it.name); return !!(p && p.hole && !p.done); };
   const fzCard = (it) => {
     const p = pullOf(it);
     const card = document.createElement('div');
     card.className = 'fz-card' + (p.done ? ' done' : '') + (holeOf(it) ? ' hole' : '');
     const sub = it.pkgDate ? 'Pkg date' : 'Sell by ' + fmtDate(sellByFor(it));
+    const added = p.addedTs ? ` · ＋${escapeHtml(fmtAdded(p.addedTs))}` : '';
     card.innerHTML =
       `<div class="fz-qty">×${p.qty}</div>
        <div class="fz-info">
          <div class="fz-name">${holeOf(it) ? '🕳️ ' : ''}${escapeHtml(it.name)}</div>
-         <div class="fz-sub">${sub}${it.plu ? ` · PLU ${escapeHtml(String(it.plu))}` : ''}</div>
+         <div class="fz-sub">${sub}${it.plu ? ` · PLU ${escapeHtml(String(it.plu))}` : ''}${added}</div>
        </div>
        <button type="button" class="fz-check${p.done ? ' on' : ''}" aria-label="${p.done ? 'Mark not pulled' : 'Mark pulled'}">${p.done ? '✓' : ''}</button>`;
+    // toggle IN PLACE — don't rebuild the whole list (that caused the green flash / scroll jump)
     card.querySelector('.fz-check').addEventListener('click', () => {
       try { if (navigator.vibrate) navigator.vibrate(25); } catch {}
-      toggleDone(it.name);   // re-renders the freezer via renderPullList
+      const p2 = pullByName.get(it.name); if (!p2) return;
+      p2.done = !p2.done;
+      savePullList();
+      const total = state.pull.length, doneNow = state.pull.filter((x) => x.done).length;
+      if (total > 0 && doneNow === total) { if (!floorSetAnnounced) { floorSetAnnounced = true; autoPost(`✅ set the floor — ${total} item${total === 1 ? '' : 's'} pulled`); track('floor_set', { items: total }); } }
+      else floorSetAnnounced = false;
+      const on = p2.done;
+      card.classList.toggle('done', on);
+      if (on) card.classList.remove('hole');
+      const btn = card.querySelector('.fz-check');
+      btn.classList.toggle('on', on); btn.textContent = on ? '✓' : '';
+      btn.setAttribute('aria-label', on ? 'Mark not pulled' : 'Mark pulled');
+      if (updateFreezerProgress()) renderFreezer();   // all pulled → show the celebration screen
     });
     return card;
   };
@@ -1128,8 +1154,10 @@ function renderFreezer() {
     }
     frag.appendChild(fzCard(it));
   }
+  const sc = list.scrollTop;               // preserve scroll across the unavoidable full rebuilds (remote sync)
   list.innerHTML = '';
   list.appendChild(frag);
+  list.scrollTop = sc;
 }
 function freezerGroupKey(it) { return it.holiday ? 's' + it._season : 't' + it._table; }
 function freezerGroupLabel(it) {
@@ -1139,10 +1167,11 @@ function freezerGroupLabel(it) {
 
 function pullListText() {
   const lines = [`Pull List — pulled ${fmtDate(getPullDate())}`];
-  const ordered = state.items.filter((it) => inList(it.name));
+  const pullByName = new Map(state.pull.map((p) => [p.name, p]));
+  const ordered = state.items.filter((it) => pullByName.has(it.name));
   let totalBoxes = 0, boxKnown = false, totalWholes = 0;
   for (const it of ordered) {
-    const p = state.pull.find((x) => x.name === it.name);
+    const p = pullByName.get(it.name);
     const sb = it.pkgDate ? 'pkg date' : 'sell by ' + fmtDate(sellByFor(it));
     let extra = '';
     if (isHalfItem(it)) { const w = wholesForHalf(p.qty); totalWholes += w; extra = ` (cut ${w} whole${w === 1 ? '' : 's'})`; }
@@ -2559,6 +2588,15 @@ function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); retu
 function fmtDate(d) { const z = (n) => String(n).padStart(2, '0'); return `${z(d.getMonth() + 1)}/${z(d.getDate())}/${d.getFullYear()}`; }
 function monthDay(d) { return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
 function mmdd(d) { const z = (n) => String(n).padStart(2, '0'); return `${z(d.getMonth() + 1)}/${z(d.getDate())}`; }
+// short "when added" stamp for pull items: clock time today, else m/d — small and glanceable
+function fmtAdded(ts) {
+  if (!ts) return '';
+  const d = new Date(ts); if (isNaN(d)) return '';
+  const now = new Date();
+  const time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  return sameDay ? time : `${mmdd(d)} ${time}`;
+}
 function weekdayShort(d) { return d.toLocaleDateString(undefined, { weekday: 'short' }); }
 
 /* ---------------- misc ---------------- */
@@ -2576,7 +2614,7 @@ function switchTab(which) {
   }
   track('screen', which);
   // entering the Pull List with items waiting jumps straight into Freezer Mode
-  if (which === 'list' && (state.pull.length || platterPrep().size) && $('freezerView').hidden) openFreezer();
+  if (which === 'list' && (state.pull.length || platterComponents().length) && $('freezerView').hidden) openFreezer();
 }
 
 /* Flip Book lives in a floating overlay (button stacked above Scan) */
@@ -2584,8 +2622,11 @@ function openFlip() { $('flipView').hidden = false; document.body.classList.add(
 function closeFlip() { $('flipView').hidden = true; document.body.classList.remove('flip-open'); }
 
 function wireEvents() {
-  let searchT = null;
-  $('search').addEventListener('input', () => { renderList(); clearTimeout(searchT); searchT = setTimeout(() => { const q = $('search').value.trim(); if (q) track('search', q.slice(0, 40)); }, 900); });
+  let searchT = null, searchRenderT = null;
+  $('search').addEventListener('input', () => {
+    clearTimeout(searchRenderT); searchRenderT = setTimeout(renderList, 120);   // debounce the full list rebuild while typing
+    clearTimeout(searchT); searchT = setTimeout(() => { const q = $('search').value.trim(); if (q) track('search', q.slice(0, 40)); }, 900);
+  });
   $('categoryFilter').addEventListener('change', () => { renderList(); if ($('categoryFilter').value) track('filter', $('categoryFilter').value); });
   $('pullDate').addEventListener('change', onPullDateChange);
   $('todayBtn').addEventListener('click', setToday);
@@ -2952,6 +2993,11 @@ function flushPush(path) {
   try { sync.mod.set(sync.mod.ref(sync.db, 'rts/' + path), { data: v, ts: Date.now() }); } catch {}
 }
 function flushAllPush() { for (const p of Object.keys(sync.pending)) flushPush(p); }
+// push only if the value differs from the last value we shared or received on this path (prevents cross-device echo loops)
+function repushSync(path, value) {
+  if (JSON.stringify(value == null ? null : value) === sync.last[path]) return;
+  pushSync(path, value);
+}
 
 function onRemote(path, wrapper) {
   const first = !sync.seen.has(path); sync.seen.add(path);
@@ -2972,13 +3018,13 @@ function onRemote(path, wrapper) {
       state.prod = data || {}; saveProduction(); renderProduction();
     } else if (path === 'compBox') {
       state.compBox = data || {};
-      if (ensureManagedPlatters()) setTimeout(() => { pushSync('platters', state.platters); pushSync('compBox', state.compBox); }, 60);
+      if (ensureManagedPlatters()) setTimeout(() => { repushSync('platters', state.platters); repushSync('compBox', state.compBox); }, 60);
       saveCompBox(); renderProduction();
     } else if (path === 'platters') {
       if (data && typeof data === 'object') { state.platters = data; }
       const fixed = ensureManagedPlatters();
       try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); } catch {}
-      if (fixed) setTimeout(() => { pushSync('platters', state.platters); pushSync('compBox', state.compBox); }, 60);
+      if (fixed) setTimeout(() => { repushSync('platters', state.platters); repushSync('compBox', state.compBox); }, 60);
       afterPlatterChange();
     } else if (path === 'profiles') {
       // authoritative (so deletes propagate) but never drop the person signed in here
@@ -2992,6 +3038,7 @@ function onRemote(path, wrapper) {
       state.pullDay = data || state.pullDay;   // adopt the shared day; rollover is driven locally on open
       try { if (state.pullDay) localStorage.setItem(LS_PULLDAY, state.pullDay); } catch {}
     }
+    sync.last[path] = incoming;   // remember the latest shared value so our own no-op echoes are skipped
   } finally { sync.applying = false; }
 }
 
