@@ -27,6 +27,7 @@ const state = {
   data: null,
   items: [],          // flattened {name, days, pkgDate, category, image?, upc?, par?}
   byName: new Map(),
+  byKey: new Map(),   // stable _key (u:<upc> or n:<name>) -> product; survives renames
   byUpc: new Map(),   // normalized UPC -> product
   current: null,      // product open in the sheet
   pull: [],           // [{name, qty, done}]
@@ -241,8 +242,8 @@ function rebuildItems() {
       || x._typeIdx - y._typeIdx || x.name.localeCompare(y.name);
   });
   state.items = list;
-  state.byName = new Map(); state.byUpc = new Map();
-  for (const it of list) { state.byName.set(it.name, it); if (it.upc) state.byUpc.set(normUpc(it.upc), it); }
+  state.byName = new Map(); state.byUpc = new Map(); state.byKey = new Map();
+  for (const it of list) { state.byName.set(it.name, it); if (it._key) state.byKey.set(it._key, it); if (it.upc) state.byUpc.set(normUpc(it.upc), it); }
 }
 
 function isOverridden(it) { return it._added || Object.prototype.hasOwnProperty.call(state.cust.patches, it._key); }
@@ -1190,13 +1191,13 @@ const CREME_CAKES = [
  * recipe rows reference catalog products by name (n) with pieces-per-platter (q). */
 const DEFAULT_PLATTERS = [
   { id: 'plt-doughnut', group: 'Platters', name: 'Donut Holes Tray', note: "1 of each — Glazed, Devil's Food, Powdered",
-    recipe: [{ n: 'Donut Holes Glazed', q: 1 }, { n: 'Donut Holes Devil Food', q: 1 }, { n: 'Donut Holes Powdered', q: 1 }] },
+    recipe: [{ n: 'Donut Holes Glazed', key: 'u:4122091076', q: 1 }, { n: 'Donut Holes Devil Food', key: 'u:4122089838', q: 1 }, { n: 'Donut Holes Powdered', key: 'u:4122083396', q: 1 }] },
   { id: 'plt-cookie', group: 'Platters', name: 'Assorted Cookie Tray (36 ct)', note: '9 each — Oatmeal Raisin, Sugar, Candy, Chocolate Chunk',
-    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 9 }, { n: 'Cookies Sugar 18 ct', q: 9 }, { n: 'Cookie Candy', q: 9 }, { n: 'Chocolate Chunk 18 ct', q: 9 }] },
+    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', key: 'u:23216200000', q: 9 }, { n: 'Cookies Sugar 18 ct', key: 'u:23212400000', q: 9 }, { n: 'Cookie Candy', key: 'u:23205700000', q: 9 }, { n: 'Chocolate Chunk 18 ct', key: 'u:23209400000', q: 9 }] },
   { id: 'plt-cookiebrownie', group: 'Platters', name: 'Cookies & Brownie Bites Tray', note: '6 each cookie + brownie bites',
-    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', q: 6 }, { n: 'Cookies Sugar 18 ct', q: 6 }, { n: 'Cookie Candy', q: 6 }, { n: 'Chocolate Chunk 18 ct', q: 6 }, { n: 'Brownie Bites Two-Bite', q: 28 }] },
+    recipe: [{ n: 'Cookies Oatmeal Raisin 18 ct', key: 'u:23216200000', q: 6 }, { n: 'Cookies Sugar 18 ct', key: 'u:23212400000', q: 6 }, { n: 'Cookie Candy', key: 'u:23205700000', q: 6 }, { n: 'Chocolate Chunk 18 ct', key: 'u:23209400000', q: 6 }, { n: 'Brownie Bites Two-Bite', key: 'u:4122010951', q: 28 }] },
   { id: 'plt-loaf', group: 'Platters', name: 'Sliced Loaf Cake Tray', note: '1 slice each — Danish, Marble, Lemon',
-    recipe: [{ n: 'Sliced Loaf Marble', q: 1 }, { n: 'Sliced Loaf Lemon Creme', q: 1 }, { n: 'Sliced Loaf Danish Butter', q: 1 }] },
+    recipe: [{ n: 'Sliced Loaf Marble', key: 'u:4122018338', q: 1 }, { n: 'Sliced Loaf Lemon Creme', key: 'u:4122018341', q: 1 }, { n: 'Sliced Loaf Danish Butter', key: 'u:4122018340', q: 1 }] },
   { id: 'plt-pdp-half', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Half & Half', note: '1 cinnamon + 1 powdered sleeve',
     recipe: [{ n: 'Bulk Cinnamon Pan de Polvo', q: 1 }, { n: 'Bulk Powdered Pan de Polvo', q: 1 }] },
   { id: 'plt-pdp-cinn', group: 'Mexican Pastries', name: 'Pan de Polvo Tray — Cinnamon', note: '2 cinnamon sleeves',
@@ -1226,9 +1227,10 @@ const DEFAULT_COMPBOX = {
   'Cookies Sugar 18 ct': 18,
   'Cookie Candy': 18,
   'Chocolate Chunk 18 ct': 18,
+  'Brownie Bites Two-Bite': 24,   // 24 per box
 };
 // managed platters whose recipes are known — corrected in place if still placeholders/missing
-const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada|loaf|doughnut)/.test(p.id));
+const MANAGED_PLATTERS = DEFAULT_PLATTERS.filter((p) => /^plt-(pdp|mantecada|loaf|doughnut|cookie)/.test(p.id));
 
 function loadProduction() {
   try { state.prod = JSON.parse(localStorage.getItem(LS_PROD) || '{}') || {}; } catch { state.prod = {}; }
@@ -1252,17 +1254,51 @@ function savePlatters(localOnly) {
 }
 function platterList() { return [...Object.values(state.platters), ...CREME_CAKES]; }
 function platterById(id) { return state.platters[id] || CREME_CAKES.find((c) => c.id === id) || null; }
-// case pack for a recipe component: the catalog product's box qty, else a legacy override
+// resolve a recipe row to its current catalog product — by stable key first (survives renames), then name
+function recipeItem(c) { return (c && c.key && state.byKey.get(c.key)) || (c && state.byName.get(c.n)) || null; }
+function recipeName(c) { const it = recipeItem(c); return it ? it.name : (c ? c.n : ''); }
+// case pack for a recipe row: the current product's box qty, else a seeded/legacy override (by original or current name)
+function componentBoxFor(c) {
+  const it = recipeItem(c);
+  if (it && it.boxQty) return it.boxQty;
+  return (c && state.compBox[c.n]) || (it && state.compBox[it.name]) || null;
+}
+// legacy name-only lookup kept for the "set box" button (data-comp carries the current name)
 function componentBox(name) {
   const it = state.byName.get(name);
   if (it && it.boxQty) return it.boxQty;
   return state.compBox[name] || null;
 }
+// roll every platter's build up to its components, merged across platters by stable identity
+function platterComponents() {
+  const map = new Map();   // stable id -> { name, pcs, box }
+  for (const it of platterList()) {
+    if (it.cake) continue;
+    const make = platterMake(it);
+    if (make <= 0) continue;
+    for (const c of (it.recipe || [])) {
+      if (!(c.q > 0)) continue;
+      const item = recipeItem(c);
+      const id = (item && item._key) || c.key || ('n:' + c.n);
+      const e = map.get(id) || { name: recipeName(c), pcs: 0, box: componentBoxFor(c) };
+      e.pcs += c.q * make; e.name = recipeName(c); e.box = componentBoxFor(c);
+      map.set(id, e);
+    }
+  }
+  return [...map.values()];
+}
 function suppressedPlatters() { try { return JSON.parse(localStorage.getItem('rts.platSuppressed') || '[]') || []; } catch { return []; } }
 // old auto-generated recipes to replace with the current default (only exact matches, never user edits)
 const SUPERSEDE = {
   'plt-pdp-cinn': ['[{"n":"Bulk Cinnamon Pan de Polvo","q":1}]'],   // was auto 1 sleeve → now 2
-  'plt-doughnut': ['[{"n":"Donut Holes Glazed","q":27},{"n":"Donut Holes Devil Food","q":27},{"n":"Donut Holes Powdered","q":26}]'],   // was ~80 holes → now 1 of each
+  // upgrade older keyless recipes to the current key-linked defaults (rename-proof)
+  'plt-doughnut': [
+    '[{"n":"Donut Holes Glazed","q":27},{"n":"Donut Holes Devil Food","q":27},{"n":"Donut Holes Powdered","q":26}]',   // was ~80 holes
+    '[{"n":"Donut Holes Glazed","q":1},{"n":"Donut Holes Devil Food","q":1},{"n":"Donut Holes Powdered","q":1}]',       // keyless 1-of-each
+  ],
+  'plt-loaf': ['[{"n":"Sliced Loaf Marble","q":1},{"n":"Sliced Loaf Lemon Creme","q":1},{"n":"Sliced Loaf Danish Butter","q":1}]'],
+  'plt-cookie': ['[{"n":"Cookies Oatmeal Raisin 18 ct","q":9},{"n":"Cookies Sugar 18 ct","q":9},{"n":"Cookie Candy","q":9},{"n":"Chocolate Chunk 18 ct","q":9}]'],
+  'plt-cookiebrownie': ['[{"n":"Cookies Oatmeal Raisin 18 ct","q":6},{"n":"Cookies Sugar 18 ct","q":6},{"n":"Cookie Candy","q":6},{"n":"Chocolate Chunk 18 ct","q":6},{"n":"Brownie Bites Two-Bite","q":28}]'],
 };
 // keep the known platters (pan de polvo, mantecada) correct without stomping user edits or deletes
 function ensureManagedPlatters() {
@@ -1281,6 +1317,16 @@ function ensureManagedPlatters() {
     const cur = state.platters[def.id];
     if (!cur || !cur.recipe || JSON.stringify(cur.recipe) !== JSON.stringify(def.recipe)) continue;
     if (cur.name !== def.name || cur.note !== def.note) { cur.name = def.name; cur.note = def.note; changed = true; }
+  }
+  // rename-proof any recipe row still missing a stable key by matching its current name to a catalog product
+  for (const id in state.platters) {
+    const pl = state.platters[id];
+    if (!pl || !Array.isArray(pl.recipe)) continue;
+    for (const c of pl.recipe) {
+      if (c.key || !c.n) continue;
+      const item = state.byName.get(c.n);
+      if (item && item._key) { c.key = item._key; changed = true; }
+    }
   }
   for (const k in DEFAULT_COMPBOX) if (state.compBox[k] == null) { state.compBox[k] = DEFAULT_COMPBOX[k]; changed = true; }
   if (changed) { try { localStorage.setItem(LS_PLATTERS, JSON.stringify(state.platters)); localStorage.setItem(LS_COMPBOX, JSON.stringify(state.compBox)); } catch {} }
@@ -1329,28 +1375,16 @@ function afterPlatterChange() {
   renderProduction(); renderPullList();
   if (!$('freezerView').hidden) renderFreezer();
 }
-// components a platter is assembled from, rolled up to total pieces to pull (frozen)
-function platterPrep() {
-  const prep = new Map();
-  for (const it of platterList()) {
-    if (it.cake) continue;
-    const make = platterMake(it);
-    if (make <= 0) continue;
-    for (const c of (it.recipe || [])) if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * make);
-  }
-  return prep;
-}
 // the "pull these frozen for platters" card, shown in the Pull List and Freezer Mode
 function platterComponentsHtml() {
-  const prep = platterPrep();
-  if (!prep.size) return '';
+  const comps = platterComponents();
+  if (!comps.length) return '';
   let totalBoxes = 0, anyBox = false;
-  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
-    const box = componentBox(n);
+  const rows = comps.sort((a, b) => b.pcs - a.pcs).map(({ name, pcs, box }) => {
     let right;
-    if (box) { const boxes = Math.ceil(q / box); totalBoxes += boxes; anyBox = true; right = `<b>${boxes} box${boxes === 1 ? '' : 'es'}</b> <small>${q} pcs</small>`; }
-    else right = `<b>${q} pcs</b> <small>set box in Production</small>`;
-    return `<div class="platc-row"><span class="platc-name">${escapeHtml(n)}</span><span class="platc-qty">${right}</span></div>`;
+    if (box) { const boxes = Math.ceil(pcs / box); totalBoxes += boxes; anyBox = true; right = `<b>${boxes} box${boxes === 1 ? '' : 'es'}</b> <small>${pcs} pcs</small>`; }
+    else right = `<b>${pcs} pcs</b> <small>set box in Production</small>`;
+    return `<div class="platc-row"><span class="platc-name">${escapeHtml(name)}</span><span class="platc-qty">${right}</span></div>`;
   }).join('');
   return `<div class="platc"><div class="platc-head">🎉 Platter components — pull these from the freezer</div>${rows}${anyBox ? `<div class="platc-total">Total <b>${totalBoxes}</b> box${totalBoxes === 1 ? '' : 'es'}</div>` : ''}</div>`;
 }
@@ -1375,11 +1409,11 @@ function updateProdCount() {
 function recipeSummary(it) {
   if (it.cake) return 'sliced half creme cake';
   const recipe = it.recipe || [];
-  const missing = recipe.some((c) => !c.q || !componentBox(c.n));
+  const missing = recipe.some((c) => !c.q || !componentBoxFor(c));
   // prefer the plain-language note; otherwise list the recipe (drop the "1×" noise on singles)
   let text = it.note && it.note.trim();
   if (!text) {
-    const parts = recipe.filter((c) => c.q).map((c) => (c.q > 1 ? c.q + '× ' : '') + shortProd(c.n));
+    const parts = recipe.filter((c) => c.q).map((c) => (c.q > 1 ? c.q + '× ' : '') + shortProd(recipeName(c)));
     text = parts.join(' · ') || 'no recipe yet';
   }
   return text + (missing ? ' · ⚠ set counts/case' : '');
@@ -1427,7 +1461,12 @@ function savePlatter() {
   $('pltRecipe').querySelectorAll('.plt-row').forEach((row) => {
     const n = row.querySelector('.plt-prod').value.trim();
     const q = parseInt(row.querySelector('.plt-pcs').value, 10);
-    if (n) recipe.push({ n, q: Number.isFinite(q) && q >= 0 ? q : 0 });
+    if (n) {
+      const item = state.byName.get(n);
+      const c = { n, q: Number.isFinite(q) && q >= 0 ? q : 0 };
+      if (item && item._key) c.key = item._key;   // link by stable id so renames don't break it
+      recipe.push(c);
+    }
   });
   const id = editingPlatterId || ('plt-u' + Date.now().toString(36) + Math.floor(Math.random() * 1e3).toString(36));
   state.platters[id] = { id, name, group: $('pltGroup').value || 'Platters', note: $('pltNote').value.trim(), recipe };
@@ -1453,7 +1492,6 @@ function renderProduction() {
   wrap.innerHTML = '';
   let lastGroup = null;
   let totalPlatters = 0, totalHalves = 0, doneCount = 0, planned = 0;
-  const prep = new Map();      // component name -> total pieces
   const tbd = [];              // platters whose piece counts aren't set yet
   let wholesToSlice = 0;
 
@@ -1471,12 +1509,7 @@ function renderProduction() {
       if (it.cake) { totalHalves += make; wholesToSlice += Math.ceil(make / 2); }
       else {
         totalPlatters += make;
-        let anyTbd = false;
-        for (const c of (it.recipe || [])) {
-          if (c.q > 0) prep.set(c.n, (prep.get(c.n) || 0) + c.q * make);
-          else anyTbd = true;
-        }
-        if (anyTbd) tbd.push(`${make}× ${it.name}`);
+        if ((it.recipe || []).some((c) => !(c.q > 0))) tbd.push(`${make}× ${it.name}`);
       }
     }
     const sub = it.cake
@@ -1521,19 +1554,19 @@ function renderProduction() {
 
   // Prep totals (component rollup) + box-pull math
   const prepEl = $('prodPrep');
-  if (!prep.size && !wholesToSlice && !tbd.length) { prepEl.innerHTML = ''; return; }
+  const comps = platterComponents();
+  if (!comps.length && !wholesToSlice && !tbd.length) { prepEl.innerHTML = ''; return; }
   let totalBoxes = 0, anyBox = false;
-  const rows = [...prep.entries()].sort((a, b) => b[1] - a[1]).map(([n, q]) => {
-    const box = componentBox(n);
+  const rows = comps.sort((a, b) => b.pcs - a.pcs).map(({ name, pcs, box }) => {
     let boxHtml;
     if (box) {
-      const boxes = Math.ceil(q / box);
+      const boxes = Math.ceil(pcs / box);
       totalBoxes += boxes; anyBox = true;
-      boxHtml = `<button type="button" class="prep-box known" data-comp="${escapeHtml(n)}">📦 ${boxes} box${boxes === 1 ? '' : 'es'} <small>(${box}/bx)</small></button>`;
+      boxHtml = `<button type="button" class="prep-box known" data-comp="${escapeHtml(name)}">📦 ${boxes} box${boxes === 1 ? '' : 'es'} <small>(${box}/bx)</small></button>`;
     } else {
-      boxHtml = `<button type="button" class="prep-box" data-comp="${escapeHtml(n)}">📦 set box</button>`;
+      boxHtml = `<button type="button" class="prep-box" data-comp="${escapeHtml(name)}">📦 set box</button>`;
     }
-    return `<div class="prep-row"><span class="prep-name">${escapeHtml(n)}</span><span class="prep-qty"><b>${q}</b></span>${boxHtml}</div>`;
+    return `<div class="prep-row"><span class="prep-name">${escapeHtml(name)}</span><span class="prep-qty"><b>${pcs}</b></span>${boxHtml}</div>`;
   });
   if (wholesToSlice) rows.push(`<div class="prep-row"><span class="prep-name">Creme cake wholes to slice</span><span class="prep-qty"><b>${wholesToSlice}</b></span><span class="prep-box-spacer"></span></div>`);
   let html = `<div class="prep-head">🧾 Prep totals — bake / portion / pull</div>${rows.join('')}`;
